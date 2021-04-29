@@ -2,3 +2,4 @@ flask
 flask-script
 flask-login
 flask-sqlalchemy
+MySQL
