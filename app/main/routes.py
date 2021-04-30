@@ -1,5 +1,6 @@
-from flask import render_template, url_for, redirect
+from flask import render_template, request
 from flask_login import current_user, UserMixin
+from ..forms import LoginForm
 from . import main_bp
 from .. import login_manager
 
@@ -12,9 +13,10 @@ def load_user(username):
     user.id = username
     return user
 
-@main_bp.route("/", methods=["GET"])
-def main_page():
-    if current_user.is_active:
-        return redirect(url_for(""))    # TODO
-    else:
-        return render_template("index.html")
+@main_bp.route("/", methods=["GET", "POST"])
+def index_page():   # index page is login page
+    if request.method == "GET":
+        return render_template("index.html", form=LoginForm())
+    if request.method == "POST":
+        # auth user
+        pass
