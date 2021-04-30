@@ -4,14 +4,17 @@ from ..forms import LoginForm
 from . import main_bp
 from .. import login_manager
 
+
 class User(UserMixin):
     pass
+
 
 @login_manager.user_loader
 def load_user(username):
     user = User()
     user.id = username
     return user
+
 
 @main_bp.route("/", methods=["GET", "POST"])
 def index_page():   # index page is login page
