@@ -17,7 +17,7 @@ def load_user(username):
 
 
 @main_bp.route("/", methods=["GET", "POST"])
-def index_page():   # index page is login page
+def index_page():  # index page is login page
     if request.method == "GET":
         return render_template("index.html", form=LoginForm())
     if request.method == "POST":
