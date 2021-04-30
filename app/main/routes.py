@@ -1,8 +1,9 @@
 from flask import render_template, request
-from flask_login import current_user, UserMixin
+from flask_login import UserMixin, current_user
+
+from .. import login_manager
 from ..forms import LoginForm
 from . import main_bp
-from .. import login_manager
 
 
 class User(UserMixin):
