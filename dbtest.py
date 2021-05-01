@@ -1,4 +1,5 @@
 from flask import Flask
+
 # from flask_sqlalchemy import SQLAlchemy
 from database import *
 from flask_script import Manager, Server
@@ -13,7 +14,7 @@ db.init_app(app)
 
 manager = Manager(app)
 # 設定 python manage.py runserver 為啟動 server 指令
-manager.add_command('runserver', Server())
+manager.add_command("runserver", Server())
 # 設定 python manage.py shell 為啟動互動式指令 shell 的指令
 
 
@@ -22,5 +23,5 @@ def make_shell_context():
     return globals()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     manager.run()

@@ -1,9 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
+
 db = SQLAlchemy()
 
 
 class Statuses(db.Model):
-    __tablename__ = 'statuses'
+    __tablename__ = "statuses"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     description = db.Column(db.String(255), nullable=False)
 
@@ -12,7 +13,7 @@ class Statuses(db.Model):
 
 
 class Items(db.Model):
-    __tablename__ = 'items'
+    __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     description = db.Column(db.String(255), nullable=False)
 
@@ -21,12 +22,13 @@ class Items(db.Model):
 
 
 class Buildings(db.Model):
-    __tablename__ = 'buildings'
+    __tablename__ = "buildings"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     description = db.Column(db.String(255), nullable=False)
 
     def __init__(self, description):
         self.description = description
+
 
 ################################################################
 
@@ -45,8 +47,7 @@ class Admins(db.Model):
 class Users(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(16), unique=True,
-                         nullable=False, index=True)
+    username = db.Column(db.String(16), unique=True, nullable=False, index=True)
     # hashlib.sha256("pAs$W0rd".encoding("utf-8")).hexdigest()
     password = db.Column(db.CHAR(64), nullable=False)
     name = db.Column(db.String(255), nullable=False)
@@ -76,12 +77,13 @@ class Users(db.Model):
 class Records(db.Model):
     __tablename__ = "records"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
-    item_id = db.Column(db.ForeignKey('items.id'), nullable=False)
-    building_id = db.Column(db.ForeignKey('buildings.id'), nullable=False)
+    user_id = db.Column(db.ForeignKey("users.id"), nullable=False)
+    item_id = db.Column(db.ForeignKey("items.id"), nullable=False)
+    building_id = db.Column(db.ForeignKey("buildings.id"), nullable=False)
     location = db.Column(db.String(255), nullable=False)
-    time = db.Column(db.TIMESTAMP, server_default=db.func.now(), nullable=False,
-                     index=True)
+    time = db.Column(
+        db.TIMESTAMP, server_default=db.func.now(), nullable=False, index=True
+    )
     description = db.Column(db.String(255), nullable=False)
     revisions = db.relationship("Revisions")
 
@@ -95,13 +97,14 @@ class Records(db.Model):
 
 
 class Revisions(db.Model):
-    __tablename__ = 'revisions'
+    __tablename__ = "revisions"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    record_id = db.Column(db.ForeignKey('records.id'), nullable=False)
-    admin_id = db.Column(db.ForeignKey('users.id'), nullable=False)
-    status_id = db.Column(db.ForeignKey('statuses.id'), nullable=False)
-    time = db.Column(db.TIMESTAMP, server_default=db.func.now(), nullable=False,
-                     index=True)
+    record_id = db.Column(db.ForeignKey("records.id"), nullable=False)
+    admin_id = db.Column(db.ForeignKey("users.id"), nullable=False)
+    status_id = db.Column(db.ForeignKey("statuses.id"), nullable=False)
+    time = db.Column(
+        db.TIMESTAMP, server_default=db.func.now(), nullable=False, index=True
+    )
     description = db.Column(db.String(255), nullable=False)
 
     def __init__(self, record_id, admin_id, status_id, time, description):
