@@ -2,4 +2,6 @@ flask
 flask-script
 flask-login
 flask-sqlalchemy
+flask-wtf
+flask-mail
 MySQL

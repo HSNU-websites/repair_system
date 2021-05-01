@@ -1,0 +1,65 @@
+h1 {
+    font-family: 'Noto Sans TC', sans-serif;
+    text-align: center;
+    margin: 10px auto 10px auto;
+}
+
+input[type="text"], input[type="password"] {
+    background: #FFFFFF;
+    color: black;
+    border: 1px solid #d1d1d1;
+    border-radius: 5px;
+    height: 20px;
+    outline: none;
+    -webkit-transition: .18s ease-out;
+    -moz-transition: .18s ease-out;
+    -o-transition: .18s ease-out;
+    transition: .18s ease-out;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    border: 1px solid rgb(13, 142, 194);
+    box-shadow: inset 5px 10px 4px rgba(13, 142, 194, 0.07)
+}
+
+
+input[type="submit"] {
+    width: 70px;
+    height: 40px;
+    border: 1px solid #d1d1d1;
+    border-radius: 10px;
+}
+
+#index-body {
+    background-image: linear-gradient(to right top, #746bd1, #7377d7, #7483dc, #778fe1, #7c9ae4, #74a7ed, #6db3f3, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: auto 0px auto 0px;
+}
+
+#copyright {
+    position: absolute;
+    text-align: center;
+    bottom: 10px;
+    width: 100%;
+}
+
+.login_form {
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 800px;
+    height: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 0 10px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.field {
+    font-family: 'Noto Sans TC', sans-serif;
+    margin: 10px 0 10px 0;
+    color: seashell;
+    font-size: 20px;
+}
