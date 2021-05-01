@@ -2,4 +2,3 @@ repair-system/*
 .vscode/*
 __pycache__/*
 */__pycache__/*
-db_credential.py
