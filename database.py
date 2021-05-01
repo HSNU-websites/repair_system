@@ -59,8 +59,8 @@ class Users(db.Model):
         self.password = password
         self.name = name
         self.classnum = classnum
-    
-    def grant_admin(self, email = ""):
+
+    def grant_admin(self, email=""):
         if self.admin:
             self.admin.email = email
         else:
