@@ -1,8 +1,8 @@
 from flask import Flask
+from flask_script import Manager, Server
 
 # from flask_sqlalchemy import SQLAlchemy
 from database import *
-from flask_script import Manager, Server
 
 app = Flask(__name__)
 # app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://{username}:{password}@localhost/{db_name}".format(
