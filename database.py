@@ -3,7 +3,7 @@ db = SQLAlchemy()
 
 
 class Statuses(db.Model):
-    __tablename__ = 'statuses'
+    __tablename__ = "statuses"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     description = db.Column(db.String(255), nullable=False)
 
@@ -12,7 +12,7 @@ class Statuses(db.Model):
 
 
 class Items(db.Model):
-    __tablename__ = 'items'
+    __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     description = db.Column(db.String(255), nullable=False)
 
@@ -21,7 +21,7 @@ class Items(db.Model):
 
 
 class Buildings(db.Model):
-    __tablename__ = 'buildings'
+    __tablename__ = "buildings"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     description = db.Column(db.String(255), nullable=False)
 
@@ -59,8 +59,8 @@ class Users(db.Model):
         self.password = password
         self.name = name
         self.classnum = classnum
-    
-    def grant_admin(self, email = ""):
+
+    def grant_admin(self, email=""):
         if self.admin:
             self.admin.email = email
         else:
@@ -76,37 +76,35 @@ class Users(db.Model):
 class Records(db.Model):
     __tablename__ = "records"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.ForeignKey('users.id'), nullable=False)
-    item_id = db.Column(db.ForeignKey('items.id'), nullable=False)
-    building_id = db.Column(db.ForeignKey('buildings.id'), nullable=False)
+    user_id = db.Column(db.ForeignKey("users.id"), nullable=False)
+    item_id = db.Column(db.ForeignKey("items.id"), nullable=False)
+    building_id = db.Column(db.ForeignKey("buildings.id"), nullable=False)
     location = db.Column(db.String(255), nullable=False)
     time = db.Column(db.TIMESTAMP, server_default=db.func.now(), nullable=False,
                      index=True)
     description = db.Column(db.String(255), nullable=False)
     revisions = db.relationship("Revisions")
 
-    def __init__(self, user_id, item_id, building_id, location, time, description):
+    def __init__(self, user_id, item_id, building_id, location, description):
         self.user_id = user_id
         self.item_id = item_id
         self.building_id = building_id
         self.location = location
-        self.time = time
         self.description = description
 
 
 class Revisions(db.Model):
-    __tablename__ = 'revisions'
+    __tablename__ = "revisions"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    record_id = db.Column(db.ForeignKey('records.id'), nullable=False)
-    admin_id = db.Column(db.ForeignKey('users.id'), nullable=False)
-    status_id = db.Column(db.ForeignKey('statuses.id'), nullable=False)
+    record_id = db.Column(db.ForeignKey("records.id"), nullable=False)
+    user_id = db.Column(db.ForeignKey("users.id"), nullable=False)
+    status_id = db.Column(db.ForeignKey("statuses.id"), nullable=False)
     time = db.Column(db.TIMESTAMP, server_default=db.func.now(), nullable=False,
                      index=True)
     description = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, record_id, admin_id, status_id, time, description):
+    def __init__(self, record_id, user_id, status_id, description):
         self.record_id = record_id
-        self.admin_id = admin_id
+        self.user_id = user_id
         self.status_id = status_id
-        self.time = time
         self.description = description
