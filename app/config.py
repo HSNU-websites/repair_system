@@ -5,8 +5,9 @@ class Config:
     SECRET_KEY = getenv("SECRET_KEY")
     # RECAPTCHA
     RECAPTCHA_ENABLED = True
-    RECAPTCHA_SITE_KEY = getenv("RECAPTCHA_SITE_KEY")
+    RECAPTCHA_PUBLIC_KEY = getenv("RECAPTCHA_PUBLIC_KEY")
     RECAPTCHA_SECRET_KEY = getenv("RECAPTCHA_SECRET_KEY")
+    RECAPTCHA_OPTIONS = {"theme": "black"}
     # SQLAlchemy
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"

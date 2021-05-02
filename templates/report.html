@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%;">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>報修</title>
+</head>
+
+<body>
+    <h1>報修</h1>
+    <div class="form" style="background-color: rgba(0, 0, 0, .00000001);">
+        <form action="/report" method="POST">
+            {{ form.csrf_token }}
+            <div class="field">
+                {{ form.building.label }}
+                <br> {{ form.building }}
+            </div>
+            <div class="field">
+                {{ form.place.label }}
+                <br> {{ form.place }}
+            </div>
+            <div class="field">
+                {{ form.item.label }}
+                <br> {{ form.item }}
+            </div>
+            <div class="field">
+                {{ form.description.label }}
+                <br> {{ form.description }}
+            </div>
+            <div class="field" id="recaptcha">
+                {{ form.recaptcha }}
+            </div>
+            <div class="field">
+                {{ form.submit }}
+            </div>
+        </form>
+    </div>
+    <footer>
+        <div id="copyright">© 2021 HSNU</div>
+    </footer>
+</body>
+
+</html>
