@@ -8,6 +8,7 @@ from wtforms import SubmitField
 from wtforms.validators import DataRequired
 from .db_helper import render_items, render_buildings
 
+
 class LoginForm(FlaskForm):
     username = StringField("帳號(學號): ",
                            validators=[DataRequired()],
