@@ -1,4 +1,4 @@
-repair-system/*
-.vscode/*
-__pycache__
-.venv/
+repair-system/
+.vscode/
+**/__pycache__/
+.venv
