@@ -10,7 +10,14 @@ class Statuses(db.Model):
     sequence = db.Column(db.Integer, unique=True, nullable=False)
     description = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, description):
+    def __init__(self, description, sequence=None):
+        if sequence is None:
+            if s := db.session.query(db.func.max(Statuses.sequence)).first()[0]:
+                self.sequence = s + 1
+            else:
+                self.sequence = 1
+        else:
+            self.sequence = sequence
         self.description = description
 
 
@@ -21,7 +28,14 @@ class Items(db.Model):
     sequence = db.Column(db.Integer, unique=True, nullable=False)
     description = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, description):
+    def __init__(self, description, sequence=None):
+        if sequence is None:
+            if s := db.session.query(db.func.max(Items.sequence)).first()[0]:
+                self.sequence = s + 1
+            else:
+                self.sequence = 1
+        else:
+            self.sequence = sequence
         self.description = description
 
 
@@ -32,7 +46,14 @@ class Buildings(db.Model):
     sequence = db.Column(db.Integer, unique=True, nullable=False)
     description = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, description):
+    def __init__(self, description, sequence=None):
+        if sequence is None:
+            if s := db.session.query(db.func.max(Buildings.sequence)).first()[0]:
+                self.sequence = s + 1
+            else:
+                self.sequence = 1
+        else:
+            self.sequence = sequence
         self.description = description
 
 ################################################################
@@ -52,8 +73,7 @@ class Admins(db.Model):
 class Users(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(16), unique=True,
-                         nullable=False, index=True)
+    username = db.Column(db.String(16), unique=True, nullable=False)
     # hashlib.sha256("pAs$W0rd".encode("utf-8")).hexdigest()
     password = db.Column(db.CHAR(64), nullable=False)
     name = db.Column(db.String(255), nullable=False)
