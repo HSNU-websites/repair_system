@@ -4,12 +4,13 @@ from os import getenv
 from database import *
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_DATABASE}".format(
-    DB_USER=getenv("DB_USER"),
-    DB_PASSWORD=getenv("DB_PASS"),
-    DB_HOST=getenv("DB_HOST", "localhost"),
-    DB_DATABASE=getenv("DB_NAME")
-)
+# app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_DATABASE}".format(
+#     DB_USER=getenv("DB_USER"),
+#     DB_PASSWORD=getenv("DB_PASS"),
+#     DB_HOST=getenv("DB_HOST", "localhost"),
+#     DB_DATABASE=getenv("DB_NAME")
+# )
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 manager = Manager(app)
@@ -37,7 +38,7 @@ def reset():
     admin_users = [
         Users("william", "27b86ae4e3177308c786d57bbe6ddb52c056b510f33d159c56c1e026bdd8e81e",
               "william920429", 1502),
-        Users("siriuskoan", "Invalid", "SiriusKoan", 1498)
+        Users("siriuskoan", "", "SiriusKoan", 1498)
     ]
     db.session.add_all(admin_users)
     # db.session.commit()
