@@ -5,7 +5,9 @@ db = SQLAlchemy()
 
 
 class Statuses(db.Model):
-    """Statuses.id = 1 will be default item"""
+    """
+    Statuses.id = 1 will be default item
+    """
     __tablename__ = "statuses"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sequence = db.Column(db.Integer, unique=True, nullable=False)
@@ -23,7 +25,9 @@ class Statuses(db.Model):
 
 
 class Items(db.Model):
-    """Items.id = 1 will be default item"""
+    """
+    Items.id = 1 will be default item
+    """
     __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sequence = db.Column(db.Integer, unique=True, nullable=False)
@@ -41,7 +45,9 @@ class Items(db.Model):
 
 
 class Buildings(db.Model):
-    """Buildings.id = 1 will be default building"""
+    """
+    Buildings.id = 1 will be default building
+    """
     __tablename__ = "buildings"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sequence = db.Column(db.Integer, unique=True, nullable=False)
