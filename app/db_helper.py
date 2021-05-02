@@ -1,5 +1,11 @@
-from .database import (Admins, Buildings, Items, Records, Revisions, Statuses,
-                       Users, db)
+from .database import Admins
+from .database import Buildings
+from .database import db
+from .database import Items
+from .database import Records
+from .database import Revisions
+from .database import Statuses
+from .database import Users
 
 
 def render_statuses():
