@@ -2,6 +2,7 @@ h1 {
     font-family: 'Noto Sans TC', sans-serif;
     text-align: center;
     margin: 10px auto 10px auto;
+    font-weight: normal;
 }
 
 input[type="text"], input[type="password"] {
@@ -29,12 +30,16 @@ input[type="submit"] {
     border-radius: 10px;
 }
 
-#index-body {
+body {
     background-image: linear-gradient(to right top, #746bd1, #7377d7, #7483dc, #778fe1, #7c9ae4, #74a7ed, #6db3f3, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     margin: auto 0px auto 0px;
+}
+
+select {
+    background-color: white;
 }
 
 #copyright {
@@ -49,11 +54,19 @@ input[type="submit"] {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 800px;
-    height: 600px;
+    width: 60vw;
+    height: 70vh;
     margin-left: auto;
     margin-right: auto;
-    box-shadow: 0 10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 10px 10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    -webkit-transition: .2s ease-out;
+    -moz-transition: .2s ease-out;
+    -o-transition: .2s ease-out;
+    transition: .2s ease-out;
+}
+
+.form:hover {
+    box-shadow: -10px -10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .field {

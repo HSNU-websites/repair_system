@@ -35,33 +35,31 @@ def reset():
     db.create_all()
 
     admin_users = [
-        Users(
-            "william",
-            "27b86ae4e3177308c786d57bbe6ddb52c056b510f33d159c56c1e026bdd8e81e",
-            "william920429",
-            1502,
-        ),
-        Users("siriuskoan", "Invalid", "SiriusKoan", 1498),
+        # Users(
+        #     "william",
+        #     "27b86ae4e3177308c786d57bbe6ddb52c056b510f33d159c56c1e026bdd8e81e",
+        #     "william920429",
+        #     1502,
+        # ),
+        # Users("siriuskoan", "Invalid", "SiriusKoan", 1498),
+        Users("admin", "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", "admin", 0)
     ]
     db.session.add_all(admin_users)
     # db.session.commit()
 
     # Statuses default
     db.session.add(Statuses("其他"))
-    statuses = db_default.statuses
-    for status in statuses:
+    for status in db_default.statuses:
         db.session.add(Statuses(status))
 
     # Items default
     db.session.add(Items("其他"))
-    items = db_default.items
-    for item in items:
+    for item in db_default.items:
         db.session.add(Items(item))
 
     # Buildings default
     db.session.add(Buildings("其他"))
-    buildings = db_default.buildings
-    for building in buildings:
+    for building in db_default.buildings:
         db.session.add(Buildings(building))
 
     db.session.commit()
