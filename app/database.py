@@ -1,5 +1,6 @@
 from typing import Sequence
 from flask_sqlalchemy import SQLAlchemy
+
 db = SQLAlchemy()
 
 
@@ -56,6 +57,7 @@ class Buildings(db.Model):
             self.sequence = sequence
         self.description = description
 
+
 ################################################################
 
 
@@ -95,7 +97,9 @@ class Records(db.Model):
     item_id = db.Column(db.ForeignKey("items.id"), nullable=False)
     building_id = db.Column(db.ForeignKey("buildings.id"), nullable=False)
     location = db.Column(db.String(255), nullable=False)
-    time = db.Column(db.TIMESTAMP, server_default=db.func.now(), nullable=False,
+    time = db.Column(db.TIMESTAMP,
+                     server_default=db.func.now(),
+                     nullable=False,
                      index=True)
     description = db.Column(db.String(255), nullable=False)
     revisions = db.relationship("Revisions")
@@ -114,7 +118,9 @@ class Revisions(db.Model):
     record_id = db.Column(db.ForeignKey("records.id"), nullable=False)
     user_id = db.Column(db.ForeignKey("users.id"), nullable=False)
     status_id = db.Column(db.ForeignKey("statuses.id"), nullable=False)
-    time = db.Column(db.TIMESTAMP, server_default=db.func.now(), nullable=False,
+    time = db.Column(db.TIMESTAMP,
+                     server_default=db.func.now(),
+                     nullable=False,
                      index=True)
     description = db.Column(db.String(255), nullable=False)
 
