@@ -11,26 +11,26 @@
 
 <body>
     <h1>報修</h1>
-    <div class="form">
+    <div class="form" style="background-color: rgba(0, 0, 0, .00000001);">
         <form action="/report" method="POST">
             {{ form.csrf_token }}
             <div class="field">
                 {{ form.building.label }}
-                {{ form.building }}
+                <br> {{ form.building }}
             </div>
             <div class="field">
                 {{ form.place.label }}
-                {{ form.place }}
+                <br> {{ form.place }}
             </div>
             <div class="field">
                 {{ form.item.label }}
-                {{ form.item }}
+                <br> {{ form.item }}
             </div>
             <div class="field">
                 {{ form.description.label }}
-                {{ form.description }}
+                <br> {{ form.description }}
             </div>
-            <div class="field">
+            <div class="field" id="recaptcha">
                 {{ form.recaptcha }}
             </div>
             <div class="field">

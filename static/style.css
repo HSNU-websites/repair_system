@@ -1,11 +1,11 @@
 h1 {
-    font-family: 'Noto Sans TC', sans-serif;
     text-align: center;
     margin: 10px auto 10px auto;
     font-weight: normal;
 }
 
-input[type="text"], input[type="password"] {
+input[type="text"],
+input[type="password"] {
     background: #FFFFFF;
     color: black;
     border: 1px solid #d1d1d1;
@@ -18,7 +18,8 @@ input[type="text"], input[type="password"] {
     transition: .18s ease-out;
 }
 
-input[type="text"]:focus, input[type="password"]:focus {
+input[type="text"]:focus,
+input[type="password"]:focus {
     border: 1px solid rgb(13, 142, 194);
     box-shadow: inset 5px 10px 4px rgba(13, 142, 194, 0.07)
 }
@@ -40,6 +41,9 @@ body {
 
 select {
     background-color: white;
+    height: 25px;
+    border-radius: 3px;
+    outline: none;
 }
 
 #copyright {
@@ -50,7 +54,6 @@ select {
 }
 
 .form {
-    background-color: rgba(255, 255, 255, 0.1);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -58,14 +61,18 @@ select {
     height: 70vh;
     margin-left: auto;
     margin-right: auto;
-    box-shadow: 10px 10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     -webkit-transition: .2s ease-out;
     -moz-transition: .2s ease-out;
     -o-transition: .2s ease-out;
     transition: .2s ease-out;
 }
 
-.form:hover {
+#index {
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 10px 10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#index:hover {
     box-shadow: -10px -10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 

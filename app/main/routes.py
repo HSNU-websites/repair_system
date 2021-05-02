@@ -21,7 +21,6 @@ def load_user(username):
 
 @main_bp.route("/", methods=["GET", "POST"])
 def index_page():  # index page is login page
-    return redirect(url_for("user.report_page"))
     if current_user.is_active:
         return redirect(url_for("user.report_page"))
     else:

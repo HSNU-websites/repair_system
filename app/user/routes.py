@@ -5,6 +5,7 @@ from ..forms import ReportForm
 from ..db_helper import render_buildings, render_items
 
 @user_bp.route("/report", methods=["GET", "POST"])
+@login_required
 def report_page():
     if request.method == "GET":
         form = ReportForm()
