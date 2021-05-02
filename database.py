@@ -1,27 +1,35 @@
+from typing import Sequence
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
+
 class Statuses(db.Model):
+    """Statuses.id = 1 will be default item"""
     __tablename__ = "statuses"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    sequence = db.Column(db.Integer, unique=True, nullable=False)
     description = db.Column(db.String(255), nullable=False)
 
     def __init__(self, description):
         self.description = description
 
-# id = 1 will be default item
+
 class Items(db.Model):
+    """Items.id = 1 will be default item"""
     __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    sequence = db.Column(db.Integer, unique=True, nullable=False)
     description = db.Column(db.String(255), nullable=False)
 
     def __init__(self, description):
         self.description = description
 
-# id = 1 will be default building
+
 class Buildings(db.Model):
+    """Buildings.id = 1 will be default building"""
     __tablename__ = "buildings"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    sequence = db.Column(db.Integer, unique=True, nullable=False)
     description = db.Column(db.String(255), nullable=False)
 
     def __init__(self, description):
@@ -36,8 +44,9 @@ class Admins(db.Model):
     user_id = db.Column(db.ForeignKey("users.id"), unique=True, nullable=False)
     email = db.Column(db.String(255), server_default="", nullable=False)
 
-    def __init__(self, user_id):
+    def __init__(self, user_id, email=None):
         self.user_id = user_id
+        self.email = email
 
 
 class Users(db.Model):
