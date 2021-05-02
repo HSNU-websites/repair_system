@@ -25,11 +25,9 @@ def reset():
     Reset All Tables to Default.
     """
 
-    print(
-        "This will drop all tables.\n"
-        "It's extremely dangerous.\n"
-        "If you are sure, please type 'YES'"
-    )
+    print("This will drop all tables.\n"
+          "It's extremely dangerous.\n"
+          "If you are sure, please type 'YES'")
     a = input()
     if a != "YES":
         print("Terminated.")
