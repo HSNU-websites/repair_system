@@ -1,6 +1,8 @@
+from os import getenv
+
 from flask import Flask
 from flask_script import Manager, Server
-from os import getenv
+
 from database import *
 
 app = Flask(__name__)
