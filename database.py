@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
+
 class Statuses(db.Model):
     __tablename__ = "statuses"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -10,6 +11,8 @@ class Statuses(db.Model):
         self.description = description
 
 # id = 1 will be default item
+
+
 class Items(db.Model):
     __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -19,6 +22,8 @@ class Items(db.Model):
         self.description = description
 
 # id = 1 will be default building
+
+
 class Buildings(db.Model):
     __tablename__ = "buildings"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
