@@ -4,7 +4,7 @@ from flask_script import Manager
 
 import db_default
 from app import create_app, db
-from app.database import Users, Items, Buildings, Statuses
+from app.database import Buildings, Items, Statuses, Users
 
 app = create_app("development")
 manager = Manager(app)

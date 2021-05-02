@@ -1,5 +1,4 @@
-from flask import Blueprint
-from flask import Flask
+from flask import Blueprint, Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 

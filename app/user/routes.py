@@ -1,5 +1,6 @@
-from . import user_bp
 from app import user
+
+from . import user_bp
 
 
 @user_bp.route("/report")

@@ -1,4 +1,5 @@
-from .database import db, Statuses, Items, Buildings, Admins, Users, Records, Revisions
+from .database import (Admins, Buildings, Items, Records, Revisions, Statuses,
+                       Users, db)
 
 
 def render_statuses():
