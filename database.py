@@ -1,7 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
-
 class Statuses(db.Model):
     __tablename__ = "statuses"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -10,7 +9,7 @@ class Statuses(db.Model):
     def __init__(self, description):
         self.description = description
 
-
+# id = 1 will be default item
 class Items(db.Model):
     __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -19,7 +18,7 @@ class Items(db.Model):
     def __init__(self, description):
         self.description = description
 
-
+# id = 1 will be default building
 class Buildings(db.Model):
     __tablename__ = "buildings"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -35,11 +34,10 @@ class Admins(db.Model):
     __tablename__ = "admins"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.ForeignKey("users.id"), unique=True, nullable=False)
-    email = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), server_default="", nullable=False)
 
-    def __init__(self, user_id, email):
+    def __init__(self, user_id):
         self.user_id = user_id
-        self.email = email
 
 
 class Users(db.Model):
@@ -47,7 +45,7 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(16), unique=True,
                          nullable=False, index=True)
-    # hashlib.sha256("pAs$W0rd".encoding("utf-8")).hexdigest()
+    # hashlib.sha256("pAs$W0rd".encode("utf-8")).hexdigest()
     password = db.Column(db.CHAR(64), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     classnum = db.Column(db.Integer, nullable=False)
@@ -59,18 +57,6 @@ class Users(db.Model):
         self.password = password
         self.name = name
         self.classnum = classnum
-
-    def grant_admin(self, email=""):
-        if self.admin:
-            self.admin.email = email
-        else:
-            self.admin = Admins(self.id, email)
-        db.session.commit()
-
-    def revoke_admin(self):
-        if self.admin:
-            db.session.delete(self.admin)
-            db.session.commit()
 
 
 class Records(db.Model):
