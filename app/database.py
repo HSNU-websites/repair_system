@@ -66,18 +66,6 @@ class Buildings(db.Model):
 
 ################################################################
 
-
-class Admins(db.Model):
-    __tablename__ = "admins"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.ForeignKey("users.id"), unique=True, nullable=False)
-    email = db.Column(db.String(255), server_default="", nullable=False)
-
-    def __init__(self, user_id, email=None):
-        self.user_id = user_id
-        self.email = email
-
-
 class Users(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -86,14 +74,58 @@ class Users(db.Model):
     password = db.Column(db.CHAR(64), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     classnum = db.Column(db.Integer, nullable=False)
-    # bool(admin) to check if it is admin
-    admin = db.relationship("Admins", uselist=False)
+    properties = db.Column(db.SmallInteger, server_default="0", nullable=False)
+    email = db.Column(db.String(255), server_default="", nullable=False)
+    flags = {
+        "admin": 0x0001,
+        "valid": 0x0002,
+        "deleted": 0x0004,
+    }
+    __table_args__ = (
+        db.Index("idx_users_admin",
+                 db.text("((properties & {mask}))".format(mask=flags["admin"]))),
+    )
 
-    def __init__(self, username, password, name, classnum):
+    def __init__(self, username, password, name, classnum, email=None, admin=False, valid=True):
         self.username = username
         self.password = password
         self.name = name
         self.classnum = classnum
+        self.email = email
+        self.properties = 0
+        self.isAdmin(admin)
+        self.isValid(valid)
+
+    def setFlag(self, flag: str, value: bool) -> bool:
+        if flag not in Users.flags:
+            return False
+        if value:
+            self.properties = self.properties | Users.flags[flag]
+        else:
+            self.properties = self.properties & (~Users.flags[flag])
+        db.session.commit()
+        return True
+
+    def readFlag(self, flag: str) -> bool:
+        return bool(self.properties & (Users.flags[flag]))
+
+    def isAdmin(self, value: bool = None) -> bool:
+        if value is None:
+            return self.readFlag("admin")
+        else:
+            return self.setFlag("admin", value)
+
+    def isValid(self, value: bool = None) -> bool:
+        if value is None:
+            return self.readFlag("valid")
+        else:
+            return self.setFlag("valid", value)
+
+    def isMarkDeleted(self, value: bool = None) -> bool:
+        if value is None:
+            return self.readFlag("delete")
+        else:
+            return self.setFlag("delete", value)
 
 
 class Records(db.Model):

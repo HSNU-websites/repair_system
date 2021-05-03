@@ -4,7 +4,7 @@ from flask_script import Manager
 
 import db_default
 from app import create_app, db
-from app.database import Users, Admins, Items, Buildings, Statuses
+from app.database import Users, Items, Buildings, Statuses
 
 app = create_app("development")
 manager = Manager(app)
@@ -34,13 +34,12 @@ def reset():
     db.drop_all()
     db.create_all()
 
-    admin_users = [
-        Users("admin", "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", "admin", 0)
+    db.session.add(Users("deleted","","此帳號已刪除",0,valid=False))
+    users = [
+        Users("admin", "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+              "admin", 0, admin=True)
     ]
-    db.session.add_all(admin_users)
-    db.session.commit()  # id will be valid only after commit
-    for user in admin_users:
-        user.admin = Admins(user.id)
+    db.session.add_all(users)
 
     # Statuses default
     db.session.add(Statuses("其他", len(db_default.statuses)+1))
