@@ -3,22 +3,24 @@ from hashlib import sha256
 
 
 def render_statuses():
-    statuses = Statuses.query.all()
+    statuses = db.session.query(
+        Statuses.description).order_by(Statuses.sequence).all()
     return [status.description for status in statuses]
 
 
 def render_items():
-    items = Items.query.all()
+    items = db.session.query(Items.description).order_by(Items.sequence).all()
     return [item.description for item in items]
 
 
 def render_buildings():
-    buildings = Buildings.query.all()
+    buildings = db.session.query(
+        Buildings.description).order_by(Buildings.sequence).all()
     return [building.description for building in buildings]
 
 
 def get_admin_emails():
-    admins = Users.query.from_statement(
+    admins = db.session.query(Users.email).from_statement(
         db.text("SELECT * FROM users WHERE (properties & :mask) > 0")).params(mask=Users.flags["admin"]).all()
     return [admin.email for admin in admins]
 

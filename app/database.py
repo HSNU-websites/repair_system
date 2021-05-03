@@ -79,7 +79,7 @@ class Users(db.Model):
     flags = {
         "admin": 0x0001,
         "valid": 0x0002,
-        "delete": 0x0004,
+        "deleted": 0x0004,
     }
     __table_args__ = (
         db.Index("idx_users_admin",
