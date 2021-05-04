@@ -33,6 +33,7 @@ def index_page():  # index page is login page
                 flash("Invalid submit.", category="alert")
                 return redirect(url_for("main.index_page"))
 
+
 @main_bp.route("/logout", methods=["GET"])
 def logout_page():
     logout_user()

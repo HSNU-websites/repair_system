@@ -1,1 +1,2 @@
+release: python manage.py reset
 web: gunicorn manage:app
