@@ -1,4 +1,4 @@
-from .database import db, Statuses, Items, Buildings,  Users, Records, Revisions
+from .database import db, Statuses, Items, Buildings, Users, Records, Revisions
 from hashlib import sha256
 
 
@@ -27,7 +27,7 @@ def get_admin_emails():
 
 def login_auth(username, password):
     user = Users.query.filter_by(username=username).first()
-    if user and user.password == sha256(password.encode('utf8').hexdigest()):
-        return dict(id=Users.id, isAdmin=Users.isAdmin())
+    if user and user.password == sha256(password.encode('utf8')).hexdigest():
+        return dict(id=user.id, isAdmin=user.isAdmin())
     else:
         return False
