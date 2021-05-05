@@ -7,7 +7,7 @@ class User(UserMixin):
 
 
 @login_manager.user_loader
-def load_user(username):
+def load_user(user_id):
     user = User()
-    user.id = username
+    user.id = user_id
     return user

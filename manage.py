@@ -1,6 +1,6 @@
 import unittest
 
-from flask_script import Manager
+from flask_script import Manager, Command
 
 import db_default
 from app import create_app, db
@@ -16,20 +16,21 @@ def shell():
 
 
 @manager.command
-def reset():
+def reset(yes=False):
     """
     Reset All Tables to Default.
     """
 
-    # print(
-    #     "This will drop all tables.\n"
-    #     "It's extremely dangerous.\n"
-    #     "If you are sure, please type 'YES'"
-    # )
-    # a = input()
-    # if a != "YES":
-    #     print("Terminated.")
-    #     return
+    if not yes:
+        print(
+            "This will drop all tables.\n"
+            "It's extremely dangerous.\n"
+            "If you are sure, please type 'YES'"
+        )
+        a = input()
+        if a != "YES":
+            print("Terminated.")
+            return
 
     db.drop_all()
     db.create_all()
