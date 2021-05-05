@@ -7,7 +7,7 @@ import os
 import re  # regex
 
 defaultTables = [Statuses, Items, Buildings,  Users, Records, Revisions]
-partition = 10
+partition = 1000
 
 backup_dir = os.path.join("backup")  # need check
 
@@ -16,14 +16,15 @@ backup_dir = os.path.join("backup")  # need check
 # archiveName -> *.tar.gz
 # fileName    -> *.json
 # tables      -> [Users]
+# tablenames  -> ["users"]
 
-pattern = re.compile(r"^(?P<tableName>[a-z]+)(_\d+)?.json$")
+pattern = re.compile(r"^(?P<tableName>[a-z]+)(_\d+-\d+)?.json$")
 
 
 def convertTableName(fileName: str):
     """
     'buildings.json'    -> 'buildings'
-    'users_1.json' -> 'users'
+    'users_1-1000.json' -> 'users'
     """
     if m := pattern.match(fileName):
         return m.group("tableName")
@@ -99,6 +100,8 @@ def backup(tables: list[db.Model] = None):  # path not fix
                         t.id.between(i, i-1+partition)).all()]
                     writeArchive(archive, fileName, final)
     print("Backup finished, file: {}".format(archiveName))
+
+# not finished
 
 
 def restore(archiveName: str, tables: list[db.Model] = None):

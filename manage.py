@@ -19,7 +19,7 @@ def shell():
 @manager.command
 def reset(yes=False):
     """
-    Reset All Tables to Default.
+    Reset all Tables to Default
     """
 
     if not yes:
@@ -79,6 +79,14 @@ def reset(yes=False):
     db.session.add(Unfinished(1))
 
     db.session.commit()
+
+
+@manager.command
+def backup():
+    """
+    Backup Tables
+    """
+    b.backup()
 
 
 @manager.command

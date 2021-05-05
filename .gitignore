@@ -5,3 +5,4 @@ __pycache__/
 data.db
 test.py
 *.tar.xz
+/Backup/
