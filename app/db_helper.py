@@ -3,20 +3,20 @@ from hashlib import sha256
 
 
 def render_statuses():
-    statuses = db.session.query(Statuses.description).order_by(Statuses.sequence).all()
-    return [status.description for status in statuses]
+    statuses = db.session.query(Statuses).order_by(Statuses.sequence).all()
+    return [(status.id, status.description) for status in statuses]
 
 
 def render_items():
-    items = db.session.query(Items.description).order_by(Items.sequence).all()
-    return [item.description for item in items]
+    items = db.session.query(Items).order_by(Items.sequence).all()
+    return [(item.id, item.description) for item in items]
 
 
 def render_buildings():
     buildings = (
-        db.session.query(Buildings.description).order_by(Buildings.sequence).all()
+        db.session.query(Buildings).order_by(Buildings.sequence).all()
     )
-    return [building.description for building in buildings]
+    return [(building.id, building.description) for building in buildings]
 
 
 def get_admin_emails():
@@ -43,3 +43,6 @@ def updateUnfinished():
     for record in Records.query.all():
         if record and record.revisions and record.revisions[-1].id == finished:
            pass
+
+def add_record(building_id, location, item_id, description):
+    pass

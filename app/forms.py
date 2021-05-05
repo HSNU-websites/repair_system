@@ -20,10 +20,10 @@ class LoginForm(FlaskForm):
 
 class ReportForm(FlaskForm):
     building = SelectField(
-        "大樓: ", choices=None, validators=[DataRequired()]
+        "大樓: ", validators=[DataRequired()]
     )  # choices will be added when rendered
-    place = StringField("地點: ", validators=[DataRequired()])
-    item = SelectField("損壞物件: ", choices=None, validators=[DataRequired()])
+    location = StringField("地點: ", validators=[DataRequired()])
+    item = SelectField("損壞物件: ", validators=[DataRequired()])
     description = StringField("狀況描述: ", validators=[DataRequired()])
     recaptcha = RecaptchaField(
         validators=[Recaptcha(message="Please click 'I am not a robot.'")]
