@@ -1,0 +1,12 @@
+{% macro display_msg(messages) -%}
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+    {% for category, message in messages %}
+        <div class="flash-message {{ category }}">
+            <span class="closebtn" onclick="hide(this.parentElement)">&times;</span>
+            <span>{{ message }}</span>
+        </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+{%- endmacro %}

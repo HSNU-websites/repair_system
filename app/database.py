@@ -9,6 +9,7 @@ class Statuses(db.Model):
     """
     Statuses.id = 1 will be default item
     """
+
     __tablename__ = "statuses"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sequence = db.Column(db.Integer, unique=True, nullable=False)
@@ -34,6 +35,7 @@ class Items(db.Model):
     """
     Items.id = 1 will be default item
     """
+
     __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sequence = db.Column(db.Integer, unique=True, nullable=False)
@@ -60,6 +62,7 @@ class Buildings(db.Model):
     """
     Buildings.id = 1 will be default building
     """
+
     __tablename__ = "buildings"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sequence = db.Column(db.Integer, unique=True, nullable=False)
@@ -83,6 +86,7 @@ class Buildings(db.Model):
 
 ################################################################
 
+
 class Users(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -100,11 +104,15 @@ class Users(db.Model):
         deleted = 0x0004
 
     __table_args__ = (
-        db.Index("idx_users_admin",
-                 db.text("((properties & {mask}))".format(mask=flags.admin))),
+        db.Index(
+            "idx_users_admin",
+            db.text("((properties & {mask}))".format(mask=flags.admin))
+        ),
     )
 
-    def __init__(self, username, password, name, classnum, email="", admin=False, valid=True, **kwargs):
+    def __init__(
+        self, username, password, name, classnum, email="", admin=False, valid=True, **kwargs
+    ):
         self.username = username
         self.password = password
         self.name = name
@@ -122,13 +130,19 @@ class Users(db.Model):
     def __repr__(self):
         return "Users(id={id},username='{username}',password='{password}',name='{name}',classnum={classnum},email='{email}',properties={properties})".format(**self.__dict__)
 
-    def setFlag(self, flag: int, value: bool) -> bool:
+    def setFlag(self, flag: int, value: bool):
+        """
+        In Linux file permission system, 1 is "executable", 2 is "writable", and 4 is "readable".
+        Hence, 7 means the file is executable, writable and readable (7=1+2+4) to the user.
+        Here, "admin" is similar to 1, "valid" similar to 2, and "deleted" similar to 4.
+        And "properties" is similar to that 7, which indicates the combined status of the user in the database.
+        Therefore, the properties can be changed by using Bitwise operator.
+        """
         if value:
             self.properties = self.properties | flag
         else:
             self.properties = self.properties & (~flag)
         db.session.commit()
-        return True
 
     def readFlag(self, flag: int) -> bool:
         return bool(self.properties & flag)
@@ -159,10 +173,9 @@ class Records(db.Model):
     item_id = db.Column(db.ForeignKey("items.id"), nullable=False)
     building_id = db.Column(db.ForeignKey("buildings.id"), nullable=False)
     location = db.Column(db.String(255), nullable=False)
-    time = db.Column(db.TIMESTAMP,
-                     server_default=db.func.now(),
-                     nullable=False,
-                     index=True)
+    time = db.Column(
+        db.TIMESTAMP, server_default=db.func.now(), nullable=False, index=True
+    )
     description = db.Column(db.String(255), nullable=False)
     revisions = db.relationship("Revisions")
 
@@ -187,10 +200,9 @@ class Revisions(db.Model):
     record_id = db.Column(db.ForeignKey("records.id"), nullable=False)
     user_id = db.Column(db.ForeignKey("users.id"), nullable=False)
     status_id = db.Column(db.ForeignKey("statuses.id"), nullable=False)
-    time = db.Column(db.TIMESTAMP,
-                     server_default=db.func.now(),
-                     nullable=False,
-                     index=True)
+    time = db.Column(
+        db.TIMESTAMP, server_default=db.func.now(), nullable=False, index=True
+    )
     description = db.Column(db.String(255), nullable=False)
 
     def __init__(self, record_id, user_id, status_id, description, **kwargs):

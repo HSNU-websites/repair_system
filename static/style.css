@@ -53,7 +53,16 @@ select {
     width: 100%;
 }
 
-.form {
+#copyright a {
+    text-decoration: none;
+    color: black;
+}
+
+#copyright a:hover {
+    text-decoration: underline;
+}
+
+.container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -65,6 +74,12 @@ select {
     -moz-transition: .2s ease-out;
     -o-transition: .2s ease-out;
     transition: .2s ease-out;
+}
+
+@media only screen and (max-width: 600px) {
+    .container {
+        height: 55vh;
+    }
 }
 
 #index {
