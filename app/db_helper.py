@@ -1,6 +1,13 @@
 from .database import db, Statuses, Items, Buildings, Users, Records, Revisions, Unfinished
 from hashlib import sha256
+from passlib.context import CryptContext
+# pbkdf2_sha256
+# verify_and_update
 
+passwd_context = CryptContext( # First scheme will be default
+    schemes=["pbkdf2_sha256", "sha512_crypt"],
+    deprecated="auto"
+)
 
 def render_statuses():
     statuses = db.session.query(Statuses.description).order_by(Statuses.sequence).all()
@@ -31,7 +38,11 @@ def get_admin_emails():
 # need revision
 def login_auth(username, password):
     user = Users.query.filter_by(username=username).first()
-    if user and user.password == sha256(password.encode("utf8")).hexdigest():
+    if user and (t:=passwd_context.verify_and_update(password, user.password))[0]:
+        # verify_and_update() return (True|false, str|None)    
+        if t[1] is not None:
+            user.password = t[1]
+            db.session.commit()
         return dict(id=user.id, isAdmin=user.isAdmin())
     else:
         return False

@@ -91,8 +91,8 @@ class Users(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(16), unique=True, nullable=False)
-    # hashlib.sha256("pAs$W0rd".encode("utf-8")).hexdigest()
-    password = db.Column(db.CHAR(64), nullable=False)
+    # passwd_context.hash("pAs$W0rd")
+    password = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     classnum = db.Column(db.Integer, nullable=False)
     properties = db.Column(db.SmallInteger, nullable=False)
