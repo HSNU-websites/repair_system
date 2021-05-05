@@ -1,5 +1,8 @@
 repair-system/
 .vscode/
-**/__pycache__/
+__pycache__/
 .venv
 data.db
+test.py
+*.tar.xz
+/Backup/

@@ -1,7 +1,8 @@
-from typing import Sequence
 from flask_sqlalchemy import SQLAlchemy
+import datetime
 
 db = SQLAlchemy()
+timeformat = "%Y-%m-%dT%H-%M-%S"
 
 
 class Statuses(db.Model):
@@ -14,7 +15,7 @@ class Statuses(db.Model):
     sequence = db.Column(db.Integer, unique=True, nullable=False)
     description = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, description, sequence=None):
+    def __init__(self, description, sequence=None, **kwargs):
         if sequence is None:
             if s := db.session.query(db.func.max(Statuses.sequence)).first()[0]:
                 self.sequence = s + 1
@@ -23,6 +24,11 @@ class Statuses(db.Model):
         else:
             self.sequence = sequence
         self.description = description
+        if "id" in kwargs:
+            self.id = kwargs["id"]
+
+    def __repr__(self):
+        return "Statuses(id={id}, sequence={sequence}, description='{description}')".format(**self.__dict__)
 
 
 class Items(db.Model):
@@ -35,15 +41,21 @@ class Items(db.Model):
     sequence = db.Column(db.Integer, unique=True, nullable=False)
     description = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, description, sequence=None):
+    def __init__(self, description, sequence=None, **kwargs):
         if sequence is None:
             if s := db.session.query(db.func.max(Items.sequence)).first()[0]:
                 self.sequence = s + 1
             else:
                 self.sequence = 1
+            # flush
         else:
             self.sequence = sequence
         self.description = description
+        if "id" in kwargs:
+            self.id = kwargs["id"]
+
+    def __repr__(self):
+        return "Items(id={id},sequence={sequence},description='{description}')".format(**self.__dict__)
 
 
 class Buildings(db.Model):
@@ -56,7 +68,7 @@ class Buildings(db.Model):
     sequence = db.Column(db.Integer, unique=True, nullable=False)
     description = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, description, sequence=None):
+    def __init__(self, description, sequence=None, **kwargs):
         if sequence is None:
             if s := db.session.query(db.func.max(Buildings.sequence)).first()[0]:
                 self.sequence = s + 1
@@ -65,6 +77,11 @@ class Buildings(db.Model):
         else:
             self.sequence = sequence
         self.description = description
+        if "id" in kwargs:
+            self.id = kwargs["id"]
+
+    def __repr__(self):
+        return "Buildings(id={id},sequence={sequence},description='{description}')".format(**self.__dict__)
 
 
 ################################################################
@@ -78,33 +95,42 @@ class Users(db.Model):
     password = db.Column(db.CHAR(64), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     classnum = db.Column(db.Integer, nullable=False)
-    properties = db.Column(db.SmallInteger, server_default="0", nullable=False)
-    email = db.Column(db.String(255), server_default="", nullable=False)
-    flags = {
-        "admin": 0x0001,
-        "valid": 0x0002,
-        "deleted": 0x0004,
-    }
+    properties = db.Column(db.SmallInteger, nullable=False)
+    email = db.Column(db.String(255), nullable=False)
+
+    class flags():
+        admin = 0x0001
+        valid = 0x0002
+        deleted = 0x0004
+
     __table_args__ = (
         db.Index(
             "idx_users_admin",
-            db.text("((properties & {mask}))".format(mask=flags["admin"])),
+            db.text("((properties & {mask}))".format(mask=flags.admin))
         ),
     )
 
     def __init__(
-        self, username, password, name, classnum, email=None, admin=False, valid=True
+        self, username, password, name, classnum, email="", admin=False, valid=True, **kwargs
     ):
         self.username = username
         self.password = password
         self.name = name
         self.classnum = classnum
         self.email = email
-        self.properties = 0
-        self.isAdmin(admin)
-        self.isValid(valid)
+        if "id" in kwargs:
+            self.id = kwargs["id"]
+        if "properties" in kwargs:
+            self.properties = kwargs["properties"]
+        else:
+            self.properties = 0
+            self.isAdmin(admin)
+            self.isValid(valid)
 
-    def setFlag(self, flag: str, value: bool) -> bool:
+    def __repr__(self):
+        return "Users(id={id},username='{username}',password='{password}',name='{name}',classnum={classnum},email='{email}',properties={properties})".format(**self.__dict__)
+
+    def setFlag(self, flag: int, value: bool):
         """
         In Linux file permission system, 1 is "executable", 2 is "writable", and 4 is "readable".
         Hence, 7 means the file is executable, writable and readable (7=1+2+4) to the user.
@@ -112,35 +138,32 @@ class Users(db.Model):
         And "properties" is similar to that 7, which indicates the combined status of the user in the database.
         Therefore, the properties can be changed by using Bitwise operator.
         """
-        if flag not in Users.flags:
-            return False
         if value:
-            self.properties = self.properties | Users.flags[flag]
+            self.properties = self.properties | flag
         else:
-            self.properties = self.properties & (~Users.flags[flag])
+            self.properties = self.properties & (~flag)
         db.session.commit()
-        return True
 
-    def readFlag(self, flag: str) -> bool:
-        return bool(self.properties & (Users.flags[flag]))
+    def readFlag(self, flag: int) -> bool:
+        return bool(self.properties & flag)
 
     def isAdmin(self, value: bool = None) -> bool:
         if value is None:
-            return self.readFlag("admin")
+            return self.readFlag(Users.flags.admin)
         else:
-            return self.setFlag("admin", value)
+            return self.setFlag(Users.flags.admin, value)
 
     def isValid(self, value: bool = None) -> bool:
         if value is None:
-            return self.readFlag("valid")
+            return self.readFlag(Users.flags.valid)
         else:
-            return self.setFlag("valid", value)
+            return self.setFlag(Users.flags.valid, value)
 
     def isMarkDeleted(self, value: bool = None) -> bool:
         if value is None:
-            return self.readFlag("deleted")
+            return self.readFlag(Users.flags.deleted)
         else:
-            return self.setFlag("deleted", value)
+            return self.setFlag(Users.flags.deleted, value)
 
 
 class Records(db.Model):
@@ -156,12 +179,19 @@ class Records(db.Model):
     description = db.Column(db.String(255), nullable=False)
     revisions = db.relationship("Revisions")
 
-    def __init__(self, user_id, item_id, building_id, location, description):
+    def __init__(self, user_id, item_id, building_id, location, description, **kwargs):
         self.user_id = user_id
         self.item_id = item_id
         self.building_id = building_id
         self.location = location
         self.description = description
+        if "id" in kwargs:
+            self.id = kwargs["id"]
+        if "time" in kwargs:
+            self.time = datetime.datetime.strptime(kwargs["time"], timeformat)
+
+    def __repr__(self):
+        return "Records(id={id},user_id={user_id},item_id={item_id},building_id={building_id},location='{location}',time='{mytime}',description='{description}')".format(mytime=self.time.strftime(timeformat), **self.__dict__)
 
 
 class Revisions(db.Model):
@@ -175,8 +205,32 @@ class Revisions(db.Model):
     )
     description = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, record_id, user_id, status_id, description):
+    def __init__(self, record_id, user_id, status_id, description, **kwargs):
         self.record_id = record_id
         self.user_id = user_id
         self.status_id = status_id
         self.description = description
+        if "id" in kwargs:
+            self.id = kwargs["id"]
+        if "time" in kwargs:
+            self.time = datetime.datetime.strptime(kwargs["time"], timeformat)
+
+    def __repr__(self):
+        return "Revisions(id={id},record_id={record_id},user_id={user_id},status_id={status_id},time='{mytime}',description='{description}')".format(mytime=self.time.strftime(timeformat), **self.__dict__)
+
+
+class Unfinished(db.Model):
+    """
+    This TABLE is used to optimize query.
+    Do not need to backup.
+    """
+    __tablename__ = "unfinisheds"
+    record_id = db.Column(db.ForeignKey("records.id"), primary_key=True)
+    record = db.relationship("Records")
+
+    def __init__(self, record_id):
+        self.record_id = record_id
+
+    def __repr__(self):
+        return "Unfinished(record_id={record_id})".format(**self.__dict__)
+

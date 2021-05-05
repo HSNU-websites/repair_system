@@ -4,7 +4,8 @@ from flask_script import Manager, Command
 
 import db_default
 from app import create_app, db
-from app.database import Users, Items, Buildings, Statuses
+from app.database import *
+import app.backup as b
 
 app = create_app("development")
 manager = Manager(app)
@@ -18,7 +19,7 @@ def shell():
 @manager.command
 def reset(yes=False):
     """
-    Reset All Tables to Default.
+    Reset all Tables to Default
     """
 
     if not yes:
@@ -72,7 +73,20 @@ def reset(yes=False):
     for building in db_default.buildings:
         db.session.add(Buildings(building, i := i + 1))
 
+    db.session.add(Records(1, 1, 1, "某個地方", "測試報修紀錄"))
+    db.session.add(Revisions(1, 1, 1, "測試修訂紀錄"))
+
+    db.session.add(Unfinished(1))
+
     db.session.commit()
+
+
+@manager.command
+def backup():
+    """
+    Backup Tables
+    """
+    b.backup()
 
 
 @manager.command

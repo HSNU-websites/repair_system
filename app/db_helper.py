@@ -1,4 +1,4 @@
-from .database import db, Statuses, Items, Buildings, Users, Records, Revisions
+from .database import db, Statuses, Items, Buildings, Users, Records, Revisions, Unfinished
 from hashlib import sha256
 
 
@@ -23,15 +23,23 @@ def get_admin_emails():
     admins = (
         db.session.query(Users.email)
         .from_statement(db.text("SELECT * FROM users WHERE (properties & :mask) > 0"))
-        .params(mask=Users.flags["admin"])
+        .params(mask=Users.flags.admin)
         .all()
     )
     return [admin.email for admin in admins]
 
-
+# need revision
 def login_auth(username, password):
     user = Users.query.filter_by(username=username).first()
     if user and user.password == sha256(password.encode("utf8")).hexdigest():
         return dict(id=user.id, isAdmin=user.isAdmin())
     else:
         return False
+
+# not finished
+def updateUnfinished():
+    finished =1000 ####
+    Unfinished.__table__.drop(db.session)
+    for record in Records.query.all():
+        if record and record.revisions and record.revisions[-1].id == finished:
+           pass
