@@ -181,18 +181,6 @@ class Records(db.Model):
         return "Records(id={id},user_id={user_id},item_id={item_id},building_id={building_id},location='{location}',time='{mytime}',description='{description}')".format(mytime=self.time.strftime(timeformat), **self.__dict__)
 
 
-class Unfinished(db.Model):
-    __tablename__ = "unfinisheds"
-    record_id = db.Column(db.ForeignKey("records.id"), primary_key=True)
-    record = db.relationship("Records")
-
-    def __init__(self, record_id):
-        self.record_id = record_id
-
-    def __repr__(self):
-        return "Unfinished(record_id={record_id})".format(**self.__dict__)
-
-
 class Revisions(db.Model):
     __tablename__ = "revisions"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -217,3 +205,20 @@ class Revisions(db.Model):
 
     def __repr__(self):
         return "Revisions(id={id},record_id={record_id},user_id={user_id},status_id={status_id},time='{mytime}',description='{description}')".format(mytime=self.time.strftime(timeformat), **self.__dict__)
+
+
+class Unfinished(db.Model):
+    """
+    This TABLE is used to optimize query.
+    Do not need to backup.
+    """
+    __tablename__ = "unfinisheds"
+    record_id = db.Column(db.ForeignKey("records.id"), primary_key=True)
+    record = db.relationship("Records")
+
+    def __init__(self, record_id):
+        self.record_id = record_id
+
+    def __repr__(self):
+        return "Unfinished(record_id={record_id})".format(**self.__dict__)
+

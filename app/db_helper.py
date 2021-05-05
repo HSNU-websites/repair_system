@@ -31,3 +31,6 @@ def login_auth(username, password):
         return dict(id=Users.id, isAdmin=Users.isAdmin())
     else:
         return False
+
+def updateUnfinished():
+    pass

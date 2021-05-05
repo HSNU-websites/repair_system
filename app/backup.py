@@ -4,27 +4,30 @@ import ujson
 import io
 import tarfile
 import os
-import lzma
 import re  # regex
 
-
-tables = [Statuses, Items, Buildings,  Users, Records, Revisions]
-backup_dir = os.path.join("backup")  # need check
+defaultTables = [Statuses, Items, Buildings,  Users, Records, Revisions]
 partition = 10
 
+backup_dir = os.path.join("backup")  # need check
+
+
 # mail [].sort(key = lambda s: s[2])
+# archiveName -> *.tar.gz
+# fileName    -> *.json
+# tables      -> [Users]
 
 
-def tableName(filename: str):
+def convertTableName(fileName: str):
     """
     'buildings.json'    -> 'buildings'
-    'users_1-1000.json' -> 'users'
+    'users_1.json' -> 'users'
     """
-    if m := tableName.pattern.match(filename):
-        return m.group("name")
+    if m := convertTableName.pattern.match(fileName):
+        return m.group("tableName")
 
 
-tableName.pattern = re.compile(r"^(?P<name>[a-z]+)(_\d+-\d+)?.json$")
+convertTableName.pattern = re.compile(r"^(?P<tableName>[a-z]+)(_\d+)?.json$")
 
 
 def dbReprTest():
@@ -48,43 +51,70 @@ def dbReprTest():
         print(c.__tablename__, d1 == d2)
 
 
-def write(archive: tarfile, name: str, data: str) -> None:
-    encoded = data.encode("utf-8")
+def writeArchive(archive: tarfile, fileName: str, data: dict) -> None:
+    s = ujson.dumps(data, ensure_ascii=False)
+    encoded = s.encode("utf-8")
     stream = io.BytesIO(encoded)
-    tarinfo = tarfile.TarInfo(name=name)
+    tarinfo = tarfile.TarInfo(name=fileName)
+    tarinfo.size = len(encoded)
     archive.addfile(tarinfo, stream)
 
 
-def read(archive: tarfile, name: str) -> str:
-    return archive.extractfile(name).read().decode("utf-8")
+def readArchive(archive: tarfile.TarFile, fileName: str) -> dict:
+    s = archive.extractfile(fileName).read().decode("utf-8")
+    return ujson.loads(s)
 
 
 def getBackups() -> list:
     pass
 
 
-def getTables(name: str) -> list:
-    with tarfile.open(name, "r:xz") as archive:
+def getFileNames(archiveName: str) -> list:
+    with tarfile.open(archiveName, "r:xz") as archive:
         return archive.getnames()
 
-def backup():
-    final = dict()
-    name = "Backup_{time}.tar.xz".format(
+
+def getTableNames(archiveName: str) -> list:
+    l = map(convertTableName, getFileNames(archiveName))
+    return list(set(l))  # unique value
+
+
+def backup(tables: list[db.Model] = None):  # path not fix
+    archiveName = "Backup_{time}.tar.xz".format(
         time=datetime.datetime.now().strftime(timeformat))
+    if tables is None:
+        tables = defaultTables
+    else:
+        tables = filter(defaultTables.__contains__, tables)
+    with tarfile.open(archiveName, "w:xz") as archive:
+        for t in tables:
+            max = t.query.order_by(t.id.desc()).first().id
+            if max <= partition:
+                fileName = "{tablename}.json".format(tablename=t.__tablename__)
+                final = dict()
+                final[t.__tablename__] = [repr(col) for col in t.query.all()]
+                writeArchive(archive, fileName, final)
+            else:
+                for i in range(1, max+1, partition):
+                    fileName = "{tablename}_{start}-{end}.json".format(
+                        tablename=t.__tablename__,
+                        start=i, end=i-1+partition)
+                    final = dict()
+                    final[t.__tablename__] = [repr(column) for column in t.query.filter(
+                        t.id.between(i, i-1+partition)).all()]
+                    writeArchive(archive, fileName, final)
+    print("Backup finished, file: {}".format(archiveName))
 
-    for t in tables:
-        final[t.__tablename__] = [repr(col) for col in t.query.all()]
 
-    s = ujson.dumps(final, ensure_ascii=False)
-    with lzma.LZMAFile(name, "wb", format=lzma.FORMAT_XZ, check=lzma.CHECK_SHA256, preset=7) as file:
-        file.write(s.encode("utf-8"))
-    print("Backup finished, file: {}".format(name))
-
-    # os.
-# pagination
-
-
-def restore(name):
-    with lzma.LZMAFile(name, "wb", format=lzma.FORMAT_XZ, check=lzma.CHECK_SHA256, preset=7) as file:
-        file.write(s.encode("utf-8"))
-    pass
+def restore(archiveName: str, tables: list[db.Model] = None):
+    if tables is None:
+        tables = defaultTables
+    tablenames = [t.__tablename__ for t in tables]
+    with tarfile.open(archiveName, "r:xz") as archive:
+        for fileName in archive.getnames():
+            if convertTableName(fileName) in tablenames:
+                d = readArchive(archive, fileName)
+                l = list(d.values())[0]
+                for o in l:
+                    db.session.merge(eval(o))
+    db.session.commit()
