@@ -1,3 +1,5 @@
+{% from 'msg.jinja' import display_msg %}
+
 <!DOCTYPE html>
 <html lang="en" style="height: 100%;">
 
@@ -6,6 +8,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
+    <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
     <title>國立臺灣師大附中校園修繕線上通報系統</title>
 </head>
@@ -13,7 +17,7 @@
 <body>
     <h1>國立臺灣師大附中</h1>
     <h1>校園修繕線上通報系統</h1>
-    <div class="form" id="index">
+    <div class="container" id="index">
         <form action="/" method="POST">
             {{ form.csrf_token }}
             <div class="field">
@@ -27,10 +31,11 @@
             <div class="field">
                 {{ form.submit }}
             </div>
+            <div>{{ display_msg(messages) }}</div>
         </form>
     </div>
     <footer>
-        <div id="copyright">© 2021 HSNU</div>
+        <div id="copyright">© 2021 <a href="https://github.com/HSNU-websites" target="_blank">師大附中網站更新計畫</a></div>
     </footer>
 </body>
 

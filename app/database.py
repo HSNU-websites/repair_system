@@ -8,6 +8,7 @@ class Statuses(db.Model):
     """
     Statuses.id = 1 will be default item
     """
+
     __tablename__ = "statuses"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sequence = db.Column(db.Integer, unique=True, nullable=False)
@@ -28,6 +29,7 @@ class Items(db.Model):
     """
     Items.id = 1 will be default item
     """
+
     __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sequence = db.Column(db.Integer, unique=True, nullable=False)
@@ -48,6 +50,7 @@ class Buildings(db.Model):
     """
     Buildings.id = 1 will be default building
     """
+
     __tablename__ = "buildings"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sequence = db.Column(db.Integer, unique=True, nullable=False)
@@ -66,6 +69,7 @@ class Buildings(db.Model):
 
 ################################################################
 
+
 class Users(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -82,11 +86,15 @@ class Users(db.Model):
         "deleted": 0x0004,
     }
     __table_args__ = (
-        db.Index("idx_users_admin",
-                 db.text("((properties & {mask}))".format(mask=flags["admin"]))),
+        db.Index(
+            "idx_users_admin",
+            db.text("((properties & {mask}))".format(mask=flags["admin"])),
+        ),
     )
 
-    def __init__(self, username, password, name, classnum, email=None, admin=False, valid=True):
+    def __init__(
+        self, username, password, name, classnum, email=None, admin=False, valid=True
+    ):
         self.username = username
         self.password = password
         self.name = name
@@ -97,6 +105,13 @@ class Users(db.Model):
         self.isValid(valid)
 
     def setFlag(self, flag: str, value: bool) -> bool:
+        """
+        In Linux file permission system, 1 is "executable", 2 is "writable", and 4 is "readable".
+        Hence, 7 means the file is executable, writable and readable (7=1+2+4) to the user.
+        Here, "admin" is similar to 1, "valid" similar to 2, and "deleted" similar to 4.
+        And "properties" is similar to that 7, which indicates the combined status of the user in the database.
+        Therefore, the properties can be changed by using Bitwise operator.
+        """
         if flag not in Users.flags:
             return False
         if value:
@@ -123,9 +138,9 @@ class Users(db.Model):
 
     def isMarkDeleted(self, value: bool = None) -> bool:
         if value is None:
-            return self.readFlag("delete")
+            return self.readFlag("deleted")
         else:
-            return self.setFlag("delete", value)
+            return self.setFlag("deleted", value)
 
 
 class Records(db.Model):
@@ -135,10 +150,9 @@ class Records(db.Model):
     item_id = db.Column(db.ForeignKey("items.id"), nullable=False)
     building_id = db.Column(db.ForeignKey("buildings.id"), nullable=False)
     location = db.Column(db.String(255), nullable=False)
-    time = db.Column(db.TIMESTAMP,
-                     server_default=db.func.now(),
-                     nullable=False,
-                     index=True)
+    time = db.Column(
+        db.TIMESTAMP, server_default=db.func.now(), nullable=False, index=True
+    )
     description = db.Column(db.String(255), nullable=False)
     revisions = db.relationship("Revisions")
 
@@ -156,10 +170,9 @@ class Revisions(db.Model):
     record_id = db.Column(db.ForeignKey("records.id"), nullable=False)
     user_id = db.Column(db.ForeignKey("users.id"), nullable=False)
     status_id = db.Column(db.ForeignKey("statuses.id"), nullable=False)
-    time = db.Column(db.TIMESTAMP,
-                     server_default=db.func.now(),
-                     nullable=False,
-                     index=True)
+    time = db.Column(
+        db.TIMESTAMP, server_default=db.func.now(), nullable=False, index=True
+    )
     description = db.Column(db.String(255), nullable=False)
 
     def __init__(self, record_id, user_id, status_id, description):
