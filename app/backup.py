@@ -17,17 +17,16 @@ backup_dir = os.path.join("backup")  # need check
 # fileName    -> *.json
 # tables      -> [Users]
 
+pattern = re.compile(r"^(?P<tableName>[a-z]+)(_\d+)?.json$")
+
 
 def convertTableName(fileName: str):
     """
     'buildings.json'    -> 'buildings'
     'users_1.json' -> 'users'
     """
-    if m := convertTableName.pattern.match(fileName):
+    if m := pattern.match(fileName):
         return m.group("tableName")
-
-
-convertTableName.pattern = re.compile(r"^(?P<tableName>[a-z]+)(_\d+)?.json$")
 
 
 def dbReprTest():
@@ -36,19 +35,15 @@ def dbReprTest():
 
     def valid(value):
         return type(value) not in [list, sqlalchemy.orm.state.InstanceState, flask_sqlalchemy.model.DefaultMeta]
-
-    for c in [Statuses, Items, Buildings,  Users, Records, Revisions]:
-        obj1 = c.query.first()
+    b = True
+    for t in defaultTables:
+        obj1 = t.query.first()
         obj2 = eval(repr(obj1))
-        d1 = dict()
-        d2 = dict()
-        for key, value in obj1.__dict__.items():
-            if valid(value):
-                d1[key] = value
-        for key, value in obj2.__dict__.items():
-            if valid(value):
-                d2[key] = value
-        print(c.__tablename__, d1 == d2)
+        d1 = {key: value for key, value in obj1.__dict__.items() if valid(value)}
+        d2 = {key: value for key, value in obj2.__dict__.items() if valid(value)}
+        print(t.__tablename__, d1 == d2)
+        b = b and (d1 == d2)
+    return b
 
 
 def writeArchive(archive: tarfile, fileName: str, data: dict) -> None:
