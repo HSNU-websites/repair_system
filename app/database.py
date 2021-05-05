@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 import datetime
 
 db = SQLAlchemy()
+timeformat = "%Y-%m-%dT%H-%M-%S"
 
 
 class Statuses(db.Model):
@@ -44,7 +45,7 @@ class Items(db.Model):
                 self.sequence = s + 1
             else:
                 self.sequence = 1
-            ############################flush
+            # flush
         else:
             self.sequence = sequence
         self.description = description
@@ -52,7 +53,7 @@ class Items(db.Model):
             self.id = kwargs["id"]
 
     def __repr__(self):
-        return "Items(id={id}, sequence={sequence}, description='{description}')".format(**self.__dict__)
+        return "Items(id={id},sequence={sequence},description='{description}')".format(**self.__dict__)
 
 
 class Buildings(db.Model):
@@ -77,7 +78,7 @@ class Buildings(db.Model):
             self.id = kwargs["id"]
 
     def __repr__(self):
-        return "Buildings(id={id}, sequence={sequence}, description='{description}')".format(**self.__dict__)
+        return "Buildings(id={id},sequence={sequence},description='{description}')".format(**self.__dict__)
 
 
 ################################################################
@@ -94,9 +95,9 @@ class Users(db.Model):
     email = db.Column(db.String(255), nullable=False)
 
     class flags():
-        admin = 0x0001,
-        valid = 0x0002,
-        deleted = 0x0004,
+        admin = 0x0001
+        valid = 0x0002
+        deleted = 0x0004
 
     __table_args__ = (
         db.Index("idx_users_admin",
@@ -119,11 +120,9 @@ class Users(db.Model):
             self.isValid(valid)
 
     def __repr__(self):
-        return "Users(id={id}, username='{username}', password='{password}', name='{name}', classnum={classnum}, email='{email}', properties={properties})".format(**self.__dict__)
+        return "Users(id={id},username='{username}',password='{password}',name='{name}',classnum={classnum},email='{email}',properties={properties})".format(**self.__dict__)
 
     def setFlag(self, flag: int, value: bool) -> bool:
-        if flag not in Users.flags:
-            return False
         if value:
             self.properties = self.properties | flag
         else:
@@ -176,10 +175,22 @@ class Records(db.Model):
         if "id" in kwargs:
             self.id = kwargs["id"]
         if "time" in kwargs:
-            self.time = datetime.datetime.fromisoformat(kwargs["time"])
+            self.time = datetime.datetime.strptime(kwargs["time"], timeformat)
 
     def __repr__(self):
-        return "Records(id={id}, user_id={user_id}, item_id={item_id}, building_id={building_id}, location='{location}', time='{time}', description='{description}')".format(**self.__dict__)
+        return "Records(id={id},user_id={user_id},item_id={item_id},building_id={building_id},location='{location}',time='{mytime}',description='{description}')".format(mytime=self.time.strftime(timeformat), **self.__dict__)
+
+
+class Unfinished(db.Model):
+    __tablename__ = "unfinisheds"
+    record_id = db.Column(db.ForeignKey("records.id"), primary_key=True)
+    record = db.relationship("Records")
+
+    def __init__(self, record_id):
+        self.record_id = record_id
+
+    def __repr__(self):
+        return "Unfinished(record_id={record_id})".format(**self.__dict__)
 
 
 class Revisions(db.Model):
@@ -202,7 +213,7 @@ class Revisions(db.Model):
         if "id" in kwargs:
             self.id = kwargs["id"]
         if "time" in kwargs:
-            self.time = datetime.datetime.fromisoformat(kwargs["time"])
+            self.time = datetime.datetime.strptime(kwargs["time"], timeformat)
 
     def __repr__(self):
-        return "Revisions(id={id}, record_id={record_id}, user_id={user_id}, status_id={status_id}, time='{time}', description='{description}')".format(**self.__dict__)
+        return "Revisions(id={id},record_id={record_id},user_id={user_id},status_id={status_id},time='{mytime}',description='{description}')".format(mytime=self.time.strftime(timeformat), **self.__dict__)

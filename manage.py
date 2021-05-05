@@ -63,6 +63,8 @@ def reset():
     db.session.add(Records(1, 1, 1, "某個地方", "測試報修紀錄"))
     db.session.add(Revisions(1, 1, 1, "測試修訂紀錄"))
 
+    db.session.add(Unfinished(1))
+
     db.session.commit()
 
 
