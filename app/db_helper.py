@@ -1,16 +1,15 @@
+from base64 import b64decode, b64encode
 from hashlib import sha256
 from os import urandom
-from base64 import b64encode, b64decode
 
-from passlib.context import CryptContext
+from flask_login import UserMixin
 
 from .database import (Buildings, Items, Records, Revisions, Statuses,
                        Unfinished, Users, db)
 
-passwd_context = CryptContext(  # First scheme will be default
-    schemes=["pbkdf2_sha256", "sha512_crypt"],
-    deprecated="auto"
-)
+
+class User(UserMixin):
+    pass
 
 
 def render_statuses():
@@ -46,27 +45,37 @@ def get_admin_emails():
 
 def login_auth(username, password):
     user = Users.query.filter_by(username=username).first()
-
-    # verify_and_update() returns tuple (verified: bool, new_hash: str|None)
-    if user and (t := passwd_context.verify_and_update(password, user.password))[0]:
-        if t[1]:
-            user.password = t[1]
-            db.session.commit()
-        return dict(id=user.id, isAdmin=user.isAdmin())
+    if user and user.verify(password) and user.isValid():
+        sessionUser = User()
+        sessionUser.id = user.id
+        sessionUser.isAdmin = user.isAdmin()
+        return sessionUser
     else:
         return False
 
 
+def load_user(user_id:str):
+    user = Users.query.filter_by(id=user_id).first()
+    if user.isValid():
+        sessionUser = User()
+        sessionUser.id = user.id
+        sessionUser.isAdmin = user.isAdmin()
+        return sessionUser
+    else:
+        return None
+
+
 def updateUnfinished():
     finishedStatus_id = 2
-    Unfinished.__table__.drop(db.session)
-    Unfinished.__table__.create(db.session)
+    Unfinished.__table__.drop(db.engine)
+    Unfinished.__table__.create(db.engine)
     l = []
     for record in Records.query.all():
         if not (record.revisions and record.revisions[-1].status_id == finishedStatus_id):
-            l += Unfinished(record.id)
+            l.append(Unfinished(record_id=record.id))
     db.session.bulk_save_objects(l)
     db.session.commit()
 
-def generateVerificationCode(user_id:int)->str:
+
+def generateVerificationCode(user_id: int) -> str:
     return b64encode(urandom(32))
