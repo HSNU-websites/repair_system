@@ -1,15 +1,14 @@
 from os import path, mkdir
 import logging
 from logging.handlers import TimedRotatingFileHandler
-from flask import Flask, Blueprint
-from flask.logging import default_handler
+from flask import Flask, has_request_context, request
 from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy
 
 from .config import config
 from .database import db
 
 login_manager = LoginManager()
+
 
 class LevelFilter(object):
     def __init__(self, level_1, level_2=None):
@@ -22,6 +21,19 @@ class LevelFilter(object):
     def filter(self, record):
         return record.levelno == self.level_1 or record.levelno == self.level_2
 
+
+class RequestFormatter(logging.Formatter):
+    def format(self, record):
+        if has_request_context():
+            record.url = request.url
+            record.remote_addr = request.remote_addr
+        else:
+            record.url = None
+            record.remote_addr = None
+
+        return super().format(record)
+
+
 def create_app(env):
     app = Flask(__name__, template_folder="../templates", static_folder="../static")
     app.config.from_object(config[env])
@@ -31,7 +43,9 @@ def create_app(env):
 
     if not path.exists("log"):
         mkdir("log")
-    formatter = default_handler.formatter
+    formatter = RequestFormatter(
+        "[%(asctime)s] %(remote_addr)s requested %(url)s %(levelname)s in %(module)s: %(message)s"
+    )
     # access log
     access_log_handler = TimedRotatingFileHandler(
         r"log/access.log",
@@ -61,6 +75,7 @@ def create_app(env):
     app.logger.addHandler(access_log_handler)
     app.logger.addHandler(error_log_handler)
 
+    # Blueprint
     from .main import main_bp
 
     app.register_blueprint(main_bp)
