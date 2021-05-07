@@ -6,3 +6,4 @@ flask-wtf
 flask-mail
 MySQL
 ujson
+passlib

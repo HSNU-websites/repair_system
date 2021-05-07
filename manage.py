@@ -6,6 +6,7 @@ import db_default
 from app import create_app, db
 from app.database import *
 import app.backup as b
+import app.db_helper as h
 
 app = create_app("development")
 manager = Manager(app)
@@ -38,16 +39,16 @@ def reset(yes=False):
 
     db.session.add(Users("deleted", "", "此帳號已刪除", 0, valid=False))
     users = [
-        Users(
+        Users(  # password: 123
             "admin",
-            "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",  # password: 123
+            "$pbkdf2-sha256$29000$ujfGeG.NUUpJaa1VijHmfA$15ZVKxgUPhTL0si.qXhmnR6/fm70SNtRJ6gnBCF/bXo",
             "admin",
             0,
             admin=True,
         ),
-        Users(
+        Users(  # password: 123
             "user",
-            "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+            "$pbkdf2-sha256$29000$d06JESLk/L83xhijdA7BOA$foHk6yDuBg3vVwIBTH8Svg7WuIMZRjt6du036rlclAk",
             "user",
             0,
             admin=False,
@@ -77,6 +78,8 @@ def reset(yes=False):
     db.session.add(Revisions(1, 1, 1, "測試修訂紀錄"))
 
     db.session.add(Unfinished(1))
+
+    h.updateUnfinished()
 
     db.session.commit()
 
