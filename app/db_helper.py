@@ -4,8 +4,16 @@ from os import urandom
 
 from flask_login import UserMixin
 
-from .database import (Buildings, Items, Records, Revisions, Statuses,
-                       Unfinished, Users, db)
+from .database import (
+    Buildings,
+    Items,
+    Records,
+    Revisions,
+    Statuses,
+    Unfinished,
+    Users,
+    db,
+)
 
 
 class User(UserMixin):
@@ -13,22 +21,20 @@ class User(UserMixin):
 
 
 def render_statuses():
-    statuses = db.session.query(
-        Statuses.description).order_by(Statuses.sequence).all()
+    statuses = db.session.query(Statuses.description).order_by(Statuses.sequence).all()
     return [status.description for status in statuses]
 
 
 def render_items():
-    items = db.session.query(Items.description).order_by(Items.sequence).all()
-    return [item.description for item in items]
+    items = db.session.query(Items).order_by(Items.sequence).all()
+    return [(item.id, item.description) for item in items]
 
 
 def render_buildings():
     buildings = (
-        db.session.query(Buildings.description).order_by(
-            Buildings.sequence).all()
+        db.session.query(Buildings.description).order_by(Buildings.sequence).all()
     )
-    return [building.description for building in buildings]
+    return [(building.id, building.description) for building in buildings]
 
 
 def get_admin_emails():
@@ -39,6 +45,7 @@ def get_admin_emails():
         .all()
     )
     return [admin.email for admin in admins]
+
 
 # need revision
 
@@ -54,7 +61,7 @@ def login_auth(username, password):
         return False
 
 
-def load_user(user_id:str):
+def load_user(user_id: str):
     user = Users.query.filter_by(id=user_id).first()
     if user.isValid():
         sessionUser = User()
@@ -71,7 +78,9 @@ def updateUnfinished():
     Unfinished.__table__.create(db.engine)
     l = []
     for record in Records.query.all():
-        if not (record.revisions and record.revisions[-1].status_id == finishedStatus_id):
+        if not (
+            record.revisions and record.revisions[-1].status_id == finishedStatus_id
+        ):
             l.append(Unfinished(record_id=record.id))
     db.session.bulk_save_objects(l)
     db.session.commit()
@@ -79,3 +88,7 @@ def updateUnfinished():
 
 def generateVerificationCode(user_id: int) -> str:
     return b64encode(urandom(32))
+
+
+def add_record(building_id, location, item_id, description):
+    pass
