@@ -1,8 +1,14 @@
 from flask_sqlalchemy import SQLAlchemy
 import datetime
+from passlib.context import CryptContext
 
 db = SQLAlchemy()
 timeformat = "%Y-%m-%dT%H-%M-%S"
+
+passwd_context = CryptContext(  # First scheme will be default
+    schemes=["pbkdf2_sha256", "sha512_crypt"],
+    deprecated="auto"
+)
 
 
 class Statuses(db.Model):
@@ -91,8 +97,8 @@ class Users(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(16), unique=True, nullable=False)
-    # hashlib.sha256("pAs$W0rd".encode("utf-8")).hexdigest()
-    password = db.Column(db.CHAR(64), nullable=False)
+    # passwd_context.hash("pAs$W0rd")
+    password_hash = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     classnum = db.Column(db.Integer, nullable=False)
     properties = db.Column(db.SmallInteger, nullable=False)
@@ -111,10 +117,10 @@ class Users(db.Model):
     )
 
     def __init__(
-        self, username, password, name, classnum, email="", admin=False, valid=True, **kwargs
+        self, username, password_hash, name, classnum, email="", admin=False, valid=True, **kwargs
     ):
         self.username = username
-        self.password = password
+        self.password_hash = password_hash
         self.name = name
         self.classnum = classnum
         self.email = email
@@ -128,7 +134,7 @@ class Users(db.Model):
             self.isValid(valid)
 
     def __repr__(self):
-        return "Users(id={id},username='{username}',password='{password}',name='{name}',classnum={classnum},email='{email}',properties={properties})".format(**self.__dict__)
+        return "Users(id={id},username='{username}',password_hash='{password_hash}',name='{name}',classnum={classnum},email='{email}',properties={properties})".format(**self.__dict__)
 
     def setFlag(self, flag: int, value: bool):
         """
@@ -165,6 +171,12 @@ class Users(db.Model):
         else:
             return self.setFlag(Users.flags.deleted, value)
 
+    def verify(self, password: str) -> bool:
+        result, new_hash = passwd_context.verify_and_update(password, self.password_hash)
+        if new_hash:
+            self.password_hash =new_hash
+            db.session.commit()
+        return result
 
 class Records(db.Model):
     __tablename__ = "records"
@@ -233,4 +245,3 @@ class Unfinished(db.Model):
 
     def __repr__(self):
         return "Unfinished(record_id={record_id})".format(**self.__dict__)
-
