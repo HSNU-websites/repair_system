@@ -5,7 +5,7 @@ from flask_script import Manager, Command
 import db_default
 from app import create_app, db
 from app.database import *
-# import app.backup as b
+import app.backup as b
 import app.db_helper as h
 
 app = create_app("development")

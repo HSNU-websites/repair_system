@@ -90,5 +90,5 @@ def generateVerificationCode(user_id: int) -> str:
     return b64encode(urandom(32))
 
 
-def add_record():
+def add_record(building_id, location, item_id, description):
     pass
