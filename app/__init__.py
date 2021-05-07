@@ -2,6 +2,7 @@ from os import path, mkdir
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from flask import Flask, Blueprint
+from flask.logging import default_handler
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
@@ -11,9 +12,12 @@ from .database import db
 login_manager = LoginManager()
 
 class LevelFilter(object):
-    def __init__(self, level_1, level_2):
+    def __init__(self, level_1, level_2=None):
         self.level_1 = logging._checkLevel(level_1)
-        self.level_2 = logging._checkLevel(level_2)
+        if level_2:
+            self.level_2 = logging._checkLevel(level_2)
+        else:
+            self.level_2 = None
 
     def filter(self, record):
         return record.levelno == self.level_1 or record.levelno == self.level_2
@@ -27,7 +31,7 @@ def create_app(env):
 
     if not path.exists("log"):
         mkdir("log")
-    formatter = logging.Formatter("[%(asctime)s][%(filename)s:%(lineno)d][%(levelname)s] - %(message)s")
+    formatter = default_handler.formatter
     # access log
     access_log_handler = TimedRotatingFileHandler(
         r"log/access.log",
