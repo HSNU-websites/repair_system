@@ -4,8 +4,7 @@ from os import urandom
 
 from flask_login import UserMixin
 
-from .database import (Buildings, Items, Records, Revisions, Statuses,
-                       Unfinished, Users, db)
+from .model import *
 
 
 class User(UserMixin):
@@ -54,7 +53,7 @@ def login_auth(username, password):
         return False
 
 
-def load_user(user_id:str):
+def load_user(user_id: str):
     user = Users.query.filter_by(id=user_id).first()
     if user.isValid():
         sessionUser = User()

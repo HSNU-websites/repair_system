@@ -4,9 +4,9 @@ from flask_script import Manager, Command
 
 import db_default
 from app import create_app, db
-from app.database import *
-import app.backup as b
-import app.db_helper as h
+from app.database.model import *
+import app.database.backup as b
+import app.database.db_helper as h
 
 app = create_app("development")
 manager = Manager(app)
@@ -77,11 +77,9 @@ def reset(yes=False):
     db.session.add(Records(1, 1, 1, "某個地方", "測試報修紀錄"))
     db.session.add(Revisions(1, 1, 1, "測試修訂紀錄"))
 
-    db.session.add(Unfinished(1))
+    db.session.commit()
 
     h.updateUnfinished()
-
-    db.session.commit()
 
 
 @manager.command

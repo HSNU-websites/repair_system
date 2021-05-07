@@ -2,7 +2,7 @@ from flask import request, render_template
 from flask_login import login_required
 from . import user_bp
 from ..forms import ReportForm
-from ..db_helper import render_buildings, render_items
+from ..database.db_helper import render_buildings, render_items
 
 @user_bp.route("/report", methods=["GET", "POST"])
 @login_required
