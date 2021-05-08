@@ -3,11 +3,13 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from flask import Flask, has_request_context, request
 from flask_login import LoginManager
+from flask_mail import Mail
 
 from .config import config
 from .database import db
 
 login_manager = LoginManager()
+mail = Mail()
 
 
 class RequestFormatter(logging.Formatter):
@@ -28,6 +30,7 @@ def create_app(env):
 
     login_manager.init_app(app)
     db.init_app(app)
+    mail.init_app(app)
 
     if not path.exists("log"):
         mkdir("log")
