@@ -4,9 +4,9 @@ from flask_script import Manager, Command
 
 import db_default
 from app import create_app, db
-from app.database import *
-import app.backup as b
-import app.db_helper as h
+from app.database.model import *
+import app.database.backup as b
+import app.database.db_helper as h
 
 app = create_app("development")
 manager = Manager(app)
@@ -44,6 +44,7 @@ def reset(yes=False):
             "$pbkdf2-sha256$29000$ujfGeG.NUUpJaa1VijHmfA$15ZVKxgUPhTL0si.qXhmnR6/fm70SNtRJ6gnBCF/bXo",
             "admin",
             0,
+            email="admin@127.0.0.1",
             admin=True,
         ),
         Users(  # password: 123
@@ -80,8 +81,6 @@ def reset(yes=False):
     # db.session.add(Unfinished(1))
 
     h.updateUnfinished()
-
-    db.session.commit()
 
 
 @manager.command

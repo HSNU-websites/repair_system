@@ -1,9 +1,11 @@
 import logging
-from flask import request, render_template, flash, current_app
+
+from flask import current_app, flash, render_template, request
 from flask_login import login_required
-from . import user_bp
+
+from ..database.db_helper import add_record, render_buildings, render_items
 from ..forms import ReportForm
-from ..db_helper import render_buildings, render_items, add_record
+from . import user_bp
 
 
 @user_bp.route("/report", methods=["GET", "POST"])
