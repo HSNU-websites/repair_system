@@ -13,15 +13,16 @@ def send_report_mail(user_id, building_id, location, item_id, description):
         報修人: {user}
         大樓: {building}
         地點: {location}
-        損壞物件: {item}
+        損壞物件: {item} ({office})
         敘述: {description}
 
     此為系統自動寄送郵件，不須回覆
     """.format(
-        user=" ".join(user.username, user.name),
+        user=" ".join([user.username, user.name]),
         building=building.description,
         location=location,
         item=item.description,
+        office=item.office.description,
         description=description,
     )
     if user.email:

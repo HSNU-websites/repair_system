@@ -13,9 +13,10 @@ class Items(db.Model):
     __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     sequence = db.Column(db.Integer, unique=True, nullable=False)
+    office_id = db.Column(db.ForeignKey("offices.id"), nullable=False)
     description = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, description, sequence=None, **kwargs):
+    def __init__(self, description, office_id, sequence=None, **kwargs):
         if sequence is None:
             if s := db.session.query(db.func.max(Items.sequence)).first()[0]:
                 self.sequence = s + 1
@@ -24,6 +25,7 @@ class Items(db.Model):
             # flush
         else:
             self.sequence = sequence
+        self.office_id = office_id
         self.description = description
         if "id" in kwargs:
             self.id = kwargs["id"]
