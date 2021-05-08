@@ -5,7 +5,7 @@ from pathlib import Path
 from .model import *
 from .Archive import Archive
 
-defaultTables = {Statuses, Items, Buildings,  Users, Records, Revisions}
+defaultTables = idTables
 partition = 1000
 
 backup_dir = Path(__file__).parent/Path("../../Backup")
@@ -44,33 +44,10 @@ def db_reprTest():
         b = b and (d1 == d2)
     return b
 
-
-# def writeArchive(archive: tarfile, filename: str, data: dict) -> None:
-#     s = ujson.dumps(data, ensure_ascii=False, escape_forward_slashes=False)
-#     encoded = s.encode("utf-8")
-#     stream = io.BytesIO(encoded)
-#     tarinfo = tarfile.TarInfo(name=filename)
-#     tarinfo.size = len(encoded)
-#     archive.addfile(tarinfo, stream)
-
-
-# def readArchive(archive: tarfile.TarFile, filename: str) -> dict:
-#     s = archive.extractfile(filename).read().decode("utf-8")
-#     return ujson.loads(s)
-
-
 def getBackups() -> list:
     return list(backup_dir.iterdir())
 
 
-# def getFileNames(archiveName: str) -> list:
-#     with tarfile.open(archiveName, "r:xz") as archive:
-#         return archive.getnames()
-
-
-# def getTableNames(archiveName: str) -> list:
-#     l = map(convertTablename, getFileNames(archiveName))
-#     return list(set(l))  # unique value
 
 
 def backup(tables: list[db.Model] = None):  # path not fix

@@ -44,6 +44,7 @@ def reset(yes=False):
             "$pbkdf2-sha256$29000$ujfGeG.NUUpJaa1VijHmfA$15ZVKxgUPhTL0si.qXhmnR6/fm70SNtRJ6gnBCF/bXo",
             "admin",
             0,
+            email="admin@127.0.0.1",
             admin=True,
         ),
         Users(  # password: 123

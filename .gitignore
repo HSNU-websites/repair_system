@@ -6,3 +6,4 @@ data.db
 test.py
 *.tar.xz
 /Backup/
+/log
