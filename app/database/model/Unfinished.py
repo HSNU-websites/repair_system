@@ -6,6 +6,7 @@ class Unfinished(db.Model):
     This TABLE is used to optimize query.
     Do not need to backup.
     """
+
     __tablename__ = "unfinisheds"
     record_id = db.Column(db.ForeignKey("records.id"), primary_key=True)
     record = db.relationship("Records")

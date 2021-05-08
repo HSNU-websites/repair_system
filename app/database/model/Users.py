@@ -2,6 +2,18 @@ from .common import db, passwd_context
 
 
 class Users(db.Model):
+    """
+    The table stores all users.
+
+    id: PK, and it is used as user.id in flask_login system.
+    username: User's student id, and admins have a nickname.
+    password_hash: Hashed password.
+    name: User's real name.
+    classnum: User's class number, and 0 will be the value if the user is an admin.
+    properties: See `setFlag` doc.
+    email: User's email, and students will have empty string since their email can be infered from their student id.
+    """
+
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(16), unique=True, nullable=False)

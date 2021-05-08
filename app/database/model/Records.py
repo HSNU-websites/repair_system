@@ -3,6 +3,19 @@ from .common import db, timeformat
 
 
 class Records(db.Model):
+    """
+    The table stores all report records.
+    The table is connected to `Users`, `Items` and `Buildings`.
+
+    id: PK.
+    user_id: `id` in `Users` table.
+    item_id: `id` in `Items` table.
+    building_id: `id` in `Buildings` table.
+    location: The detailed place which is written by the reporter.
+    time: Revision time. The value will be automatically added.
+    description: The detailed description about the broken items and is written by the reporter.
+    """
+
     __tablename__ = "records"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.ForeignKey("users.id"), nullable=False)
@@ -27,4 +40,6 @@ class Records(db.Model):
             self.time = datetime.datetime.strptime(kwargs["time"], timeformat)
 
     def __repr__(self):
-        return "Records(id={id},user_id={user_id},item_id={item_id},building_id={building_id},location='{location}',time='{mytime}',description='{description}')".format(mytime=self.time.strftime(timeformat), **self.__dict__)
+        return "Records(id={id},user_id={user_id},item_id={item_id},building_id={building_id},location='{location}',time='{mytime}',description='{description}')".format(
+            mytime=self.time.strftime(timeformat), **self.__dict__
+        )

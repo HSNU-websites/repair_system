@@ -3,7 +3,11 @@ from .common import db
 
 class Items(db.Model):
     """
-    Items.id = 1 will be default item
+    Items.id = 1 will be default item.
+
+    id: PK.
+    sequence: The displayed order.
+    description: The name of the item.
     """
 
     __tablename__ = "items"
@@ -25,4 +29,6 @@ class Items(db.Model):
             self.id = kwargs["id"]
 
     def __repr__(self):
-        return "Items(id={id},sequence={sequence},description='{description}')".format(**self.__dict__)
+        return "Items(id={id},sequence={sequence},description='{description}')".format(
+            **self.__dict__
+        )
