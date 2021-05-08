@@ -3,8 +3,8 @@ from flask import request, render_template, flash, current_app
 from flask_login import login_required, current_user
 from . import user_bp
 from ..forms import ReportForm
-from .. mail import send_report_mail
-from ..db_helper import render_buildings, render_items, add_record
+from ..mail import send_report_mail
+from ..database.db_helper import add_record, render_buildings, render_items
 
 
 @user_bp.route("/report", methods=["GET", "POST"])
@@ -24,7 +24,9 @@ def report_page():
             item_id = form.item.data  # type: int
             description = form.description.data  # type: str
             add_record(building_id, location, item_id, description)
-            send_report_mail(current_user.id, building_id, location, item_id, description)
+            send_report_mail(
+                current_user.id, building_id, location, item_id, description
+            )
             flash("Successfully report.", "success")
             return render_template("report.html", form=form)
         else:

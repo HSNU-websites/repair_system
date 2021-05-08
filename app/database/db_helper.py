@@ -4,7 +4,7 @@ from os import urandom
 
 from flask_login import UserMixin
 
-from .database import (
+from .model import (
     Buildings,
     Items,
     Records,
@@ -13,6 +13,7 @@ from .database import (
     Unfinished,
     Users,
     db,
+    sequenceTables,
 )
 
 
@@ -21,7 +22,8 @@ class User(UserMixin):
 
 
 def render_statuses():
-    statuses = db.session.query(Statuses.description).order_by(Statuses.sequence).all()
+    statuses = db.session.query(
+        Statuses.description).order_by(Statuses.sequence).all()
     return [status.description for status in statuses]
 
 
@@ -39,15 +41,13 @@ def render_buildings():
 
 def get_admin_emails():
     admins = (
+        # only "(properties & :mask) > 0" works with index
         db.session.query(Users.email)
-        .from_statement(db.text("SELECT * FROM users WHERE (properties & :mask) > 0"))
+        .from_statement(db.text("SELECT users.email FROM users WHERE (properties & :mask) > 0"))
         .params(mask=Users.flags.admin)
         .all()
     )
     return [admin.email for admin in admins]
-
-
-# need revision
 
 
 def login_auth(username, password):
@@ -58,12 +58,13 @@ def login_auth(username, password):
         sessionUser.isAdmin = user.isAdmin()
         return sessionUser
     else:
-        return False
+        return None
 
 
 def load_user(user_id: str):
+    # whether user_id is str or int doesn't matter
     user = Users.query.filter_by(id=user_id).first()
-    if user.isValid():
+    if user and user.isValid():
         sessionUser = User()
         sessionUser.id = user.id
         sessionUser.isAdmin = user.isAdmin()
@@ -74,8 +75,7 @@ def load_user(user_id: str):
 
 def updateUnfinished():
     finishedStatus_id = 2
-    Unfinished.__table__.drop(db.engine)
-    Unfinished.__table__.create(db.engine)
+    Unfinished.query.delete()
     l = []
     for record in Records.query.all():
         if not (
@@ -84,6 +84,25 @@ def updateUnfinished():
             l.append(Unfinished(record_id=record.id))
     db.session.bulk_save_objects(l)
     db.session.commit()
+
+
+def updateSequence(table: db.Model):
+    """
+    assign rows where sequence=0
+    """
+    if table not in sequenceTables:
+        return False
+    if r := db.session.query(db.func.max(table.sequence)).first():
+        max = r[0]
+    else:
+        max = 0
+    l = []
+    for row in table.query.filter(table.sequence == 0).order_by(table.id).all():
+        row.sequence = (max := max+1)
+        l.append(row)
+    db.session.bulk_save_objects(l)
+    db.session.commit()
+    return True
 
 
 def generateVerificationCode(user_id: int) -> str:

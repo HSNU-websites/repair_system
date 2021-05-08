@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, request, flash, current_ap
 from flask_login import current_user, login_user, logout_user
 from . import main_bp
 from ..forms import LoginForm
-from ..db_helper import login_auth
+from ..database.db_helper import login_auth
 from ..users import *
 
 
