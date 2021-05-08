@@ -12,7 +12,7 @@ class Users(db.Model):
     properties = db.Column(db.SmallInteger, nullable=False)
     email = db.Column(db.String(255), nullable=False)
 
-    class flags():
+    class flags:
         admin = 0x0001
         valid = 0x0002
         deleted = 0x0004
@@ -20,12 +20,20 @@ class Users(db.Model):
     __table_args__ = (
         db.Index(
             "idx_users_admin",
-            db.text("((properties & {mask}))".format(mask=flags.admin))
+            db.text("((properties & {mask}))".format(mask=flags.admin)),
         ),
     )
 
     def __init__(
-        self, username, password_hash, name, classnum, email="", admin=False, valid=True, **kwargs
+        self,
+        username,
+        password_hash,
+        name,
+        classnum,
+        email="",
+        admin=False,
+        valid=True,
+        **kwargs
     ):
         self.username = username
         self.password_hash = password_hash
@@ -42,7 +50,9 @@ class Users(db.Model):
             self.isValid(valid)
 
     def __repr__(self):
-        return "Users(id={id},username='{username}',password_hash='{password_hash}',name='{name}',classnum={classnum},email='{email}',properties={properties})".format(**self.__dict__)
+        return "Users(id={id},username='{username}',password_hash='{password_hash}',name='{name}',classnum={classnum},email='{email}',properties={properties})".format(
+            **self.__dict__
+        )
 
     def setFlag(self, flag: int, value: bool):
         """
@@ -81,7 +91,8 @@ class Users(db.Model):
 
     def verify(self, password: str) -> bool:
         result, new_hash = passwd_context.verify_and_update(
-            password, self.password_hash)
+            password, self.password_hash
+        )
         if new_hash:
             self.password_hash = new_hash
             db.session.commit()
