@@ -32,7 +32,7 @@ input[type="submit"] {
 }
 
 body {
-    background-image: linear-gradient(to right top, #746bd1, #7377d7, #7483dc, #778fe1, #7c9ae4, #74a7ed, #6db3f3, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
+    background-image: linear-gradient(to left bottom, #746bd1, #7377d7, #7483dc, #778fe1, #7c9ae4, #74a7ed, #6db3f3, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -44,6 +44,13 @@ select {
     height: 25px;
     border-radius: 3px;
     outline: none;
+}
+
+#logo {
+    display: block;
+    height: 100px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 #copyright {

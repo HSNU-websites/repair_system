@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
     <script src="{{ url_for('static', filename='msg.js') }}"></script>
+    <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
     <title>報修</title>
 </head>
 
@@ -23,8 +24,8 @@
                 <br> {{ form.building }}
             </div>
             <div class="field">
-                {{ form.place.label }}
-                <br> {{ form.place }}
+                {{ form.location.label }}
+                <br> {{ form.location }}
             </div>
             <div class="field">
                 {{ form.item.label }}

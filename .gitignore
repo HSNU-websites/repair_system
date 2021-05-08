@@ -1,9 +1,9 @@
-repair-system/
 .vscode/
 __pycache__/
 .venv
+.env
 data.db
 test.py
 *.tar.xz
 /Backup/
-/log
+/log/

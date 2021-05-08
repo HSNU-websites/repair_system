@@ -4,7 +4,17 @@ from os import urandom
 
 from flask_login import UserMixin
 
-from .model import *
+from .model import (
+    Buildings,
+    Items,
+    Records,
+    Revisions,
+    Statuses,
+    Unfinished,
+    Users,
+    db,
+    sequenceTables,
+)
 
 
 class User(UserMixin):
@@ -18,8 +28,8 @@ def render_statuses():
 
 
 def render_items():
-    items = db.session.query(Items.description).order_by(Items.sequence).all()
-    return [item.description for item in items]
+    items = db.session.query(Items).order_by(Items.sequence).all()
+    return [(item.id, item.description) for item in items]
 
 
 def render_buildings():
@@ -27,7 +37,7 @@ def render_buildings():
         db.session.query(Buildings.description).order_by(
             Buildings.sequence).all()
     )
-    return [building.description for building in buildings]
+    return [(building.id, building.description) for building in buildings]
 
 
 def get_admin_emails():
@@ -69,7 +79,9 @@ def updateUnfinished():
     Unfinished.query.delete()
     l = []
     for record in Records.query.all():
-        if not (record.revisions and record.revisions[-1].status_id == finishedStatus_id):
+        if not (
+            record.revisions and record.revisions[-1].status_id == finishedStatus_id
+        ):
             l.append(Unfinished(record_id=record.id))
     db.session.bulk_save_objects(l)
     db.session.commit()
@@ -96,3 +108,7 @@ def updateSequence(table: db.Model):
 
 def generateVerificationCode(user_id: int) -> str:
     return b64encode(urandom(32))
+
+
+def add_record(building_id, location, item_id, description):
+    pass
