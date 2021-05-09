@@ -1,12 +1,14 @@
 import unittest
+from datetime import datetime, timedelta
 
-from flask_script import Manager, Command
+from flask_script import Command, Manager
 
+import app.database.backup as b
+import app.database.db_helper as h
+import app.mail_helper as m
 import db_default
 from app import create_app, db
 from app.database.model import *
-import app.database.backup as b
-import app.database.db_helper as h
 
 app = create_app("development")
 manager = Manager(app)
@@ -76,12 +78,22 @@ def reset(yes=False):
     for i, building in enumerate(db_default.buildings):
         db.session.add(Buildings(building, sequence=i + 1))
 
-    db.session.add(Records(1, 1, 1, "某個地方", "測試報修紀錄"))
+    db.session.commit()
+
+    db.session.add(Records(1, 1, 1, "某個地方", "今天的紀錄"))
+    db.session.add(Records(1, 1, 1, "某個地方", "昨天的紀錄",
+                   time=(datetime.now() - timedelta(days=1)).strftime(timeformat)))
+    db.session.add(Records(1, 1, 1, "某個地方", "三天前的紀錄",
+                   time=(datetime.now() - timedelta(days=3)).strftime(timeformat)))
+    db.session.add(Records(1, 1, 1, "某個地方", "十天前的紀錄",
+                   time=(datetime.now() - timedelta(days=10)).strftime(timeformat)))
+
     db.session.add(Revisions(1, 1, 1, "測試修訂紀錄"))
 
-    # db.session.add(Unfinished(1))
+    # db.session.add(Unfinisheds(1))
 
-    h.updateUnfinished()
+    h.updateUnfinisheds()
+    db.session.commit()
 
 
 @manager.command
