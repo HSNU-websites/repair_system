@@ -28,14 +28,17 @@ def render_statuses():
 
 
 def render_items():
-    items = db.session.query(Items).order_by(Items.sequence).all()
+    items = (
+        db.session.query(Items.id, Items.description)
+        .order_by(Items.sequence).all()
+    )
     return [(item.id, item.description) for item in items]
 
 
 def render_buildings():
     buildings = (
-        db.session.query(Buildings.description).order_by(
-            Buildings.sequence).all()
+        db.session.query(Buildings.id, Buildings.description)
+        .order_by(Buildings.sequence).all()
     )
     return [(building.id, building.description) for building in buildings]
 
