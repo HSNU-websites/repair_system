@@ -16,6 +16,9 @@ class Config:
     MAIL_USE_SSL = True
     MAIL_USERNAME = getenv("MAIL_USERNAME")
     MAIL_PASSWORD = getenv("MAIL_PASSWORD")
+    MAIL_DEFAULT_SENDER = "HSNU"
+    # APScheduler
+    SCHEDULER_API_ENABLED=True
 
 
 class Development(Config):

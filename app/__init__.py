@@ -4,13 +4,14 @@ from logging.handlers import TimedRotatingFileHandler
 from flask import Flask, has_request_context, request
 from flask_login import LoginManager
 from flask_mail import Mail
-
+from flask_apscheduler import APScheduler
 from .config import config
 from .database import db
 
+
 login_manager = LoginManager()
 mail = Mail()
-
+scheduler = APScheduler()
 
 class RequestFormatter(logging.Formatter):
     def format(self, record):
@@ -31,6 +32,16 @@ def create_app(env):
     login_manager.init_app(app)
     db.init_app(app)
     mail.init_app(app)
+    scheduler.init_app(app)
+    scheduler.start()
+    from .mail_helper import send_daily_mail
+    scheduler.add_job(
+        "send_daily_mail",
+        send_daily_mail,
+        trigger="cron",
+        day="*",
+        hour="7",
+    )
 
     if not path.exists("log"):
         mkdir("log")

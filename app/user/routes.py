@@ -3,7 +3,7 @@ from flask import request, render_template, flash, current_app
 from flask_login import login_required, current_user
 from . import user_bp
 from ..forms import ReportForm
-from ..mail import send_report_mail
+from ..mail_helper import send_report_mail
 from ..database.db_helper import add_record, render_buildings, render_items
 
 
