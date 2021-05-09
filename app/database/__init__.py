@@ -15,7 +15,7 @@ __all__ = [db, backup, db_helper]
 #     base_filename, ext, date = default_name.split(".")
 #     return f"{base_filename}_{date}.{ext}"
 
-# todo rewrite log hendeler
+# todo rewrite log handler
 sql_log_handler = TimedRotatingFileHandler(
     r"log/SQL.log",
     when="D",
