@@ -10,7 +10,7 @@ from .model import (
     Records,
     Revisions,
     Statuses,
-    Unfinished,
+    Unfinisheds,
     Users,
     db,
     sequenceTables,
@@ -79,13 +79,13 @@ def load_user(user_id: str):
 
 def updateUnfinished():
     finishedStatus_id = 2
-    Unfinished.query.delete()
+    Unfinisheds.query.delete()
     l = []
     for record in Records.query.all():
         if not (
             record.revisions and record.revisions[-1].status_id == finishedStatus_id
         ):
-            l.append(Unfinished(record_id=record.id))
+            l.append(Unfinisheds(record_id=record.id))
     db.session.bulk_save_objects(l)
     db.session.commit()
 

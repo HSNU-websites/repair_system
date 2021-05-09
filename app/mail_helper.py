@@ -3,7 +3,7 @@ from flask_mail import Message
 from flask import current_app
 from .database import db
 from .database.db_helper import get_admin_emails
-from .database.model import Users, Buildings, Items, Records, Unfinished, Offices
+from .database.model import Users, Buildings, Items, Records, Unfinisheds, Offices
 from . import mail
 
 
@@ -42,13 +42,24 @@ def send_report_mail(user_id, building_id, location, item_id, description):
     mail.send(msg)
 
 
+def dm():
+    items = {row.id: row.office_id
+             for row in db.session.query(Items.id, Items.office_id).all()
+             }
+    unfinished_records = [r for r in Records.query.filter(Records.id.in_(Unfinisheds))]
+    result = {row.id: [[], [], []]
+              for row in db.session.query(Offices.id).all()}
+    pass
+
+
 def send_daily_mail():
     subject = "%s 報修列表" % datetime.now().strftime("%Y/%m/%d")
     today = datetime.now().strftime("%Y-%m-%d")
     yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
     seven_days = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
-    offices = [(office.id, office.description) for office in Offices.query.all()]
-    unfinisheds = [unfinished for unfinished in Unfinished.query.all()]
+    offices = [(office.id, office.description)
+               for office in Offices.query.all()]
+    unfinisheds = [unfinished for unfinished in Unfinisheds.query.all()]
     records = []
     for office_id, office_description in offices:
         record = "<div><b>%s</b></div>" % office_description
@@ -60,7 +71,8 @@ def send_daily_mail():
             .order_by("time")
             .all()
         )
-        finished = []   # Temporarily storing the records that have been written in the email.
+        # Temporarily storing the records that have been written in the email.
+        finished = []
         for r in record_yesterday:
             if r.id in [unfinished.record_id for unfinished in unfinisheds]:
                 record += "<div style='color: red'>%s %s</div>" % (
@@ -70,7 +82,8 @@ def send_daily_mail():
                 finished.append(r.id)
             else:
                 record += "<div>%s %s</div>" % (r.time, r.description)
-        unfinisheds = filter(lambda unfinished: unfinished.record_id not in finished, unfinisheds)
+        unfinisheds = filter(
+            lambda unfinished: unfinished.record_id not in finished, unfinisheds)
 
         record += "<div>七天內未完成: </div>"
         finished = []
@@ -81,12 +94,14 @@ def send_daily_mail():
                     unfinished.record.description,
                 )
                 finished.append(unfinished.record_id)
-        unfinisheds = filter(lambda unfinished: unfinished.record_id not in finished, unfinisheds)
+        unfinisheds = filter(
+            lambda unfinished: unfinished.record_id not in finished, unfinisheds)
 
         record += "<div>七天以上未完成: </div>"
         for unfinished in unfinisheds:
             if unfinished.record.item.office.id == office_id:
-                record += "<div style='color: red'>%s %s</div>" % (unfinished.record.time, unfinished.record.description)
+                record += "<div style='color: red'>%s %s</div>" % (
+                    unfinished.record.time, unfinished.record.description)
 
         records.append(record)
     content = """

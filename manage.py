@@ -76,12 +76,14 @@ def reset(yes=False):
     for i, building in enumerate(db_default.buildings):
         db.session.add(Buildings(building, sequence=i + 1))
 
+    db.session.commit()
+    
     db.session.add(Records(1, 1, 1, "某個地方", "測試報修紀錄"))
     db.session.add(Revisions(1, 1, 1, "測試修訂紀錄"))
 
-    # db.session.add(Unfinished(1))
-
-    h.updateUnfinished()
+    # db.session.add(Unfinisheds(1))
+    return
+    h.updateUnfinisheds()
 
 
 @manager.command
