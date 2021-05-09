@@ -1,8 +1,13 @@
 from .common import db
 
+
 class Statuses(db.Model):
     """
-    Statuses.id = 1 will be default item
+    Statuses.id = 1 will be default item.
+
+    id: PK.
+    sequence: The displayed order.
+    description: The name of the building.
     """
 
     __tablename__ = "statuses"
@@ -23,4 +28,6 @@ class Statuses(db.Model):
             self.id = kwargs["id"]
 
     def __repr__(self):
-        return "Statuses(id={id}, sequence={sequence}, description='{description}')".format(**self.__dict__)
+        return "Statuses(id={id}, sequence={sequence}, description='{description}')".format(
+            **self.__dict__
+        )

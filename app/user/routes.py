@@ -5,6 +5,7 @@ from flask_login import current_user, login_required
 
 from ..database.db_helper import add_record, render_buildings, render_items
 from ..forms import ReportForm
+from ..mail_helper import send_report_mail
 from . import user_bp
 
 
@@ -20,11 +21,16 @@ def report_page():
     if request.method == "POST":
         if form.validate_on_submit():
             current_app.logger.info("POST /report")
-            building = form.building.data  # id
-            location = form.location.data  # str
-            item = form.item.data  # id
-            description = form.description.data  # id
-            add_record(current_user.id, building, location, item, description)
+            building_id = form.building.data  # type: int
+            location = form.location.data  # type: str
+            item_id = form.item.data  # type: int
+            description = form.description.data  # type: str
+            add_record(
+                current_user.id, building_id, location, item_id, description
+            )
+            send_report_mail(
+                current_user.id, building_id, location, item_id, description
+            )
             flash("Successfully report.", "success")
             return render_template("report.html", form=form)
         else:
