@@ -77,7 +77,7 @@ def load_user(user_id: str):
         return None
 
 
-def updateUnfinished():
+def updateUnfinisheds():
     finishedStatus_id = 2
     Unfinisheds.query.delete()
     l = []
