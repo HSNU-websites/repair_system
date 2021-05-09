@@ -2,7 +2,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 import re  # regex
 
-from .model import db, timeformat, timeformat_re_str
+from .model import db, timeformat
 from . import backup, db_helper
 
 __all__ = [db, backup, db_helper]

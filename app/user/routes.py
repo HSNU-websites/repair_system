@@ -1,7 +1,7 @@
 import logging
 
 from flask import current_app, flash, render_template, request
-from flask_login import login_required
+from flask_login import current_user, login_required
 
 from ..database.db_helper import add_record, render_buildings, render_items
 from ..forms import ReportForm
@@ -24,7 +24,7 @@ def report_page():
             location = form.location.data  # str
             item = form.item.data  # id
             description = form.description.data  # id
-            add_record(building, location, item, description)
+            add_record(current_user.id, building, location, item, description)
             flash("Successfully report.", "success")
             return render_template("report.html", form=form)
         else:

@@ -113,5 +113,8 @@ def generateVerificationCode(user_id: int) -> str:
     return b64encode(urandom(32))
 
 
-def add_record(building_id, location, item_id, description):
-    pass
+def add_record(user_id, building_id, location, item_id, description):
+    db.session.add(
+        Records(user_id, item_id, building_id, location,  description)
+    )
+    db.session.commit()
