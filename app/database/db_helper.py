@@ -34,8 +34,7 @@ def render_items():
 
 def render_buildings():
     buildings = (
-        db.session.query(Buildings.description).order_by(
-            Buildings.sequence).all()
+        db.session.query(Buildings).order_by(Buildings.sequence).all()
     )
     return [(building.id, building.description) for building in buildings]
 

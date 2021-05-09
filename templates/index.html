@@ -15,11 +15,7 @@
 </head>
 
 <body>
-    <!--
-    <h1>國立臺灣師大附中</h1>
-    <h1>校園修繕線上通報系統</h1>
-    -->
-    <img src="{{ url_for('static', filename='logo.png') }}" id="logo">
+    <a href="/"><img src="{{ url_for('static', filename='logo.png') }}" id="logo"></a>
     <div class="container" id="index">
         <form action="/" method="POST">
             {{ form.csrf_token }}

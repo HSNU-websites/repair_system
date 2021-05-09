@@ -58,22 +58,23 @@ def reset(yes=False):
     db.session.add_all(users)
 
     # Statuses default
-    db.session.add(Statuses("其他", len(db_default.statuses) + 1))
-    i = 0
-    for status in db_default.statuses:
-        db.session.add(Statuses(status, i := i + 1))
+    db.session.add(Statuses("其他", sequence=len(db_default.statuses) + 1))
+    for i, status in enumerate(db_default.statuses):
+        db.session.add(Statuses(status, sequence=i + 1))
+
+    # Offices default
+    for office in db_default.offices:
+        db.session.add(Offices(office))
 
     # Items default
-    db.session.add(Items("其他", len(db_default.items) + 1))
-    i = 0
-    for item in db_default.items:
-        db.session.add(Items(item, i := i + 1))
+    db.session.add(Items("其他", 1, sequence=len(db_default.items) + 1))
+    for i, item in enumerate(db_default.items):
+        db.session.add(Items(item[0], item[1], sequence=i + 1))
 
     # Buildings default
-    db.session.add(Buildings("其他", len(db_default.buildings) + 1))
-    i = 0
-    for building in db_default.buildings:
-        db.session.add(Buildings(building, i := i + 1))
+    db.session.add(Buildings("其他", sequence=len(db_default.buildings) + 1))
+    for i, building in enumerate(db_default.buildings):
+        db.session.add(Buildings(building, sequence=i + 1))
 
     db.session.add(Records(1, 1, 1, "某個地方", "測試報修紀錄"))
     db.session.add(Revisions(1, 1, 1, "測試修訂紀錄"))

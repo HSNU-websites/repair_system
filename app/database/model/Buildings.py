@@ -3,13 +3,16 @@ from .common import db
 
 class Buildings(db.Model):
     """
-    Buildings.id = 1 will be default building
+    Buildings.id = 1 will be default building.
+
+    id: PK.
+    sequence: The displayed order.
+    description: The name of the building.
     """
 
     __tablename__ = "buildings"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    sequence = db.Column(db.Integer, server_default="0",
-                         nullable=False, index=True)
+    sequence = db.Column(db.Integer, server_default="0", nullable=False, index=True)
     description = db.Column(db.String(255), nullable=False)
 
     def __init__(self, description, sequence=None, **kwargs):
@@ -19,4 +22,8 @@ class Buildings(db.Model):
             self.id = kwargs["id"]
 
     def __repr__(self):
-        return "Buildings(id={id},sequence={sequence},description='{description}')".format(**self.__dict__)
+        return (
+            "Buildings(id={id},sequence={sequence},description='{description}')".format(
+                **self.__dict__
+            )
+        )
