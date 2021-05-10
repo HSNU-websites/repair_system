@@ -1,9 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from flask_mail import Message
 from flask import current_app
 from .database import db
 from .database.db_helper import get_admin_emails
-from .database.model import Users, Buildings, Items, Records, Unfinished, Offices
+from .database.model import Users, Buildings, Items, Records, Unfinisheds, Offices
 from . import mail
 
 
@@ -43,63 +43,68 @@ def send_report_mail(user_id, building_id, location, item_id, description):
 
 
 def send_daily_mail():
-    subject = "%s 報修列表" % datetime.now().strftime("%Y/%m/%d")
-    today = datetime.now().strftime("%Y-%m-%d")
-    yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-    seven_days = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
-    offices = [(office.id, office.description) for office in Offices.query.all()]
-    unfinisheds = [unfinished for unfinished in Unfinished.query.all()]
-    records = []
-    for office_id, office_description in offices:
-        record = "<div><b>%s</b></div>" % office_description
+    # prepare data
+    today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    yesterday = (today - timedelta(days=1))
+    seven_days = (today - timedelta(days=7))
 
-        record += "<div>昨日新增: </div>"
-        record_yesterday = set(
-            db.session.query(Records)
-            .filter(Records.time.between(yesterday, yesterday))
-            .order_by("time")
-            .all()
+    # todo ordered by offices.sequence
+    result = [(row.id, row.description, [[], [], []])
+              for row in db.session.query(Offices.id, Offices.description)
+              .all()]
+
+    # query object
+    unfin_query = db.session.query(Unfinisheds.record_id)
+    for id, _, value in result:
+        item_query = db.session.query(Items.id).filter(Items.office_id == id)
+        records = (
+            Records.query.filter(Records.id.in_(unfin_query))
+                   .filter(Records.item_id.in_(item_query))
+                   .order_by(Records.time.desc())
+                   .all()
         )
-        finished = []   # Temporarily storing the records that have been written in the email.
-        for r in record_yesterday:
-            if r.id in [unfinished.record_id for unfinished in unfinisheds]:
-                record += "<div style='color: red'>%s %s</div>" % (
-                    r.time,
-                    r.description,
-                )
-                finished.append(r.id)
+        for row in records:
+            if row.time > today:
+                pass  # today
+            elif row.time > yesterday:
+                value[0].append(row)  # yesterday
+            elif row.time > seven_days:
+                value[1].append(row)  # 2-7 days
             else:
-                record += "<div>%s %s</div>" % (r.time, r.description)
-        unfinisheds = filter(lambda unfinished: unfinished.record_id not in finished, unfinisheds)
+                value[2].append(row)  # 7 days and before
+    # print(result)
+
+    # send mail
+    subject = "%s 報修列表" % datetime.now().strftime("%Y/%m/%d")
+    record = ""
+    for id, description, value in result:
+        record += "<div><b>%s</b></div>" % description
+        record += "<div>昨日新增: </div>"
+        for row in value[0]:
+            record += "<div>%s %s</div>" % (
+                row.time.strftime("%Y-%m-%dT%H-%M-%S"), row.description
+            )
 
         record += "<div>七天內未完成: </div>"
-        finished = []
-        for unfinished in unfinisheds:
-            if unfinished.record.item.office.id == office_id and unfinished.record.time > datetime.now() - timedelta(days=7):
-                record += "<div style='color: red'>%s %s</div>" % (
-                    unfinished.record.time,
-                    unfinished.record.description,
-                )
-                finished.append(unfinished.record_id)
-        unfinisheds = filter(lambda unfinished: unfinished.record_id not in finished, unfinisheds)
+        for row in value[1]:
+            record += "<div>%s %s</div>" % (
+                row.time.strftime("%Y-%m-%dT%H-%M-%S"), row.description
+            )
 
         record += "<div>七天以上未完成: </div>"
-        for unfinished in unfinisheds:
-            if unfinished.record.item.office.id == office_id:
-                record += "<div style='color: red'>%s %s</div>" % (unfinished.record.time, unfinished.record.description)
-
-        records.append(record)
+        for row in value[2]:
+            record += "<div style='color: red'>%s %s</div>" % (
+                row.time.strftime("%Y-%m-%dT%H-%M-%S"), row.description
+            )
     content = """
     <h3>每日報修:</h3>
     <div>未完成以紅色表示</div>
-        {records}
+        {record}
 
     <footer>此為系統自動寄送郵件，不須回覆</footer>
     """.format(
-        records
+        record=record
     )
-    print(content)
-    return
     recipients = get_admin_emails()
     msg = Message(subject, recipients=recipients)
     msg.html = content

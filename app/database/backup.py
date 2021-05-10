@@ -8,7 +8,7 @@ from .Archive import Archive
 defaultTables = idTables
 partition = 1000
 
-backup_dir = Path(__file__).parent/Path("../../Backup")
+backup_dir = Path("Backup")
 
 # mail [].sort(key = lambda s: s[2])
 # archiveName -> *.tar.gz / * (a folder)
@@ -44,10 +44,9 @@ def db_reprTest():
         b = b and (d1 == d2)
     return b
 
+
 def getBackups() -> list:
     return list(backup_dir.iterdir())
-
-
 
 
 def backup(tables: list[db.Model] = None):  # path not fix

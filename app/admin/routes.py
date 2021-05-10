@@ -27,3 +27,17 @@ def system_page():
         )
     if request.method == "POST":
         pass
+
+@admin_bp.route("/system_modification", methods=["POST", "DELETE", "UPDATE"])
+def system_modification_page():
+    if request.method == "POST":
+        # Add
+        pass
+    if request.method == "DELETE":
+        # Delete
+        data = request.get_json(force=True)
+        print(data)
+    if request.method == "UPDATE":
+        # Update
+        data = request.get_json(force=True)
+        print(data)

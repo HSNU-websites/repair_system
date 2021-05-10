@@ -8,7 +8,7 @@ from .model import (
     Records,
     Revisions,
     Statuses,
-    Unfinished,
+    Unfinisheds,
     Users,
     db,
     sequenceTables,
@@ -26,12 +26,18 @@ def render_statuses():
 
 
 def render_items():
-    items = db.session.query(Items).order_by(Items.sequence).all()
+    items = (
+        db.session.query(Items.id, Items.description)
+        .order_by(Items.sequence).all()
+    )
     return [(item.id, item.description) for item in items]
 
 
 def render_buildings():
-    buildings = db.session.query(Buildings).order_by(Buildings.sequence).all()
+    buildings = (
+        db.session.query(Buildings.id, Buildings.description)
+        .order_by(Buildings.sequence).all()
+    )
     return [(building.id, building.description) for building in buildings]
 
 
@@ -79,15 +85,15 @@ def load_user(user_id: str):
         return None
 
 
-def updateUnfinished():
+def updateUnfinisheds():
     finishedStatus_id = 2
-    Unfinished.query.delete()
+    Unfinisheds.query.delete()
     l = []
     for record in Records.query.all():
         if not (
             record.revisions and record.revisions[-1].status_id == finishedStatus_id
         ):
-            l.append(Unfinished(record_id=record.id))
+            l.append(Unfinisheds(record_id=record.id))
     db.session.bulk_save_objects(l)
     db.session.commit()
 
@@ -115,8 +121,11 @@ def generateVerificationCode(user_id: int) -> str:
     return b64encode(urandom(32))
 
 
-def add_record(building_id, location, item_id, description):
-    pass
+def add_record(user_id, building_id, location, item_id, description):
+    db.session.add(
+        Records(user_id, item_id, building_id, location,  description)
+    )
+    db.session.commit()
 
 def render_user_records(user_id):
     pass
