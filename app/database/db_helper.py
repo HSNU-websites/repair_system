@@ -14,6 +14,7 @@ from .model import (
     Users,
     db,
     sequenceTables,
+    tablenameRev,
 )
 
 
@@ -121,4 +122,23 @@ def add_record(user_id, building_id, location, item_id, description):
     db.session.add(
         Records(user_id, item_id, building_id, location,  description)
     )
+    db.session.commit()
+
+
+def insert(tablename: str, data: dict):
+    t = tablenameRev[tablename]
+    db.session.add(t(**data))
+    db.session.commit()
+
+
+def update(tablename: str, data: dict):
+    t = tablenameRev[tablename]
+    id = data.pop("id")
+    t.query.filter_by(id=id).update(data)
+    db.session.commit()
+
+
+def delete(tablename: str, id: int):
+    t = tablenameRev[tablename]
+    t.query.filter_by(id=id).delete()
     db.session.commit()
