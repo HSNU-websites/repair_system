@@ -21,6 +21,6 @@ class Offices(db.Model):
 
     def __repr__(self):
         return (
-            "Offices(id={id}),description={description}"
+            "Offices(id={id},sequence={sequence},description='{description}')"
             .format(**self.__dict__)
         )
