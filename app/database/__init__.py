@@ -1,9 +1,10 @@
 import logging
-from logging.handlers import TimedRotatingFileHandler
 import re  # regex
+from logging.handlers import TimedRotatingFileHandler
+from pathlib import Path
 
-from .model import db, timeformat
 from . import backup, db_helper
+from .model import db, timeformat
 
 __all__ = [db, backup, db_helper]
 
@@ -16,10 +17,11 @@ __all__ = [db, backup, db_helper]
 #     return f"{base_filename}_{date}.{ext}"
 
 # todo rewrite log handler
+Path("log").mkdir(parents=True, exist_ok=True)
 sql_log_handler = TimedRotatingFileHandler(
     r"log/SQL.log",
     when="D",
-    interval=10,
+    interval=1,
     backupCount=2,
     encoding="UTF-8",
     delay=False,

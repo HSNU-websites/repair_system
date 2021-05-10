@@ -40,6 +40,7 @@ class Records(db.Model):
             self.time = datetime.datetime.strptime(kwargs["time"], timeformat)
 
     def __repr__(self):
-        return "Records(id={id},user_id={user_id},item_id={item_id},building_id={building_id},location='{location}',time='{mytime}',description='{description}')".format(
-            mytime=self.time.strftime(timeformat), **self.__dict__
+        return (
+            "Records(id={id},user_id={user_id},item_id={item_id},building_id={building_id},location='{location}',time='{mytime}',description='{description}')"
+            .format(mytime=self.time.strftime(timeformat), **self.__dict__)
         )

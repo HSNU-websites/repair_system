@@ -9,6 +9,7 @@ from .Users import Users
 from .Offices import Offices
 
 tables = {Statuses, Offices, Items, Buildings, Users, Records, Revisions, Unfinisheds}
+tablenameRev = {t.__tablename__:t for t in tables}
 idTables = {t for t in tables if "id" in t.__dict__}
 sequenceTables = {t for t in tables if "sequence" in t.__dict__}
 

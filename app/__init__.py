@@ -56,7 +56,7 @@ def create_app(env):
         backupCount=15,
         encoding="UTF-8",
         delay=False,
-        utc=True,
+        utc=False,
     )
     access_log_handler.setLevel("INFO")
     access_log_handler.setFormatter(formatter)

@@ -37,6 +37,16 @@ def send_report_mail(user_id, building_id, location, item_id, description):
         # For normal students
         recipients = [user.username + "@gs.hs.ntnu.edu.tw"]
 
+    # do not send email in development
+    if current_app.config["ENV"] != "production":
+        print("not sending mail since ENV={ENV}\n"
+              "subject: {subject}\n"
+              "recipients: {recipients}\n"
+              "content: \n{content}"
+              .format(ENV=current_app.config["ENV"], subject=subject, recipients=recipients, content=content)
+              )
+        return
+
     msg = Message(subject, recipients=recipients)
     msg.html = content
     mail.send(msg)
