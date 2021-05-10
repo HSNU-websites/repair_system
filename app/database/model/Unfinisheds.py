@@ -15,4 +15,7 @@ class Unfinisheds(db.Model):
         self.record_id = record_id
 
     def __repr__(self):
-        return "Unfinisheds(record_id={record_id})".format(**self.__dict__)
+        return (
+            "Unfinisheds(record_id={record_id})"
+            .format(**self.__dict__)
+        )

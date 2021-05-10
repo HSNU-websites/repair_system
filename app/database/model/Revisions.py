@@ -6,7 +6,7 @@ class Revisions(db.Model):
     """
     After the admin views the reports, they will make a revision record.
     The table is connected to `Records`, `Users` and `Statuses`.
-    
+
     id: PK.
     record_id: `id` in `Records` table.
     user_id: `id` in `Users` table.
@@ -36,6 +36,7 @@ class Revisions(db.Model):
             self.time = datetime.datetime.strptime(kwargs["time"], timeformat)
 
     def __repr__(self):
-        return "Revisions(id={id},record_id={record_id},user_id={user_id},status_id={status_id},time='{mytime}',description='{description}')".format(
-            mytime=self.time.strftime(timeformat), **self.__dict__
+        return (
+            "Revisions(id={id},record_id={record_id},user_id={user_id},status_id={status_id},time='{mytime}',description='{description}')"
+            .format(mytime=self.time.strftime(timeformat), **self.__dict__)
         )

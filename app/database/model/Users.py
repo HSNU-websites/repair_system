@@ -62,8 +62,9 @@ class Users(db.Model):
             self.isValid(valid)
 
     def __repr__(self):
-        return "Users(id={id},username='{username}',password_hash='{password_hash}',name='{name}',classnum={classnum},email='{email}',properties={properties})".format(
-            **self.__dict__
+        return (
+            "Users(id={id},username='{username}',password_hash='{password_hash}',name='{name}',classnum={classnum},email='{email}',properties={properties})"
+            .format(**self.__dict__)
         )
 
     def setFlag(self, flag: int, value: bool):
