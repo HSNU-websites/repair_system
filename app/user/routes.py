@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from . import user_bp
 from ..forms import ReportForm
 from ..mail_helper import send_report_mail
-from ..database.db_helper import add_record, render_buildings, render_items
+from ..database.db_helper import add_record, render_buildings, render_items, render_user_records
 
 
 @user_bp.route("/report", methods=["GET", "POST"])
@@ -38,7 +38,7 @@ def report_page():
             return render_template("report.html", form=form)
 
 
-@user_bp.route("/dashboard")
+@user_bp.route("/dashboard", methods=["GET"])
 @login_required
 def dashboard_page():
-    pass
+    return render_template("user_dashboard.html", records=render_user_records(current_user.id))

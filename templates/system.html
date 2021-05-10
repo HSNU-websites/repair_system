@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System</title>
+</head>
+<body>
+    <h1>System</h1>
+    <p>前者為名稱，後者為顯示順序</p>
+    <h3>大樓</h3>
+    <div id="buildings">
+        {% for building in buildings %}
+            <div id="buildings_{{ building.id }}">
+                <input type="text" value="{{ building.description }}">
+                <input type="text" value="{{ building.sequence }}">
+                <button>移除</button>
+            </div>
+        {% endfor %}
+        <button>新增</button>
+        <button>更新</button>
+    </div>
+    <h3>物件</h3>
+    <div id="items">
+        {% for item in items %}
+            <div id="items_{{ item.id }}">
+                <input type="text" value="{{ item.description }}">
+                <input type="text" value="{{ item.sequence }}">
+                <button>移除</button>
+            </div>
+        {% endfor %}
+        <button>新增</button>
+        <button>更新</button>
+    </div>
+    <h3>處室</h3>
+    <div id="offices">
+        {% for office in offices %}
+            <div id="offices_{{ office.id }}">
+                <input type="text" value="{{ office.description }}">
+                <input type="text" value="{{ office.sequence }}">
+                <button>移除</button>
+            </div>
+        {% endfor %}
+        <button>新增</button>
+        <button>更新</button>
+    </div>
+    <h3>狀態</h3>
+    <div id="statuses">
+        {% for status in statuses %}
+            <div id="statuses_{{ status.id }}">
+                <input type="text" value="{{ status.description }}">
+                <input type="text" value="{{ status.sequence }}">
+                <button>移除</button>
+            </div>
+        {% endfor %}
+        <button>新增</button>
+        <button>更新</button>
+    </div>
+</body>
+</html>
