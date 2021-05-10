@@ -54,9 +54,9 @@ class Archive():
                         hash_method=self.hash_dict["hash_method"], filepath=self.path/filepath, m1=m1, m2=m2
                     )
                 )
-            if hash_flag == Archive.flags.strict:
-                print("Abort reading")
-                return dict()
+                if hash_flag == Archive.flags.strict:
+                    print("Abort reading")
+                    return dict()
         return ujson.loads(s.decode("utf-8"))
 
     def write(self, filepath: str, data: dict, hash_gen=True):
@@ -106,7 +106,8 @@ class Archive():
         # hash
         if self.mode == "r":
             if "hash.json" in self.getFileNames():
-                self.hash_dict = self.read("hash.json", hash_check=False)
+                self.hash_dict = self.read(
+                    "hash.json", hash_flag=Archive.flags.no_check)
                 self.hash = type(self).Hash(self.hash_dict["hash_method"])
             else:
                 print("No hash file found in {path}".format(path=self.path))
@@ -118,6 +119,7 @@ class Archive():
             }
 
     def __del__(self):
-        self.write("hash.json", self.hash_dict, False)
+        if self.mode == "w":
+            self.write("hash.json", self.hash_dict, False)
         if self.isArchive:
             self.archive.close()

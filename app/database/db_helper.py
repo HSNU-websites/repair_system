@@ -12,7 +12,7 @@ from .model import (
     Users,
     db,
     sequenceTables,
-    Offices,
+    tablenameRev,
 )
 
 
@@ -26,17 +26,15 @@ def render_statuses():
 
 
 def render_items():
-    items = (
-        db.session.query(Items.id, Items.description)
-        .order_by(Items.sequence).all()
-    )
+    items = db.session.query(Items.id, Items.description).order_by(Items.sequence).all()
     return [(item.id, item.description) for item in items]
 
 
 def render_buildings():
     buildings = (
         db.session.query(Buildings.id, Buildings.description)
-        .order_by(Buildings.sequence).all()
+        .order_by(Buildings.sequence)
+        .all()
     )
     return [(building.id, building.description) for building in buildings]
 
@@ -98,23 +96,27 @@ def updateUnfinisheds():
     db.session.commit()
 
 
-def updateSequence(table: db.Model):
+def updateSequence(tables=None):
     """
+    table: a list of sequence tables
     assign rows where sequence=0
     """
-    if table not in sequenceTables:
-        return False
-    if r := db.session.query(db.func.max(table.sequence)).first():
-        max = r[0]
+    if tables is None:
+        tables = sequenceTables
     else:
-        max = 0
-    l = []
-    for row in table.query.filter(table.sequence == 0).order_by(table.id).all():
-        row.sequence = (max := max + 1)
-        l.append(row)
-    db.session.bulk_save_objects(l)
+        tables = filter(lambda x: x in sequenceTables, tables)
+
+    for table in tables:
+        if r := db.session.query(db.func.max(table.sequence)).first():
+            max = r[0]
+        else:
+            max = 0
+        l = []
+        for row in table.query.filter_by(sequence=0).order_by(table.id).all():
+            row.sequence = (max := max + 1)
+            l.append(row)
+        db.session.bulk_save_objects(l)
     db.session.commit()
-    return True
 
 
 def generateVerificationCode(user_id: int) -> str:
@@ -122,10 +124,28 @@ def generateVerificationCode(user_id: int) -> str:
 
 
 def add_record(user_id, building_id, location, item_id, description):
-    db.session.add(
-        Records(user_id, item_id, building_id, location,  description)
-    )
+    db.session.add(Records(user_id, item_id, building_id, location, description))
     db.session.commit()
+
 
 def render_user_records(user_id):
     pass
+
+
+def insert(tablename: str, data: dict):
+    t = tablenameRev[tablename]
+    db.session.add(t(**data))
+    db.session.commit()
+
+
+def update(tablename: str, data: dict):
+    t = tablenameRev[tablename]
+    id = data.pop("id")
+    t.query.filter_by(id=id).update(data)
+    db.session.commit()
+
+
+def delete(tablename: str, id: int):
+    t = tablenameRev[tablename]
+    t.query.filter_by(id=id).delete()
+    db.session.commit()
