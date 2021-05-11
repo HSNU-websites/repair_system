@@ -1,7 +1,7 @@
 from flask import request, render_template, current_app
 from flask_login import login_required
 from . import admin_bp
-from ..database.db_helper import render_system_setting, delete, update, insert
+from ..database.db_helper import render_system_setting, delete, update, insert, render_all_records
 from ..users import admin_required
 
 
@@ -9,9 +9,13 @@ from ..users import admin_required
 @admin_required
 @login_required
 def dashboard_page():
-    # TODO render all records
-    pass
-
+    if request.method == "GET":
+        return render_template("admin_dashboard.html", records=render_all_records)
+    if request.method == "POST":
+        # form hasn't designed
+        form = ""
+        filter = form.filter.data
+        return render_template("admin_dashboard.html", records=render_all_records(filter))
 
 @admin_bp.route("/system", methods=["GET"])
 @admin_required
@@ -30,6 +34,8 @@ def system_page():
 
 
 @admin_bp.route("/system_modification", methods=["POST", "DELETE", "UPDATE"])
+@admin_required
+@login_required
 def system_modification_page():
     if request.method == "POST":
         # Add

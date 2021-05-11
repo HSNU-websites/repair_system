@@ -40,6 +40,7 @@ def reset(yes=False):
     db.drop_all()
     db.create_all()
 
+    # test users will be removed in production
     db.session.add(Users("deleted", "", "此帳號已刪除", 0, valid=False))
     users = [
         Users(  # password: 123

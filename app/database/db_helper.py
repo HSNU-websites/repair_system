@@ -133,11 +133,16 @@ def render_user_records(user_id):
     pass
 
 
+def render_all_records(filter=None):
+    pass
+
+
 def insert(tablename: str, data: dict):
     try:
         t = tablenameRev[tablename]
         db.session.add(t(**data))
         db.session.commit()
+        updateSequence(tablename)
         return True
     except:
         return False
@@ -149,6 +154,7 @@ def update(tablename: str, data: dict):
         id = data.pop("id")
         t.query.filter_by(id=id).update(data)
         db.session.commit()
+        updateSequence(tablename)
         return True
     except:
         return False
@@ -159,6 +165,7 @@ def delete(tablename: str, id: int):
         t = tablenameRev[tablename]
         t.query.filter_by(id=id).delete()
         db.session.commit()
+        updateSequence(tablename)
         return True
     except:
         return False

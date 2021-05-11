@@ -33,16 +33,17 @@ def create_app(env):
     login_manager.init_app(app)
     db.init_app(app)
     mail.init_app(app)
-    scheduler.init_app(app)
-    scheduler.start()
-    from .mail_helper import send_daily_mail
-    scheduler.add_job(
-        "send_daily_mail",
-        send_daily_mail,
-        trigger="cron",
-        day="*",
-        hour="7",
-    )
+    if app.config["ENV"] != "testing":
+        scheduler.init_app(app)
+        scheduler.start()
+        from .mail_helper import send_daily_mail
+        scheduler.add_job(
+            "send_daily_mail",
+            send_daily_mail,
+            trigger="cron",
+            day="*",
+            hour="7",
+        )
 
     # log
     if not path.exists("log"):

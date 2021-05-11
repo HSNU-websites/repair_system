@@ -16,3 +16,7 @@ class BasicTest(unittest.TestCase):
     def test_alive(self):
         r = self.client.get(url_for("main.index_page"))
         self.assertTrue(r.status_code == 200)
+
+    def test_404(self):
+        r = self.client.get("/wrong")
+        self.assertTrue(r.status_code == 404)
