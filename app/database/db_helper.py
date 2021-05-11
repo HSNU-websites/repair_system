@@ -10,6 +10,7 @@ from .model import (
     Statuses,
     Unfinisheds,
     Users,
+    Offices,
     db,
     sequenceTables,
     tablenameRev,
@@ -133,19 +134,31 @@ def render_user_records(user_id):
 
 
 def insert(tablename: str, data: dict):
-    t = tablenameRev[tablename]
-    db.session.add(t(**data))
-    db.session.commit()
+    try:
+        t = tablenameRev[tablename]
+        db.session.add(t(**data))
+        db.session.commit()
+        return True
+    except:
+        return False
 
 
 def update(tablename: str, data: dict):
-    t = tablenameRev[tablename]
-    id = data.pop("id")
-    t.query.filter_by(id=id).update(data)
-    db.session.commit()
+    try:
+        t = tablenameRev[tablename]
+        id = data.pop("id")
+        t.query.filter_by(id=id).update(data)
+        db.session.commit()
+        return True
+    except:
+        return False
 
 
 def delete(tablename: str, id: int):
-    t = tablenameRev[tablename]
-    t.query.filter_by(id=id).delete()
-    db.session.commit()
+    try:
+        t = tablenameRev[tablename]
+        t.query.filter_by(id=id).delete()
+        db.session.commit()
+        return True
+    except:
+        return False

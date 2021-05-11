@@ -1,7 +1,7 @@
-from flask import request, render_template
+from flask import request, render_template, current_app
 from flask_login import login_required
 from . import admin_bp
-from ..database.db_helper import render_system_setting
+from ..database.db_helper import render_system_setting, delete, update, insert
 from ..users import admin_required
 
 
@@ -9,14 +9,16 @@ from ..users import admin_required
 @admin_required
 @login_required
 def dashboard_page():
+    # TODO render all records
     pass
 
 
-@admin_bp.route("/system", methods=["GET", "POST"])
+@admin_bp.route("/system", methods=["GET"])
 @admin_required
 @login_required
 def system_page():
     if request.method == "GET":
+        current_app.logger.info("GET /system")
         buildings, items, offices, statuses = render_system_setting()
         return render_template(
             "system.html",
@@ -25,19 +27,35 @@ def system_page():
             offices=offices,
             statuses=statuses,
         )
-    if request.method == "POST":
-        pass
+
 
 @admin_bp.route("/system_modification", methods=["POST", "DELETE", "UPDATE"])
 def system_modification_page():
     if request.method == "POST":
         # Add
-        pass
+        current_app.logger.info("POST /system_modification")
+        data = request.get_json(force=True)
+        if insert(data["category"], {"description": data["value"]}):
+            return "OK"
+        else:
+            return "Error", 400
     if request.method == "DELETE":
         # Delete
+        current_app.logger.info("DELETE /system_modification")
         data = request.get_json(force=True)
-        print(data)
+        if delete(data["category"], data["id"]):
+            return "OK"
+        else:
+            return "Error", 400
     if request.method == "UPDATE":
         # Update
+        current_app.logger.info("UPDATE /system_modification")
         data = request.get_json(force=True)
-        print(data)
+        category = data[0]["category"]
+        for r in data[1:]:
+            if not update(
+                r["category"],
+                {"description": r["description"], "sequence": r["sequence"]},
+            ):
+                return "Error", 400
+        return "OK"

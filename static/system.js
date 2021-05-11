@@ -8,24 +8,36 @@ function send_remove(element) {
         data: JSON.stringify({ 'category': category, 'id': id }),
         dataType: "json",
         success: function (data) {
-            alert("data");
+            alert("OK");
         },
         error: function (e) {
-            alert("e");
+            alert("Error");
         },
     })
 }
 
 function send_add(element) {
     var category = element.parentElement.id;
-    // pending
+    var value = document.getElementsByName("add")[0].value;
+    $.ajax({
+        url: "/system_modification",
+        type: "post",
+        data: JSON.stringify({ "category": category, "value": value }),
+        dataType: "json",
+        success: function (data) {
+            alert("OK");
+        },
+        error: function (e) {
+            alert("Error");
+        },
+    })
 }
 
 function send_update(element) {
     var category = element.parentElement.id;
     var info = element.parentElement.children;
-    var result = [];
-    for (var i = 0; i< info.length;i++) {
+    var result = [{ "category": category }];
+    for (var i = 0; i < info.length; i++) {
         if (info[i].tagName == "DIV") {
             result.push({
                 id: parseInt(info[i].id.split("_")[1]),
@@ -40,10 +52,10 @@ function send_update(element) {
         data: JSON.stringify(result),
         dataType: "json",
         success: function (data) {
-            alert("data");
+            alert("OK");
         },
         error: function (e) {
-            alert("e");
+            alert("Error");
         },
     })
 }

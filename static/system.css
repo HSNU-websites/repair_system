@@ -1,0 +1,51 @@
+body {
+    background-color: #778fe1;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: auto 0px auto 0px;
+}
+
+h1 {
+    text-align: center;
+}
+
+hr {
+    width: 420px
+}
+
+input[type="text"] {
+    margin: 5px 10px 5px 0px;
+}
+
+footer {
+    height: 40px;
+    position: relative;
+    bottom: 0;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#tip {
+    text-align: center;
+}
+
+#copyright {
+    position: absolute;
+    text-align: center;
+    bottom: 10px;
+    width: 100%;
+}
+
+#copyright a {
+    text-decoration: none;
+    color: black;
+}
+
+#copyright a:hover {
+    text-decoration: underline;
+}
