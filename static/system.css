@@ -10,18 +10,20 @@ h1 {
     text-align: center;
 }
 
+h3 {
+    margin-left: 5px;
+}
+
 hr {
     width: 420px
 }
 
 input[type="text"] {
-    margin: 5px 10px 5px 0px;
+    margin: 5px 10px 5px 10px;
 }
 
-footer {
-    height: 40px;
-    position: relative;
-    bottom: 0;
+button {
+    margin-left: 10px;
 }
 
 .container {
@@ -35,9 +37,10 @@ footer {
 }
 
 #copyright {
-    position: absolute;
+    height: 40px;
+    position: relative;
     text-align: center;
-    bottom: 10px;
+    bottom: 0px;
     width: 100%;
 }
 

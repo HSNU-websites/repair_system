@@ -7,30 +7,37 @@ function send_remove(element) {
         type: "delete",
         data: JSON.stringify({ 'category': category, 'id': id }),
         dataType: "json",
-        success: function (data) {
-            alert("OK");
-        },
-        error: function (e) {
-            alert("Error");
-        },
     })
+        .always(function (r) {
+            if (r.status == 200) {
+                alert("OK");
+                location.reload();
+            }
+            else {
+                alert("Error");
+            }
+        })
 }
 
 function send_add(element) {
     var category = element.parentElement.id;
-    var value = document.getElementsByName("add")[0].value;
+    var input_list = element.parentElement.getElementsByTagName("INPUT")
+    var value = input_list[input_list.length - 1].value;
     $.ajax({
         url: "/system_modification",
         type: "post",
         data: JSON.stringify({ "category": category, "value": value }),
         dataType: "json",
-        success: function (data) {
-            alert("OK");
-        },
-        error: function (e) {
-            alert("Error");
-        },
     })
+        .always(function (r) {
+            if (r.status == 200) {
+                alert("OK");
+                location.reload();
+            }
+            else {
+                alert("Error");
+            }
+        })
 }
 
 function send_update(element) {
@@ -48,14 +55,17 @@ function send_update(element) {
     }
     $.ajax({
         url: "/system_modification",
-        type: "delete",
+        type: "update",
         data: JSON.stringify(result),
         dataType: "json",
-        success: function (data) {
-            alert("OK");
-        },
-        error: function (e) {
-            alert("Error");
-        },
     })
+        .always(function (r) {
+            if (r.status == 200) {
+                alert("OK");
+                location.reload();
+            }
+            else {
+                alert("Error");
+            }
+        })
 }

@@ -1,6 +1,7 @@
 from os import path, mkdir
 import logging
 from logging.handlers import TimedRotatingFileHandler
+from datetime import datetime
 from flask import Flask, has_request_context, request
 from flask_login import LoginManager
 from flask_mail import Mail
@@ -43,14 +44,14 @@ def create_app(env):
         hour="7",
     )
 
+    # log
     if not path.exists("log"):
         mkdir("log")
     formatter = RequestFormatter(
-        "[%(asctime)s] %(remote_addr)s requested %(url)s %(levelname)s in %(module)s: %(message)s"
+        "[%(asctime)s] %(remote_addr)s requested %(url)s %(levelname)s: %(message)s"
     )
-    # access log
     access_log_handler = TimedRotatingFileHandler(
-        r"log/access.log",
+        "log/access_" + datetime.now().strftime("%Y-%m-%d") + ".log",
         when="D",
         interval=1,
         backupCount=15,
@@ -60,7 +61,7 @@ def create_app(env):
     )
     access_log_handler.setLevel("INFO")
     access_log_handler.setFormatter(formatter)
-
+    access_log_handler.suffix = "access_%Y-%m-%d.log"
     app.logger.addHandler(access_log_handler)
 
     # Blueprint

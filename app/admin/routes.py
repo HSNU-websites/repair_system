@@ -54,8 +54,12 @@ def system_modification_page():
         category = data[0]["category"]
         for r in data[1:]:
             if not update(
-                r["category"],
-                {"description": r["description"], "sequence": r["sequence"]},
+                category,
+                {
+                    "id": r["id"],
+                    "description": r["description"],
+                    "sequence": r["sequence"],
+                },
             ):
                 return "Error", 400
         return "OK"

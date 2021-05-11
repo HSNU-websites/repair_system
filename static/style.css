@@ -54,7 +54,7 @@ select {
 }
 
 #copyright {
-    position: relative;
+    position: absolute;
     text-align: center;
     bottom: 10px;
     width: 100%;
