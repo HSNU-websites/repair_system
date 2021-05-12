@@ -1,3 +1,4 @@
+from logging import NOTSET
 from flask import request, render_template, current_app
 from flask_login import login_required
 from . import admin_bp
@@ -41,7 +42,11 @@ def system_modification_page():
         # Add
         current_app.logger.info("POST /system_modification")
         data = request.get_json(force=True)
-        if insert(data["category"], {"description": data["value"]}):
+        if data.get("office") != None:
+            args = {"description": data["value"], "office_id": data["office"]}
+        else:
+            args = {"description": data["value"]}
+        if insert(data["category"], args):
             return "OK"
         else:
             return "Error", 400

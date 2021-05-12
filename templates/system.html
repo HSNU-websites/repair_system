@@ -43,6 +43,11 @@
             </div>
             {% endfor %}
             <input type="text" name="add">
+            <select name="offices" id="offices">
+                {% for office in offices %}
+                    <option value="{{ office.id }}">{{ office.description }}</option>
+                {% endfor %}
+            </select>
             <button class="add" onclick="send_add(this);">新增</button>
             <br>
             <button class="update" onclick="send_update(this);">更新</button>

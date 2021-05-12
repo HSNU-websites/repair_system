@@ -23,10 +23,18 @@ function send_add(element) {
     var category = element.parentElement.id;
     var input_list = element.parentElement.getElementsByTagName("INPUT")
     var value = input_list[input_list.length - 1].value;
+    var office = element.parentElement.getElementsByTagName("select");
+    if (office.length != 0) {
+        var data = JSON.stringify({ "category": category, "value": value, "office": parseInt(office[0].value) });
+    }
+    else {
+        var data = JSON.stringify({ "category": category, "value": value });
+    }
+    console.log(data)
     $.ajax({
         url: "/system_modification",
         type: "post",
-        data: JSON.stringify({ "category": category, "value": value }),
+        data: data,
         dataType: "json",
     })
         .always(function (r) {

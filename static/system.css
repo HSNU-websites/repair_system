@@ -24,12 +24,32 @@ input[type="text"] {
 
 button {
     margin-left: 10px;
+    border-radius: 5px;
+    height: 30px;
+    width: 50px;
+    background-color: white;
+}
+
+button:hover {
+    opacity: 0.8;
 }
 
 .container {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.add {
+    color: rgb(38, 168, 38);
+}
+
+.remove {
+    color: crimson;
+}
+
+.update {
+    color: blue;
 }
 
 #tip {
