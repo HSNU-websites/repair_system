@@ -30,6 +30,9 @@ class Testing(Config):
     TESTING = True
     DEBUG = True
     ENV = "testing"
+    RECAPTCHA_ENABLED = False
+    PRESERVE_CONTEXT_ON_EXCEPTION = False
+    WTF_CSRF_ENABLED = False
 
 
 class Production(Config):
