@@ -8,8 +8,7 @@ class Offices(db.Model):
 
     __tablename__ = "offices"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    sequence = db.Column(db.Integer, server_default="0",
-                         nullable=False, index=True)
+    sequence = db.Column(db.Integer, server_default="0", nullable=False, index=True)
     description = db.Column(db.String(255), nullable=False)
     # item = db.relationship("Items", backref="office")
 
@@ -21,6 +20,7 @@ class Offices(db.Model):
 
     def __repr__(self):
         return (
-            "Offices(id={id},sequence={sequence},description='{description}')"
-            .format(**self.__dict__)
+            "Offices(id={id},sequence={sequence},description='{description}')".format(
+                **self.__dict__
+            )
         )

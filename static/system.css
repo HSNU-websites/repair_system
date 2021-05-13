@@ -1,0 +1,74 @@
+body {
+    background-color: #778fe1;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin: auto 0px auto 0px;
+}
+
+h1 {
+    text-align: center;
+}
+
+h3 {
+    margin-left: 5px;
+}
+
+hr {
+    width: 420px
+}
+
+input[type="text"] {
+    margin: 5px 10px 5px 10px;
+}
+
+button {
+    margin-left: 10px;
+    border-radius: 5px;
+    height: 30px;
+    width: 50px;
+    background-color: white;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.add {
+    color: rgb(38, 168, 38);
+}
+
+.remove {
+    color: crimson;
+}
+
+.update {
+    color: blue;
+}
+
+#tip {
+    text-align: center;
+}
+
+#copyright {
+    height: 40px;
+    position: relative;
+    text-align: center;
+    bottom: 0px;
+    width: 100%;
+}
+
+#copyright a {
+    text-decoration: none;
+    color: black;
+}
+
+#copyright a:hover {
+    text-decoration: underline;
+}

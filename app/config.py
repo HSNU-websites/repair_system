@@ -18,7 +18,7 @@ class Config:
     MAIL_PASSWORD = getenv("MAIL_PASSWORD")
     MAIL_DEFAULT_SENDER = "HSNU"
     # APScheduler
-    SCHEDULER_API_ENABLED=True
+    SCHEDULER_API_ENABLED = True
 
 
 class Development(Config):
@@ -28,6 +28,7 @@ class Development(Config):
 
 class Testing(Config):
     TESTING = True
+    DEBUG = True
     ENV = "testing"
 
 

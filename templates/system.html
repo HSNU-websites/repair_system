@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='system.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='system.js') }}"></script>
+    <title>系統設定</title>
+</head>
+
+<body>
+    <h1>系統設定</h1>
+    <p id="tip">前者為名稱，後者為顯示順序</p>
+    <div class="container">
+        <div id="buildings">
+            <h3>大樓</h3>
+            {% for building in buildings %}
+            <div id="buildings_{{ building.id }}">
+                <input type="text" value="{{ building.description }}">
+                <input type="text" value="{{ building.sequence }}">
+                <button class="remove" onclick="send_remove(this);">移除</button>
+            </div>
+            {% endfor %}
+            <input type="text" name="add">
+            <button class="add" onclick="send_add(this);">新增</button>
+            <br>
+            <button class="update" onclick="send_update(this);">更新</button>
+        </div>
+    </div>
+    <hr>
+    <div class="container">
+        <div id="items">
+            <h3>物件</h3>
+            {% for item in items %}
+            <div id="items_{{ item.id }}">
+                <input type="text" value="{{ item.description }}">
+                <input type="text" value="{{ item.sequence }}">
+                <button class="remove" onclick="send_remove(this);">移除</button>
+            </div>
+            {% endfor %}
+            <input type="text" name="add">
+            <select name="offices" id="offices">
+                {% for office in offices %}
+                    <option value="{{ office.id }}">{{ office.description }}</option>
+                {% endfor %}
+            </select>
+            <button class="add" onclick="send_add(this);">新增</button>
+            <br>
+            <button class="update" onclick="send_update(this);">更新</button>
+        </div>
+    </div>
+    <hr>
+    <div class="container">
+        <div id="offices">
+            <h3>處室</h3>
+            {% for office in offices %}
+            <div id="offices_{{ office.id }}">
+                <input type="text" value="{{ office.description }}">
+                <input type="text" value="{{ office.sequence }}">
+                <button class="remove" onclick="send_remove(this);">移除</button>
+            </div>
+            {% endfor %}
+            <input type="text" name="add">
+            <button class="add" onclick="send_add(this);">新增</button>
+            <br>
+            <button class="update" onclick="send_update(this);">更新</button>
+        </div>
+    </div>
+    <hr>
+    <div class="container">
+        <div id="statuses">
+            <h3>狀態</h3>
+            {% for status in statuses %}
+            <div id="statuses_{{ status.id }}">
+                <input type="text" value="{{ status.description }}">
+                <input type="text" value="{{ status.sequence }}">
+                <button class="remove" onclick="send_remove(this);">移除</button>
+            </div>
+            {% endfor %}
+            <input type="text" name="add">
+            <button class="add" onclick="send_add(this);">新增</button>
+            <br>
+            <button class="update" onclick="send_update(this);">更新</button>
+        </div>
+    </div>
+    <footer>
+        <div id="copyright">© 2021 <a href="https://github.com/HSNU-websites" target="_blank">師大附中網站更新計畫</a></div>
+    </footer>
+</body>
+
+</html>
