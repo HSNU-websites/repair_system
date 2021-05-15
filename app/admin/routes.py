@@ -2,7 +2,13 @@ from logging import NOTSET
 from flask import request, render_template, current_app
 from flask_login import login_required
 from . import admin_bp
-from ..database.db_helper import render_system_setting, delete, update, insert, render_all_records
+from ..database.db_helper import (
+    render_system_setting,
+    delete,
+    update,
+    insert,
+    render_all_records,
+)
 from ..users import admin_required
 
 
@@ -16,7 +22,10 @@ def dashboard_page():
         # form hasn't designed
         form = ""
         filter = form.filter.data
-        return render_template("admin_dashboard.html", records=render_all_records(filter))
+        return render_template(
+            "admin_dashboard.html", records=render_all_records(filter)
+        )
+
 
 @admin_bp.route("/system", methods=["GET"])
 @admin_required
