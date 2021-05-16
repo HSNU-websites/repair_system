@@ -100,6 +100,7 @@ class NormalUserAuthTest(unittest.TestCase):
             self.assertTrue(r.status_code == 401)
 
 
+# Admin privileges
 class AdminAuthTest(NormalUserAuthTest):
     def setUp(self) -> None:
         self.app = create_app("testing")

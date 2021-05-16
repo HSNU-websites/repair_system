@@ -1,5 +1,5 @@
 from flask import render_template, redirect, url_for, request, flash, current_app, abort
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from . import main_bp
 from ..forms import LoginForm
 from ..database.db_helper import login_auth
@@ -39,6 +39,7 @@ def index_page():  # index page is login page
 
 
 @main_bp.route("/logout", methods=["GET"])
+@login_required
 def logout_page():
     current_app.logger.info("GET /logout")
     logout_user()
