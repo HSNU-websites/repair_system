@@ -2,17 +2,67 @@ from os import path, mkdir
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from datetime import datetime
-from flask import Flask, has_request_context, request
+from flask import (
+    Flask,
+    has_request_context,
+    request,
+    abort,
+    flash,
+    current_app,
+    redirect,
+    session,
+)
 from flask_login import LoginManager
+from flask_login.utils import (
+    login_url as make_login_url,
+    expand_login_view,
+    make_next_param,
+)
+from flask_login.signals import user_unauthorized
 from flask_mail import Mail
 from flask_apscheduler import APScheduler
 from .config import config
 from .database import db
 
 
-login_manager = LoginManager()
-mail = Mail()
-scheduler = APScheduler()
+class LoginManager_(LoginManager):
+    def __init__(self):
+        super().__init__()
+
+    def forbidden(self):
+        user_unauthorized.send(current_app._get_current_object())
+
+        if self.unauthorized_callback:
+            return self.unauthorized_callback()
+
+        if request.blueprint in self.blueprint_login_views:
+            login_view = self.blueprint_login_views[request.blueprint]
+        else:
+            login_view = self.login_view
+
+        if not login_view:
+            abort(403)
+
+        if self.login_message:
+            if self.localize_callback is not None:
+                flash(
+                    self.localize_callback(self.login_message),
+                    category=self.login_message_category,
+                )
+            else:
+                flash(self.login_message, category=self.login_message_category)
+
+        config = current_app.config
+        if config.get("USE_SESSION_FOR_NEXT", USE_SESSION_FOR_NEXT):
+            login_url = expand_login_view(login_view)
+            session["_id"] = self._session_identifier_generator()
+            session["next"] = make_next_param(login_url, request.url)
+            redirect_url = make_login_url(login_view)
+        else:
+            redirect_url = make_login_url(login_view, next_url=request.url)
+
+        return redirect(redirect_url)
+
 
 class RequestFormatter(logging.Formatter):
     def format(self, record):
@@ -26,6 +76,11 @@ class RequestFormatter(logging.Formatter):
         return super().format(record)
 
 
+login_manager = LoginManager_()
+mail = Mail()
+scheduler = APScheduler()
+
+
 def create_app(env):
     app = Flask(__name__, template_folder="../templates", static_folder="../static")
     app.config.from_object(config[env])
@@ -37,6 +92,7 @@ def create_app(env):
         scheduler.init_app(app)
         scheduler.start()
         from .mail_helper import send_daily_mail
+
         scheduler.add_job(
             "send_daily_mail",
             send_daily_mail,
