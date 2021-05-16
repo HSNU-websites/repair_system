@@ -85,21 +85,22 @@ class NormalUserAuthTest(unittest.TestCase):
         with self.client:
             self.login()
             r = self.client.get(url_for("admin.dashboard_page"))
-            self.assertTrue(r.status_code == 401)
+            self.assertTrue(r.status_code == 403)
 
     def test_system_page(self):
         with self.client:
             self.login()
             r = self.client.get(url_for("admin.system_page"))
-            self.assertTrue(r.status_code == 401)
+            self.assertTrue(r.status_code == 403)
 
     def test_system_modification_page(self):
         with self.client:
             self.login()
             r = self.client.post(url_for("admin.system_modification_page"))
-            self.assertTrue(r.status_code == 401)
+            self.assertTrue(r.status_code == 403)
 
 
+# Admin privileges
 class AdminAuthTest(NormalUserAuthTest):
     def setUp(self) -> None:
         self.app = create_app("testing")
