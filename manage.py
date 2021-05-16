@@ -84,20 +84,22 @@ def reset(yes=False):
 
     db.session.commit()
 
-
-# "%Y-%m-%dT%H-%M-%S"
+    # "%Y-%m-%dT%H-%M-%S"
     random_records = [
         Records(
             user_id=randint(2, len(users)),
-            item_id=randint(1, len(db_default.items)+1),
-            building_id=randint(1, len(db_default.buildings)+1),
+            item_id=randint(1, len(db_default.items) + 1),
+            building_id=randint(1, len(db_default.buildings) + 1),
             location="某{}個地方".format(randint(1, 100000)),
             description="?{}?的紀錄".format(randint(1, 100000)),
             insert_time="{:04}-{:02}-{:02}T{:02}-{:02}-{:02}".format(
-                randint(1980, 2021), randint(1, 12), randint(1, 28),
-                randint(0, 23), randint(0, 59), randint(0, 59)
-            )
-
+                randint(1980, 2021),
+                randint(1, 12),
+                randint(1, 28),
+                randint(0, 23),
+                randint(0, 59),
+                randint(0, 59),
+            ),
         )
         for _ in range(100)
     ]
@@ -144,7 +146,7 @@ def reset(yes=False):
     db.session.commit()
 
 
-@ manager.command
+@manager.command
 def backup():
     """
     Backup Tables
@@ -152,7 +154,7 @@ def backup():
     b.backup()
 
 
-@ manager.command
+@manager.command
 def test():
     tests = unittest.TestLoader().discover("tests")
     unittest.TextTestRunner(verbosity=2).run(tests)

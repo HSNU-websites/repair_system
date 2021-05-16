@@ -12,12 +12,12 @@ def load(user_id):
 def admin_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
-        try:
+        if current_user.is_active:
             if current_user.isAdmin:
                 return func(*args, **kwargs)
             else:
-                return login_manager.unauthorized()
-        except:
-            return login_manager.unauthorized()
+                return login_manager.forbidden()
+        else:
+            return login_manager.unauthorized()            
 
     return decorated_view
