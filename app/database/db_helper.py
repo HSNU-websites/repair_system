@@ -1,7 +1,10 @@
 from base64 import b64decode, b64encode
 from hashlib import sha256
+from math import ceil
 from os import urandom
+
 from flask_login import UserMixin
+
 from .model import (
     Buildings,
     Items,
@@ -14,6 +17,7 @@ from .model import (
     db,
     sequenceTables,
     tablenameRev,
+    timeformat,
 )
 
 
@@ -22,12 +26,14 @@ class User(UserMixin):
 
 
 def render_statuses():
-    statuses = db.session.query(Statuses.description).order_by(Statuses.sequence).all()
+    statuses = db.session.query(
+        Statuses.description).order_by(Statuses.sequence).all()
     return [status.description for status in statuses]
 
 
 def render_items():
-    items = db.session.query(Items.id, Items.description).order_by(Items.sequence).all()
+    items = db.session.query(
+        Items.id, Items.description).order_by(Items.sequence).all()
     return [(item.id, item.description) for item in items]
 
 
@@ -89,9 +95,9 @@ def updateUnfinisheds():
     Unfinisheds.query.delete()
     l = []
     for record in Records.query.all():
-        if not (
-            record.revisions and record.revisions[-1].status_id == finishedStatus_id
-        ):
+        r = db.session.query(Revisions.status_id).order_by(
+            Revisions.id.desc()).first()
+        if not (r and r.status_id == finishedStatus_id):
             l.append(Unfinisheds(record_id=record.id))
     db.session.bulk_save_objects(l)
     db.session.commit()
@@ -125,16 +131,57 @@ def generateVerificationCode(user_id: int) -> str:
 
 
 def add_record(user_id, building_id, location, item_id, description):
-    db.session.add(Records(user_id, item_id, building_id, location, description))
+    db.session.add(
+        Records(user_id, item_id, building_id, location, description)
+    )
     db.session.commit()
 
 
-def render_user_records(user_id):
-    pass
+def get_user(user_id) -> dict:
+    user = db.session.query(
+        Users.username, Users.name, Users.classnum
+    ).filter_by(id=id).first()
+    return {
+        "username": user.username,
+        "name": user.name,
+        "classnum": user.classnum
+    }
 
 
-def render_all_records(filter=None):
-    pass
+def record_to_dict(record):
+    item = db.session.query(Items.description).filter_by(
+        id=record.item_id).first()[0]
+    building = db.session.query(Buildings.description).filter_by(
+        id=record.building_id).first()[0]
+    insert_time = record.insert_time.strftime(timeformat)
+    update_time = record.update_time.strftime(timeformat)
+    return {
+        "user": get_user(record.user_id),
+        "item": item,
+        "building": building,
+        "location": record.location,
+        "insert_time": insert_time,
+        "update_time": update_time,
+        "description": record.description
+    }
+
+
+def render_user_records(user_id) -> list:
+    l = []
+    for record in Records.query.filter_by(id=user_id).order_by(Records.update_time.desc()).all():
+        l.append(record_to_dict(record))
+    return l
+
+
+def render_all_records(page=1, per_page=100) -> dict:
+    l = []
+    for record in Records.query.offset(page*per_page).limit(per_page).all():
+        l.append(record_to_dict(record))
+    return {
+        "page": page,
+        "pages": ceil(Records.query.count()/per_page),
+        "records": l
+    }
 
 
 def insert(tablename: str, data: dict):
@@ -142,9 +189,11 @@ def insert(tablename: str, data: dict):
         t = tablenameRev[tablename]
         db.session.add(t(**data))
         db.session.commit()
+        updateSequence([t])
         return True
     except:
         return False
+
 
 def update(tablename: str, data: dict):
     try:
@@ -165,3 +214,4 @@ def delete(tablename: str, id: int):
         return True
     except:
         return False
+    # todo fix foreign key constraint
