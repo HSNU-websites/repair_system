@@ -95,8 +95,11 @@ def updateUnfinisheds():
     Unfinisheds.query.delete()
     l = []
     for record in Records.query.all():
-        r = db.session.query(Revisions.status_id).order_by(
-            Revisions.id.desc()).first()
+        r = (
+            db.session.query(Revisions.status_id)
+            .filter_by(record_id=record.id)
+            .order_by(Revisions.id.desc()).first()
+        )
         if not (r and r.status_id == finishedStatus_id):
             l.append(Unfinisheds(record_id=record.id))
     db.session.bulk_save_objects(l)
@@ -140,7 +143,7 @@ def add_record(user_id, building_id, location, item_id, description):
 def get_user(user_id) -> dict:
     user = db.session.query(
         Users.username, Users.name, Users.classnum
-    ).filter_by(id=id).first()
+    ).filter_by(id=user_id).first()
     return {
         "username": user.username,
         "name": user.name,
@@ -168,15 +171,21 @@ def record_to_dict(record):
 
 def render_user_records(user_id) -> list:
     l = []
-    for record in Records.query.filter_by(id=user_id).order_by(Records.update_time.desc()).all():
+    for record in Records.query.filter_by(user_id=user_id).order_by(Records.update_time.desc()).all():
         l.append(record_to_dict(record))
     return l
 
 
-def render_all_records(page=1, per_page=100) -> dict:
+def render_all_records(filter: dict = None, page=1, per_page=100) -> dict:
+    if filter is None:
+        q = Records.query
+    else:
+        q = Records.query.filter_by(**filter)
+
     l = []
-    for record in Records.query.offset(page*per_page).limit(per_page).all():
+    for record in q.order_by(Records.update_time.desc()).offset((page-1)*per_page).limit(per_page).all():
         l.append(record_to_dict(record))
+
     return {
         "page": page,
         "pages": ceil(Records.query.count()/per_page),

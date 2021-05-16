@@ -18,15 +18,15 @@ class Records(db.Model):
 
     __tablename__ = "records"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.ForeignKey("users.id"), nullable=False)
+    user_id = db.Column(db.ForeignKey("users.id"), nullable=False, index=True)
     item_id = db.Column(db.ForeignKey("items.id"), nullable=False)
     building_id = db.Column(db.ForeignKey("buildings.id"), nullable=False)
     location = db.Column(db.String(255), nullable=False)
     insert_time = db.Column(
-        db.TIMESTAMP, server_default=db.text("NOW()"), nullable=False, index=True
+        db.TIMESTAMP, server_default=db.func.now(), nullable=False
     )
     update_time = db.Column(
-        db.TIMESTAMP, server_default=db.text("NOW() ON UPDATE NOW()"), nullable=False, index=True
+        db.TIMESTAMP, server_default=db.func.now(), nullable=False, index=True
     )
     description = db.Column(db.String(255), nullable=False)
     # revisions = db.relationship("Revisions")
@@ -40,10 +40,10 @@ class Records(db.Model):
         if "id" in kwargs:
             self.id = kwargs["id"]
         if "insert_time" in kwargs:
-            self.time = datetime.datetime.strptime(
+            self.insert_time = datetime.datetime.strptime(
                 kwargs["insert_time"], timeformat)
         if "update_time" in kwargs:
-            self.time = datetime.datetime.strptime(
+            self.update_time = datetime.datetime.strptime(
                 kwargs["update_time"], timeformat)
 
     def __repr__(self):
@@ -55,4 +55,4 @@ class Records(db.Model):
     @staticmethod
     def update(id):
         Records.query.filter_by(id=id).update(
-            {"update_time": db.text("NOW()")})
+            {"update_time": db.text("CURRENT_TIMESTAMP")})
