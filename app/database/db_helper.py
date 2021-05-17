@@ -18,6 +18,7 @@ from .model import (
     sequenceTables,
     tablenameRev,
     timeformat,
+    passwd_context,
 )
 
 
@@ -150,6 +151,7 @@ def get_user(user_id) -> dict:
         "classnum": user.classnum
     }
 
+
 def record_to_dict(record):
     item = db.session.query(Items.description).filter_by(
         id=record.item_id).first()[0]
@@ -181,23 +183,17 @@ def record_to_dict(record):
     }
 
 
-def render_user_records(user_id) -> list:
-    l = []
-    for record in Records.query.filter_by(user_id=user_id).order_by(Records.update_time.desc()).all():
-        l.append(record_to_dict(record))
-    return l
-
-
 def render_all_records(filter: dict = None, page=1, per_page=100) -> dict:
-    if filter is None:
-        q = Records.query
-    else:
+    q = Records.query
+    if filter is not None:
         if "username" in filter:
-            u = db.session.query(Users.id).filter_by(username=filter.pop("username"))
+            u = db.session.query(Users.id).filter_by(
+                username=filter.pop("username"))
             if u:
                 q = q.filter_by(user_id=u.id)
         if "classnum" in filter:
-            u = db.session.query(Users.id).filter_by(username=filter.pop("classnum"))
+            u = db.session.query(Users.id).filter_by(
+                username=filter.pop("classnum"))
             if u:
                 q = q.filter_by(user_id=u.id)
         q = q.filter_by(**filter)
@@ -214,8 +210,12 @@ def render_all_records(filter: dict = None, page=1, per_page=100) -> dict:
 
 
 def insert(tablename: str, data: dict):
+    """
+    Statuses, Offices, Items, Buildings only
+    """
     try:
-        t = tablenameRev[tablename]
+        if t := tablenameRev[tablename] not in sequenceTables:
+            return False
         db.session.add(t(**data))
         db.session.commit()
         updateSequence([t])
@@ -225,8 +225,12 @@ def insert(tablename: str, data: dict):
 
 
 def update(tablename: str, data: dict):
+    """
+    Statuses, Offices, Items, Buildings only
+    """
     try:
-        t = tablenameRev[tablename]
+        if t := tablenameRev[tablename] not in sequenceTables:
+            return False
         id = data.pop("id")
         t.query.filter_by(id=id).update(data)
         db.session.commit()
@@ -236,11 +240,43 @@ def update(tablename: str, data: dict):
 
 
 def delete(tablename: str, id: int):
+    """
+    Statuses, Offices, Items, Buildings only
+    """
     try:
-        t = tablenameRev[tablename]
+        if t := tablenameRev[tablename] not in sequenceTables:
+            return False
         t.query.filter_by(id=id).delete()
         db.session.commit()
         return True
     except:
         return False
     # todo fix foreign key constraint
+
+
+def add_user(username, password, name, classnum, email="", admin=False, valid=True):
+    password_hash = passwd_context.hash(password)
+    u = User(username=username, password_hash=password_hash, name=name,
+             classnum=classnum, email=email, admin=admin, valid=valid)
+    db.session.add(u)
+    db.session.commit()
+
+
+def del_user(user_id, force=False):
+    if force:
+        Records.query.filter_by(user_id=user_id).update({"user_id": 1})
+        Revisions.query.filter_by(user_id=user_id).update({"user_id": 1})
+        Users.query.filter_by(id=user_id).delete()
+    else:
+        a = db.session.query(db.exists().where(
+            Records.user_id == user_id)).scalar()
+        b = db.session.query(db.exists().where(
+            Revisions.user_id == user_id)).scalar()
+        if a or b:
+            u = Users.query.filter_by(id=user_id).first()
+            u.isValid(False)
+            u.isMarkDeleted(True)
+        else:
+            Users.query.filter_by(id=user_id).delete()
+    db.session.commit()
+
