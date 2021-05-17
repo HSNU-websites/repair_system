@@ -29,3 +29,9 @@ class ReportForm(FlaskForm):
         validators=[Recaptcha(message="Please click 'I am not a robot.'")]
     )
     submit = SubmitField("報修")
+
+
+class ReportsFilterForm(FlaskForm):
+    username = StringField("報修人學號: ")
+    classnum = StringField("班級: ")
+    submit = SubmitField("送出")

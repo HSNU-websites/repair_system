@@ -47,6 +47,7 @@ def report_page():
 @user_bp.route("/dashboard", methods=["GET"])
 @login_required
 def dashboard_page():
+    current_app.logger.info("GET /dashboard")
     return render_template(
         "user_dashboard.html", records=render_user_records(current_user.id)
     )

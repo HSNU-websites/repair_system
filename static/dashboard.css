@@ -25,6 +25,54 @@ tr:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
+form {
+    position: fixed;
+    margin: 10px auto 10px 30px;
+}
+
+input[type="text"], input[type="password"] {
+    background: #FFFFFF;
+    color: black;
+    border: 1px solid #d1d1d1;
+    border-radius: 5px;
+    height: 20px;
+    outline: none;
+    -webkit-transition: .18s ease-out;
+    -moz-transition: .18s ease-out;
+    -o-transition: .18s ease-out;
+    transition: .18s ease-out;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    border: 1px solid rgb(13, 142, 194);
+    box-shadow: inset 5px 10px 4px rgba(13, 142, 194, 0.07)
+}
+
+input[type="submit"] {
+    width: 70px;
+    height: 40px;
+    border: 1px solid #d1d1d1;
+    border-radius: 10px;
+}
+
+#pages {
+    color: black;
+    margin: 10px 0 10px 30px;
+    font-weight: bold;
+}
+
+#pages a {
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.3);
+    text-decoration: none;
+    color: black;
+    padding: 4px 5px 4px 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 40px;
+    height: 20px;
+}
+
 #copyright {
     height: 40px;
     position: relative;
@@ -40,4 +88,17 @@ tr:hover {
 
 #copyright a:hover {
     text-decoration: underline;
+}
+
+.field {
+    font-family: 'Noto Sans TC', sans-serif;
+    margin: 10px 0 10px 0;
+    color: black;
+    font-size: 20px;
+}
+
+@media only screen and (max-width: 1200px) {
+    form {
+        position: relative;
+    }
 }

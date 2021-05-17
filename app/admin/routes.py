@@ -1,6 +1,7 @@
 from logging import NOTSET
 from flask import request, render_template, current_app
 from flask_login import login_required
+from ..forms import ReportsFilterForm
 from . import admin_bp
 from ..database.db_helper import (
     render_system_setting,
@@ -16,15 +17,24 @@ from ..users import admin_required
 @admin_required
 @login_required
 def dashboard_page():
+    form = ReportsFilterForm()
     if request.method == "GET":
-        return render_template("admin_dashboard.html", records=render_all_records)
+        current_app.logger.info("GET /admin_dashboard")
+        return render_template("admin_dashboard.html", records=render_all_records(), form=form)
     if request.method == "POST":
-        # form hasn't designed
-        form = ""
-        filter = form.filter.data
-        return render_template(
-            "admin_dashboard.html", records=render_all_records(filter)
-        )
+        if form.validate_on_submit():
+            current_app.logger.info("POST /admin_dashboard")
+            # Filter cannot be used now
+            Filter = dict()
+            if username := form.username.data:
+                Filter["username"] = username
+            if classnum := form.classnum.data:
+                Filter["classnum"] = classnum
+            return render_template(
+                "admin_dashboard.html", records=render_all_records(Filter)
+            )
+        else:
+            current_app.logger.info("POST /admin_dashboard: Invalid submit")
 
 
 @admin_bp.route("/system", methods=["GET"])
