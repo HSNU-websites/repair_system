@@ -7,7 +7,7 @@ from ..database.db_helper import (
     delete,
     update,
     insert,
-    render_all_records,
+    render_records,
 )
 from ..users import admin_required
 
@@ -16,15 +16,16 @@ from ..users import admin_required
 @admin_required
 @login_required
 def dashboard_page():
-    if request.method == "GET":
-        return render_template("admin_dashboard.html", records=render_all_records)
-    if request.method == "POST":
-        # form hasn't designed
-        form = ""
-        filter = form.filter.data
-        return render_template(
-            "admin_dashboard.html", records=render_all_records(filter)
-        )
+    pass
+    # if request.method == "GET":
+    #     return render_template("admin_dashboard.html", records=render_all_records)
+    # if request.method == "POST":
+    #     # form hasn't designed
+    #     form = ""
+    #     filter = form.filter.data
+    #     return render_template(
+    #         "admin_dashboard.html", records=render_all_records(filter)
+    #     )
 
 
 @admin_bp.route("/system", methods=["GET"])

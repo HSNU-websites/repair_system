@@ -1,4 +1,4 @@
-from .common import db, timeformat
+from .common import db, timeformat, passwd_context
 from .Buildings import Buildings
 from .Items import Items
 from .Records import Records
