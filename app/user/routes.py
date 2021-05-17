@@ -1,15 +1,14 @@
-import logging
 from flask import current_app, flash, render_template, request
 from flask_login import current_user, login_required
 from ..database.db_helper import (
     add_record,
     render_buildings,
     render_items,
-    render_user_records,
+    render_records,
+    get_user
 )
 from ..forms import ReportForm
 from ..mail_helper import send_report_mail
-from ..database.db_helper import add_record, render_buildings, render_items
 from . import user_bp
 
 
@@ -49,5 +48,5 @@ def report_page():
 def dashboard_page():
     current_app.logger.info("GET /dashboard")
     return render_template(
-        "user_dashboard.html", records=render_user_records(current_user.id)
+        "user_dashboard.html", records=render_records({"username": get_user(current_user.id)["username"]})
     )

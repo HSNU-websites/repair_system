@@ -8,7 +8,7 @@ from ..database.db_helper import (
     delete,
     update,
     insert,
-    render_all_records,
+    render_records,
 )
 from ..users import admin_required
 
@@ -20,7 +20,7 @@ def dashboard_page():
     form = ReportsFilterForm()
     if request.method == "GET":
         current_app.logger.info("GET /admin_dashboard")
-        return render_template("admin_dashboard.html", records=render_all_records(), form=form)
+        return render_template("admin_dashboard.html", records=render_records(), form=form)
     if request.method == "POST":
         if form.validate_on_submit():
             current_app.logger.info("POST /admin_dashboard")
@@ -31,7 +31,7 @@ def dashboard_page():
             if classnum := form.classnum.data:
                 Filter["classnum"] = classnum
             return render_template(
-                "admin_dashboard.html", records=render_all_records(Filter)
+                "admin_dashboard.html", records=render_records(Filter), form=form
             )
         else:
             current_app.logger.info("POST /admin_dashboard: Invalid submit")
