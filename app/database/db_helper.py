@@ -151,6 +151,12 @@ def get_user(user_id) -> dict:
     }
 
 
+# user_id = db.Column(db.ForeignKey("users.id"), nullable=False)
+# status_id = db.Column(db.ForeignKey("statuses.id"), nullable=False)
+# insert_time = db.Column(
+#     db.TIMESTAMP, server_default=db.func.now(), nullable=False, index=True
+# )
+# description
 def record_to_dict(record):
     item = db.session.query(Items.description).filter_by(
         id=record.item_id).first()[0]
@@ -158,6 +164,18 @@ def record_to_dict(record):
         id=record.building_id).first()[0]
     insert_time = record.insert_time.strftime(timeformat)
     update_time = record.update_time.strftime(timeformat)
+    l = []
+    for rev in Revisions.query.filter_by(record_id=record.id).all():
+        status = db.session.query(Statuses.description).filter_by(
+            id=rev.status_id).first()[0]
+        time = rev.insert_time.strftime(timeformat)
+        l.append({
+            "user": get_user(rev.user_id),
+            "status": status,
+            "insert_time": time,
+            "description": rev.description
+        })
+
     return {
         "user": get_user(record.user_id),
         "item": item,
@@ -165,7 +183,8 @@ def record_to_dict(record):
         "location": record.location,
         "insert_time": insert_time,
         "update_time": update_time,
-        "description": record.description
+        "description": record.description,
+        "revisions": l
     }
 
 

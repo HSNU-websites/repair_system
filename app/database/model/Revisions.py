@@ -20,7 +20,7 @@ class Revisions(db.Model):
     record_id = db.Column(db.ForeignKey("records.id"), nullable=False)
     user_id = db.Column(db.ForeignKey("users.id"), nullable=False)
     status_id = db.Column(db.ForeignKey("statuses.id"), nullable=False)
-    time = db.Column(
+    insert_time = db.Column(
         db.TIMESTAMP, server_default=db.func.now(), nullable=False, index=True
     )
     description = db.Column(db.String(255), nullable=False)
@@ -32,11 +32,12 @@ class Revisions(db.Model):
         self.description = description
         if "id" in kwargs:
             self.id = kwargs["id"]
-        if "time" in kwargs:
-            self.time = datetime.datetime.strptime(kwargs["time"], timeformat)
+        if "insert_time" in kwargs:
+            self.insert_time = datetime.datetime.strptime(
+                kwargs["insert_time"], timeformat)
 
     def __repr__(self):
         return (
-            "Revisions(id={id},record_id={record_id},user_id={user_id},status_id={status_id},time='{mytime}',description='{description}')"
-            .format(mytime=self.time.strftime(timeformat), **self.__dict__)
+            "Revisions(id={id},record_id={record_id},user_id={user_id},status_id={status_id},insert_time='{mytime}',description='{description}')"
+            .format(mytime=self.insert_time.strftime(timeformat), **self.__dict__)
         )
