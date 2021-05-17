@@ -183,7 +183,7 @@ def record_to_dict(record):
     }
 
 
-def render_all_records(filter: dict = None, page=1, per_page=100) -> dict:
+def render_records(filter: dict = None, page=1, per_page=100) -> dict:
     q = Records.query
     if filter is not None:
         if "username" in filter:
@@ -256,7 +256,7 @@ def delete(tablename: str, id: int):
 
 def add_user(username, password, name, classnum, email="", admin=False, valid=True):
     password_hash = passwd_context.hash(password)
-    u = User(username=username, password_hash=password_hash, name=name,
+    u = Users(username=username, password_hash=password_hash, name=name,
              classnum=classnum, email=email, admin=admin, valid=valid)
     db.session.add(u)
     db.session.commit()
