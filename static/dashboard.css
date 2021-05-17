@@ -1,9 +1,14 @@
+html {
+    height: 100%;
+}
+
 body {
     background-color: #a4b8fa;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     margin: auto 0px auto 0px;
+    height: 100%;
 }
 
 h1 {
@@ -16,6 +21,7 @@ table {
 }
 
 th, td {
+    font-family: 'Noto Sans TC', sans-serif;
     text-align: center;
     padding: 4px 10px 4px 10px;
     border: 1px solid black;
@@ -73,7 +79,12 @@ input[type="submit"] {
     height: 20px;
 }
 
+#pages a:hover {
+    opacity: 0.8;
+}
+
 #copyright {
+    font-family: 'Noto Sans TC', sans-serif;
     height: 40px;
     position: relative;
     text-align: center;

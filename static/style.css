@@ -6,6 +6,7 @@ h1 {
 
 input[type="text"],
 input[type="password"] {
+    font-family: 'Noto Sans TC', sans-serif;
     background: #FFFFFF;
     color: black;
     border: 1px solid #d1d1d1;
@@ -25,6 +26,7 @@ input[type="password"]:focus {
 }
 
 input[type="submit"] {
+    font-family: 'Noto Sans TC', sans-serif;
     width: 70px;
     height: 40px;
     border: 1px solid #d1d1d1;
@@ -54,6 +56,7 @@ select {
 }
 
 #copyright {
+    font-family: 'Noto Sans TC', sans-serif;
     position: absolute;
     text-align: center;
     bottom: 10px;

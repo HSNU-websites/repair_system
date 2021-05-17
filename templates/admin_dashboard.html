@@ -32,13 +32,13 @@
             </div>
         </form>
     </div>
-    <div>
+    <div style="min-height: 100%;">
         <table>
             <caption>
                 <div id="pages">
-                    <a href="#" id="previous">&#8249;</a>
+                    <a href="./{{ records['page'] - 1 }}" {% if records['page'] <= 1 %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8249;</a>
                     <span>{{ records.page }} / {{ records.pages }}</span>
-                    <a href="#" id="next">&#8250;</a>
+                    <a href="./{{ records['page'] + 1 }}" {% if records['page'] >= records['pages'] %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8250;</a>
                 </div>
             </caption>
             <thead>

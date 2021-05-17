@@ -7,10 +7,12 @@ body {
 }
 
 h1 {
+    font-family: 'Noto Sans TC', sans-serif;
     text-align: center;
 }
 
 h3 {
+    font-family: 'Noto Sans TC', sans-serif;
     margin-left: 5px;
 }
 
@@ -23,6 +25,7 @@ input[type="text"] {
 }
 
 button {
+    font-family: 'Noto Sans TC', sans-serif;
     margin-left: 10px;
     border-radius: 5px;
     height: 30px;
@@ -53,10 +56,12 @@ button:hover {
 }
 
 #tip {
+    font-family: 'Noto Sans TC', sans-serif;
     text-align: center;
 }
 
 #copyright {
+    font-family: 'Noto Sans TC', sans-serif;
     height: 40px;
     position: relative;
     text-align: center;

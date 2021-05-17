@@ -14,8 +14,15 @@
 
 <body>
     <h1>Dashboard</h1>
-    <div style="display: block;">
+    <div style="display: block; min-height: 100%;">
         <table>
+            <caption>
+                <div id="pages">
+                    <a href="./{{ records['page'] - 1 }}" {% if records['page'] <= 1 %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8249;</a>
+                    <span>{{ records.page }} / {{ records.pages }}</span>
+                    <a href="./{{ records['page'] + 1 }}" {% if records['page'] >= records['pages'] %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8250;</a>
+                </div>
+            </caption>
             <thead>
             <tr>
                 <th>報修人</th>

@@ -13,14 +13,17 @@ from ..database.db_helper import (
 from ..users import admin_required
 
 
-@admin_bp.route("/admin_dashboard", methods=["GET", "POST"])
+@admin_bp.route("/admin_dashboard/", methods=["GET", "POST"])
+@admin_bp.route("/admin_dashboard/<int:page>", methods=["GET", "POST"])
 @admin_required
 @login_required
-def dashboard_page():
+def dashboard_page(page=1):
     form = ReportsFilterForm()
     if request.method == "GET":
         current_app.logger.info("GET /admin_dashboard")
-        return render_template("admin_dashboard.html", records=render_records(), form=form)
+        return render_template(
+            "admin_dashboard.html", records=render_records(page=page), form=form
+        )
     if request.method == "POST":
         if form.validate_on_submit():
             current_app.logger.info("POST /admin_dashboard")
