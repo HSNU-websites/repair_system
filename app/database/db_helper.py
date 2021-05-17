@@ -150,13 +150,6 @@ def get_user(user_id) -> dict:
         "classnum": user.classnum
     }
 
-
-# user_id = db.Column(db.ForeignKey("users.id"), nullable=False)
-# status_id = db.Column(db.ForeignKey("statuses.id"), nullable=False)
-# insert_time = db.Column(
-#     db.TIMESTAMP, server_default=db.func.now(), nullable=False, index=True
-# )
-# description
 def record_to_dict(record):
     item = db.session.query(Items.description).filter_by(
         id=record.item_id).first()[0]
@@ -199,7 +192,15 @@ def render_all_records(filter: dict = None, page=1, per_page=100) -> dict:
     if filter is None:
         q = Records.query
     else:
-        q = Records.query.filter_by(**filter)
+        if "username" in filter:
+            u = db.session.query(Users.id).filter_by(username=filter.pop("username"))
+            if u:
+                q = q.filter_by(user_id=u.id)
+        if "classnum" in filter:
+            u = db.session.query(Users.id).filter_by(username=filter.pop("classnum"))
+            if u:
+                q = q.filter_by(user_id=u.id)
+        q = q.filter_by(**filter)
 
     l = []
     for record in q.order_by(Records.update_time.desc()).offset((page-1)*per_page).limit(per_page).all():
