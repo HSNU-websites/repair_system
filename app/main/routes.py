@@ -39,11 +39,11 @@ def index_page():  # index page is login page
 
 
 @main_bp.route("/logout", methods=["GET"])
-@login_required
 def logout_page():
     current_app.logger.info("GET /logout")
-    logout_user()
-    flash("Logout.", category="info")
+    if current_user.is_active:
+        logout_user()
+        flash("Logout.", category="info")
     return redirect(url_for("main.index_page"))
 
 

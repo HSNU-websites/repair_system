@@ -188,15 +188,16 @@ def render_records(filter: dict = None, page=1, per_page=100) -> dict:
     if filter is not None:
         if "username" in filter:
             u = db.session.query(Users.id).filter_by(
-                username=filter.pop("username"))
+                username=filter.pop("username")).first()
             if u:
                 q = q.filter_by(user_id=u.id)
         if "classnum" in filter:
             u = db.session.query(Users.id).filter_by(
-                username=filter.pop("classnum"))
+                username=filter.pop("classnum")).first()
             if u:
                 q = q.filter_by(user_id=u.id)
-        q = q.filter_by(**filter)
+        if filter:
+            q = q.filter_by(**filter)
 
     l = []
     for record in q.order_by(Records.update_time.desc()).offset((page-1)*per_page).limit(per_page).all():
@@ -204,7 +205,7 @@ def render_records(filter: dict = None, page=1, per_page=100) -> dict:
 
     return {
         "page": page,
-        "pages": ceil(Records.query.count()/per_page),
+        "pages": ceil(q.count()/per_page),
         "records": l
     }
 
