@@ -52,6 +52,6 @@ def dashboard_page(page=1):
     return render_template(
         "user_dashboard.html",
         records=render_records(
-            {"username": get_user(current_user.id)["username"]}, page
+            {"user_id": current_user.id}, page
         ),
     )
