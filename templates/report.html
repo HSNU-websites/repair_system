@@ -42,6 +42,14 @@
                 {{ form.submit }}
             </div>
             <div>{{ display_msg(messages) }}</div>
+            <div>
+                <a href="/dashboard">報修紀錄</a>
+                {% if current_user.isAdmin %}
+                <a href="/admin_dashboard">全體報修紀錄(管理員)</a>
+                <a href="/system">系統設定(管理員)</a>
+                {% endif %}
+                <a href="/logout">登出</a>
+            </div>
         </form>
     </div>
     <footer>

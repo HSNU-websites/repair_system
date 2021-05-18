@@ -1,12 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
+    <script src="{{ url_for('static', filename='msg.js') }}"></script>
+    <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
+    <title>Admin Dashboard</title>
+    {% if records["pages"] != 0 %}
+    {% if records["page"] < 1 %} <script>window.location.replace("1");</script>
+        {% endif %}
+        {% if records["page"] > records["pages"] %}
+        <script>window.location.replace("{{ records['pages'] }}");</script>
+        {% endif %}
+        {% endif %}
 </head>
+
 <body>
-    <h1>Dashboard</h1>
+    <div style="min-height: 100%;">
+        <h1>Admin Dashboard</h1>
+        <div id="sidebar">
+            <form action="/admin_dashboard/" method="POST">
+                {{ form.csrf_token }}
+                <div class="field">
+                    {{ form.username.label }}
+                    <br>
+                    {{ form.username }}
+                </div>
+                <div class="field">
+                    {{ form.classnum.label }}
+                    <br>
+                    {{ form.classnum }}
+                </div>
+                <div class="field">
+                    {{ form.submit }}
+                </div>
+            </form>
+            <a href="/report">報修</a>
+            <a href="/dashboard">報修紀錄</a>
+            <a href="/system">系統設定(管理員)</a>
+            <a href="/logout">登出</a>
+        </div>
+        <table>
+            <caption>
+                <div id="pages">
+                    <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
+                    <span>{{ records["page"] }} / {{ records["pages"] }}</span>
+                    <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
+                </div>
+            </caption>
+            <thead>
+                <tr>
+                    <th>報修人</th>
+                    <th>大樓</th>
+                    <th>地點</th>
+                    <th>損壞物件</th>
+                    <th>狀況描述</th>
+                    <th>報修時間</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records["records"] %}
+                <tr>
+                    <td>{{ record["user"]["classnum"] | string + " " + record["user"]["name"] }}</td>
+                    <td>{{ record["building"] }}</td>
+                    <td>{{ record["location"] }}</td>
+                    <td>{{ record["item"] }}</td>
+                    <td>{{ record["description"] }}</td>
+                    <td>{{ record["insert_time"] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <footer>
+        <div id="copyright">© 2021 <a href="https://github.com/HSNU-websites" target="_blank">師大附中網站更新計畫</a></div>
+    </footer>
 </body>
+
 </html>

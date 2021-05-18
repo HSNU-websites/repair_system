@@ -1,4 +1,3 @@
-import logging
 from flask import current_app, flash, render_template, request
 from flask_login import current_user, login_required
 from ..database.db_helper import (
@@ -6,10 +5,12 @@ from ..database.db_helper import (
     render_buildings,
     render_items,
     render_records,
+    get_user,
 )
 from ..forms import ReportForm
 from ..mail_helper import send_report_mail
 from . import user_bp
+from app import user
 
 
 @user_bp.route("/report", methods=["GET", "POST"])
@@ -43,9 +44,14 @@ def report_page():
             return render_template("report.html", form=form)
 
 
-@user_bp.route("/dashboard", methods=["GET"])
+@user_bp.route("/dashboard/", methods=["GET"])
+@user_bp.route("/dashboard/<int:page>", methods=["GET"])
 @login_required
-def dashboard_page():
+def dashboard_page(page=1):
+    current_app.logger.info("GET /dashboard")
     return render_template(
-        # "user_dashboard.html", records=render_user_records(current_user.id)
+        "user_dashboard.html",
+        records=render_records(
+            {"user_id": current_user.id}, page
+        ),
     )
