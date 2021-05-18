@@ -22,8 +22,8 @@
 <body>
     <div style="min-height: 100%;">
         <h1>Admin Dashboard</h1>
-        <div style="display: block;">
-            <form action="/admin_dashboard" method="POST">
+        <div id="sidebar">
+            <form action="/admin_dashboard/" method="POST">
                 {{ form.csrf_token }}
                 <div class="field">
                     {{ form.username.label }}
@@ -39,6 +39,10 @@
                     {{ form.submit }}
                 </div>
             </form>
+            <a href="/report">報修</a>
+            <a href="/dashboard">報修紀錄</a>
+            <a href="/system">系統設定(管理員)</a>
+            <a href="/logout">登出</a>
         </div>
         <table>
             <caption>

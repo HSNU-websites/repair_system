@@ -22,6 +22,14 @@
 
 <body>
     <h1>Dashboard</h1>
+    <div id="sidebar">
+        <a href="/report">報修</a>
+        {% if current_user.isAdmin %}
+        <a href="/admin_dashboard">全體報修紀錄(管理員)</a>
+        <a href="/system">系統設定(管理員)</a>
+        {% endif %}
+        <a href="/logout">登出</a>
+    </div>
     <div style="display: block; min-height: 100%;">
         <table>
             <caption>

@@ -48,6 +48,15 @@ select {
     outline: none;
 }
 
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
 #logo {
     display: block;
     height: 100px;
@@ -64,14 +73,6 @@ select {
     height: 40px;
 }
 
-#copyright a {
-    text-decoration: none;
-    color: black;
-}
-
-#copyright a:hover {
-    text-decoration: underline;
-}
 
 .container {
     display: flex;
@@ -85,6 +86,11 @@ select {
     -moz-transition: .2s ease-out;
     -o-transition: .2s ease-out;
     transition: .2s ease-out;
+}
+
+.container a {
+    display: block;
+    margin: 5px 0 5px 0;
 }
 
 @media only screen and (max-width: 600px) {
