@@ -44,7 +44,7 @@ def report_page():
             return render_template("report.html", form=form)
 
 
-@user_bp.route("/dashboard", methods=["GET"])
+@user_bp.route("/dashboard/", methods=["GET"])
 @user_bp.route("/dashboard/<int:page>", methods=["GET"])
 @login_required
 def dashboard_page(page=1):

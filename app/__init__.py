@@ -84,7 +84,6 @@ scheduler = APScheduler()
 def create_app(env):
     app = Flask(__name__, template_folder="../templates", static_folder="../static")
     app.config.from_object(config[env])
-    app.url_map.strict_slashes = False
 
     login_manager.init_app(app)
     db.init_app(app)

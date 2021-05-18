@@ -13,7 +13,7 @@ from ..database.db_helper import (
 from ..users import admin_required
 
 
-@admin_bp.route("/admin_dashboard", methods=["GET", "POST"])
+@admin_bp.route("/admin_dashboard/", methods=["GET", "POST"])
 @admin_bp.route("/admin_dashboard/<int:page>", methods=["GET", "POST"])
 @admin_required
 @login_required

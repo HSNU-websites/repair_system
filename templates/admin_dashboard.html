@@ -10,41 +10,42 @@
     <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
     <title>Admin Dashboard</title>
-    {% if records["page"] < 1 %}
-    <script>window.location.replace("1");</script>
-    {% endif %}
-    {% if records["page"] > records["pages"] %}
-    <script>window.location.replace("{{ records['pages'] }}");</script>
-    {% endif %}
+    {% if records["pages"] != 0 %}
+    {% if records["page"] < 1 %} <script>window.location.replace("1");</script>
+        {% endif %}
+        {% if records["page"] > records["pages"] %}
+        <script>window.location.replace("{{ records['pages'] }}");</script>
+        {% endif %}
+        {% endif %}
 </head>
 
 <body>
-    <h1>Admin Dashboard</h1>
-    <div style="display: block;">
-        <form action="/admin_dashboard" method="POST">
-            {{ form.csrf_token }}
-            <div class="field">
-                {{ form.username.label }}
-                <br>
-                {{ form.username }}
-            </div>
-            <div class="field">
-                {{ form.classnum.label }}
-                <br>
-                {{ form.classnum }}
-            </div>
-            <div class="field">
-                {{ form.submit }}
-            </div>
-        </form>
-    </div>
     <div style="min-height: 100%;">
+        <h1>Admin Dashboard</h1>
+        <div style="display: block;">
+            <form action="/admin_dashboard" method="POST">
+                {{ form.csrf_token }}
+                <div class="field">
+                    {{ form.username.label }}
+                    <br>
+                    {{ form.username }}
+                </div>
+                <div class="field">
+                    {{ form.classnum.label }}
+                    <br>
+                    {{ form.classnum }}
+                </div>
+                <div class="field">
+                    {{ form.submit }}
+                </div>
+            </form>
+        </div>
         <table>
             <caption>
                 <div id="pages">
-                    <a href="{{ records['page'] - 1 }}" {% if records['page'] <= 1 %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8249;</a>
+                    <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
                     <span>{{ records["page"] }} / {{ records["pages"] }}</span>
-                    <a href="{{ records['page'] + 1 }}" {% if records['page'] >= records['pages'] %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8250;</a>
+                    <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
                 </div>
             </caption>
             <thead>
