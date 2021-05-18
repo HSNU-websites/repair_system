@@ -20,7 +20,7 @@ class Users(db.Model):
     # passwd_context.hash("pAs$W0rd")
     password_hash = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
-    classnum = db.Column(db.Integer, nullable=False)
+    classnum = db.Column(db.Integer, nullable=False, index=True)
     properties = db.Column(db.SmallInteger, nullable=False)
     email = db.Column(db.String(255), nullable=False)
 

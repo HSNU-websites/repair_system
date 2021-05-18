@@ -1,6 +1,5 @@
 from base64 import b64decode, b64encode
 from hashlib import sha256
-from math import ceil
 from os import urandom
 
 from flask_login import UserMixin
@@ -182,29 +181,45 @@ def record_to_dict(record):
         "revisions": l
     }
 
+# __import__()
 
-def render_records(filter: dict = None, page=1, per_page=100) -> dict:
+
+def render_records(Filter: dict = None, page=1, per_page=100) -> dict:
     q = Records.query
-    if filter is not None:
-        if "username" in filter:
+    valid = True
+    if Filter is not None:
+        if "username" in Filter:
             u = db.session.query(Users.id).filter_by(
-                username=filter.pop("username"))
-            if u:
+                username=Filter.pop("username")
+            ).first()
+            if valid := valid and bool(u):
                 q = q.filter_by(user_id=u.id)
-        if "classnum" in filter:
+        if valid and "classnum" in Filter:
             u = db.session.query(Users.id).filter_by(
-                username=filter.pop("classnum"))
-            if u:
+                username=Filter.pop("classnum")
+            ).first()
+            if valid := valid and bool(u):
                 q = q.filter_by(user_id=u.id)
-        q = q.filter_by(**filter)
+        if valid:
+            Filter = {
+                key: value
+                for key, value in Filter.items()
+                if key in Records.__mapper__.columns
+            }
+            if Filter:
+                q = q.filter_by(**Filter)
 
-    l = []
-    for record in q.order_by(Records.update_time.desc()).offset((page-1)*per_page).limit(per_page).all():
-        l.append(record_to_dict(record))
+    if valid:
+        l = [
+            record_to_dict(record)
+            for record in q.order_by(Records.update_time.desc()).offset((page-1)*per_page).limit(per_page).all()
+        ]
+    else:
+        l = []
 
     return {
         "page": page,
-        "pages": ceil(Records.query.count()/per_page),
+        "pages": (q.count()+per_page-1)//per_page if valid else 0,
         "records": l
     }
 
@@ -257,7 +272,7 @@ def delete(tablename: str, id: int):
 def add_user(username, password, name, classnum, email="", admin=False, valid=True):
     password_hash = passwd_context.hash(password)
     u = Users(username=username, password_hash=password_hash, name=name,
-             classnum=classnum, email=email, admin=admin, valid=valid)
+              classnum=classnum, email=email, admin=admin, valid=valid)
     db.session.add(u)
     db.session.commit()
 
@@ -279,4 +294,3 @@ def del_user(user_id, force=False):
         else:
             Users.query.filter_by(id=user_id).delete()
     db.session.commit()
-
