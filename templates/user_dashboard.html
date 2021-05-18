@@ -10,6 +10,12 @@
     <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
     <title>Dashboard</title>
+    {% if records["page"] < 1 %}
+    <script>window.location.replace("1");</script>
+    {% endif %}
+    {% if records["page"] > records["pages"] %}
+    <script>window.location.replace("{{ records['pages'] }}");</script>
+    {% endif %}
 </head>
 
 <body>
@@ -18,9 +24,9 @@
         <table>
             <caption>
                 <div id="pages">
-                    <a href="./{{ records['page'] - 1 }}" {% if records['page'] <= 1 %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8249;</a>
+                    <a href="{{ records['page'] - 1 }}" {% if records['page'] <= 1 %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8249;</a>
                     <span>{{ records.page }} / {{ records.pages }}</span>
-                    <a href="./{{ records['page'] + 1 }}" {% if records['page'] >= records['pages'] %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8250;</a>
+                    <a href="{{ records['page'] + 1 }}" {% if records['page'] >= records['pages'] %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8250;</a>
                 </div>
             </caption>
             <thead>

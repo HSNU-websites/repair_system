@@ -205,7 +205,7 @@ def render_records(filter: dict = None, page=1, per_page=100) -> dict:
 
     return {
         "page": page,
-        "pages": ceil(Records.query.count()/per_page),
+        "pages": ceil(q.count()/per_page),
         "records": l
     }
 
