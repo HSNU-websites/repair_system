@@ -29,24 +29,36 @@ def convertTablename(filename: str):
         return m.group("tableName")
 
 
-def getDict(row):
-    import flask_sqlalchemy
-    import sqlalchemy
-
-    def valid(value):
-        return type(value) not in {list, sqlalchemy.orm.state.InstanceState, flask_sqlalchemy.model.DefaultMeta}
-    return {key: value for key, value in row.__dict__.items() if valid(value)}
+def get_dict(row):
+    """
+    Get pure dict from table without relationship.
+    datetime.datetime will be converted to str
+    """
+    def process_value(value):
+        if isinstance(value, datetime.datetime):
+            return value.strftime(timeformat)
+        else:
+            return value
+    return {
+        key: process_value(row.__dict__[key])
+        for key in type(row).__mapper__.columns.keys()
+    }
 
 
 def db_reprTest():
+    """
+    Test if repr(eval(obj)) == obj for tables
+    that have at least one row.
+    """
     b = True
     for t in defaultTables:
         obj1 = t.query.first()
         obj2 = eval(repr(obj1))
-        d1 = getDict(obj1)
-        d2 = getDict(obj2)
-        print(t.__tablename__, d1 == d2)
-        b = b and (d1 == d2)
+        d1 = get_dict(obj1)
+        d2 = get_dict(obj2)
+        r = d1 == d2
+        print(t.__tablename__, r)
+        b = b and r
     return b
 
 
@@ -111,25 +123,25 @@ def restore(archiveName: str, tables: list = None, insert=True, update=True, del
     tablenames = [t.__tablename__ for t in tables]
     print("Restoring tables {}".format(tablenames))
     archive = Archive(backup_dir/archiveName, "r")
-    print("Archive {} has {}".format(archiveName,archive.getFileNames()))
+    print("Archive {} has {}".format(archiveName, archive.getFileNames()))
     for filename in archive.getFileNames():
         tablename = convertTablename(filename)
         if tablename in tablenames:
             print("Restoring {}".format(tablename))
             t = tablenameRev[tablename]
             l = archive.read(filename)[tablename]
-            temp = [getDict(eval(obj)) for obj in l]
-            rows = {d["id"]:d for d in temp}
+            temp = [get_dict(eval(obj)) for obj in l]
+            rows = {d["id"]: d for d in temp}
             a = set(rows.keys())
             b = {row.id for row in db.session.query(t.id).all()}
-            result = set_diff(a,b,modify=True)
+            result = set_diff(a, b, modify=True)
             if insert:
                 print("Inserting {}".format(sorted(result[0])))
                 ld = [rows[id] for id in result[0]]
                 db.session.bulk_insert_mappings(t, ld)
             if update:
                 print("Updating {}".format(sorted(result[1])))
-                ld=[rows[id] for id in result[1]]
+                ld = [rows[id] for id in result[1]]
                 db.session.bulk_update_mappings(t, ld)
             if delete:
                 print("Deleting {}".format(sorted(result[2])))
