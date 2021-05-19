@@ -45,6 +45,8 @@ class Records(db.Model):
         if "update_time" in kwargs:
             self.update_time = datetime.datetime.strptime(
                 kwargs["update_time"], timeformat)
+        else:
+            self.update_time = self.insert_time
 
     def __repr__(self):
         return (
