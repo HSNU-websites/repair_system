@@ -1,7 +1,7 @@
-from logging import NOTSET
+import csv
 from flask import request, render_template, current_app
 from flask_login import login_required
-from ..forms import ReportsFilterForm
+from ..forms import ReportsFilterForm, AddOneUserForm, AddUsersByFileForm
 from . import admin_bp
 from ..database.db_helper import (
     render_system_setting,
@@ -9,6 +9,7 @@ from ..database.db_helper import (
     update,
     insert,
     render_records,
+    add_user,
 )
 from ..users import admin_required
 
@@ -97,3 +98,52 @@ def system_modification_page():
             ):
                 return "Error", 400
         return "OK"
+
+
+@admin_bp.route("/manage_user/", methods=["GET", "POST", "DELETE"])
+@admin_bp.route("/manage_user/<int:page>", methods=["GET", "POST", "DELETE"])
+@admin_required
+@login_required
+def manage_user_page(page=1):
+    form = AddOneUserForm()
+    form_csv=AddUsersByFileForm()
+    if request.method == "GET":
+        # Render all users
+        current_app.logger.info("GET /manage_user")
+        return render_template("manage_user.html", form=form, form_csv=form_csv)
+    if request.method == "POST":
+        # Add user
+        # Add one user
+        if form.validate_on_submit():
+            current_app.logger.info("POST /manage_user")
+            username = form.username.data
+            name = form.name.data
+            classnum = form.classnum.data
+            password = form.password.data
+            email = form.email.data
+            isAdmin = True if int(classnum) == 0 else False
+            add_user(username, password, name, classnum, email, isAdmin)
+        else:
+            current_app.logger.info("POST /manage_user: Invalid submit")
+        # Add users by csv
+        if form_csv.validate_on_submit():
+            current_app.logger.info("POST /manage_user")
+            csv_file = form_csv.csv_file.data
+            rawdata = csv_file.read()
+            # data format: [{"username": "zxc", "name": "zxc", "password": "123", "classnum": "1400"}]
+            try:
+                data = [row for row in csv.DictReader(rawdata.decode("utf-8").splitlines())]
+            except UnicodeDecodeError:
+                data = [row for row in csv.DictReader(rawdata.decode("big5").splitlines())]
+            except Exception:
+                data = [row for row in csv.DictReader(rawdata.decode("ANSI").splitlines())]
+            except:
+                return "Error"
+            # TODO add_user_by_csv(data)
+        else:
+            current_app.logger.info("POST /manage_user: Invalid submit")
+
+        return render_template("manage_user.html", form=form, form_csv=form_csv)
+    if request.method == "DELETE":
+        # Delete user
+        current_app.logger.info("DELETE /manage_user")
