@@ -1,5 +1,6 @@
 from base64 import b64decode, b64encode
 from hashlib import sha256
+from math import ceil
 from os import urandom
 
 from flask_login import UserMixin
@@ -17,7 +18,6 @@ from .model import (
     sequenceTables,
     tablenameRev,
     timeformat,
-    passwd_context,
 )
 
 
@@ -69,10 +69,10 @@ def get_admin_emails():
 
 def login_auth(username, password):
     user = Users.query.filter_by(username=username).first()
-    if user and user.verify(password) and user.isValid():
+    if user and user.verify(password) and user.is_valid:
         sessionUser = User()
         sessionUser.id = user.id
-        sessionUser.isAdmin = user.isAdmin()
+        sessionUser.isAdmin = user.is_admin
         return sessionUser
     else:
         return None
@@ -81,10 +81,10 @@ def login_auth(username, password):
 def load_user(user_id: str):
     # whether user_id is str or int doesn't matter
     user = Users.query.filter_by(id=user_id).first()
-    if user and user.isValid():
+    if user and user.is_valid:
         sessionUser = User()
         sessionUser.id = user.id
-        sessionUser.isAdmin = user.isAdmin()
+        sessionUser.isAdmin = user.is_admin
         return sessionUser
     else:
         return None
@@ -153,15 +153,13 @@ def get_user(user_id) -> dict:
 
 def record_to_dict(record):
     item = db.session.query(Items.description).filter_by(
-        id=record.item_id).first()[0]
+        id=record.item_id).scalar()
     building = db.session.query(Buildings.description).filter_by(
-        id=record.building_id).first()[0]
-    insert_time = record.insert_time.strftime(timeformat)
-    update_time = record.update_time.strftime(timeformat)
+        id=record.building_id).scalar()
     l = []
     for rev in Revisions.query.filter_by(record_id=record.id).all():
         status = db.session.query(Statuses.description).filter_by(
-            id=rev.status_id).first()[0]
+            id=rev.status_id).scalar()
         time = rev.insert_time.strftime(timeformat)
         l.append({
             "user": get_user(rev.user_id),
@@ -175,39 +173,37 @@ def record_to_dict(record):
         "item": item,
         "building": building,
         "location": record.location,
-        "insert_time": insert_time,
-        "update_time": update_time,
+        "insert_time": record.insert_time.strftime(timeformat),
+        "update_time": record.update_time.strftime(timeformat),
         "description": record.description,
         "revisions": l
     }
 
-# __import__()
 
-
-def render_records(Filter: dict = None, page=1, per_page=100) -> dict:
+def render_records(Filter=dict(), page=1, per_page=100) -> dict:
     q = Records.query
     valid = True
-    if Filter is not None:
-        if "username" in Filter:
-            u = db.session.query(Users.id).filter_by(
-                username=Filter.pop("username")
-            ).first()
-            if valid := valid and bool(u):
-                q = q.filter_by(user_id=u.id)
-        if valid and "classnum" in Filter:
-            u = db.session.query(Users.id).filter_by(
-                username=Filter.pop("classnum")
-            ).first()
-            if valid := valid and bool(u):
-                q = q.filter_by(user_id=u.id)
-        if valid:
-            Filter = {
-                key: value
-                for key, value in Filter.items()
-                if key in Records.__mapper__.columns
-            }
-            if Filter:
-                q = q.filter_by(**Filter)
+    if "username" in Filter:
+        user_id = db.session.query(Users.id).filter_by(
+            username=Filter.pop("username")
+        ).scalar()
+        if valid := valid and user_id is not None:
+            q = q.filter_by(user_id=user_id)
+
+    if valid and "classnum" in Filter:
+        unfin_query = db.session.query(Users.id).filter_by(
+            classnum=Filter.pop("classnum")
+        )
+        if valid := valid and unfin_query.count() > 0:
+            q = q.filter(Records.user_id.in_(unfin_query))
+
+    if valid:
+        Filter = {
+            key: value
+            for key, value in Filter.items()
+            if key in Records.__mapper__.columns
+        }
+        q = q.filter_by(**Filter)
 
     if valid:
         l = [
@@ -219,9 +215,29 @@ def render_records(Filter: dict = None, page=1, per_page=100) -> dict:
 
     return {
         "page": page,
-        "pages": (q.count()+per_page-1)//per_page if valid else 0,
+        "pages": ceil(q.count()/per_page) if valid else 0,
         "records": l
     }
+
+
+def render_users(Filter=dict(), page=1, per_page=100) -> dict:
+    q = db.session.query(
+        Users.username, Users.name, Users.classnum, Users.email
+    )
+    Filter = {
+        key: value
+        for key, value in Filter.items()
+        if key in Users.__mapper__.columns
+    }
+    q = q.filter_by(**Filter)
+    l = []
+    for user in q.offset((page-1)*per_page).limit(per_page).all():
+        l.append({
+            "username": user.username,
+            "name": user.name,
+            "classnum": user.classnum,
+            "email": user.email
+        })
 
 
 def insert(tablename: str, data: dict):
@@ -269,28 +285,57 @@ def delete(tablename: str, id: int):
     # todo fix foreign key constraint
 
 
-def add_user(username, password, name, classnum, email="", admin=False, valid=True):
-    password_hash = passwd_context.hash(password)
-    u = Users(username=username, password_hash=password_hash, name=name,
-              classnum=classnum, email=email, admin=admin, valid=valid)
-    db.session.add(u)
+def add_users(data: list[dict]):
+    """
+    returns a list of username that already exist
+    """
+    l = []
+    ae = []
+    for d in data:
+        if "username" in d:
+            if Users.username_exists(d["username"]):
+                ae.append(d["username"])
+            else:
+                l.append(Users.new(**d))
+    db.session.bulk_save_objects(l)
+    db.session.commit()
+    return ae
+
+
+def update_users(data: list[dict]):
+    l = []
+    for d in data:
+        if "password" in d:
+            d["password_hash"] = Users.passwd_hash(d.pop("password"))
+        d = {
+            key: value
+            for key, value in d.items()
+            if key in Users.__mapper__.columns
+        }
+        if len(d) >= 2 and "id" in d:
+            l.append(d)
+    db.session.bulk_update_mappings(Users, l)
     db.session.commit()
 
 
-def del_user(user_id, force=False):
-    if force:
-        Records.query.filter_by(user_id=user_id).update({"user_id": 1})
-        Revisions.query.filter_by(user_id=user_id).update({"user_id": 1})
-        Users.query.filter_by(id=user_id).delete()
-    else:
-        a = db.session.query(db.exists().where(
-            Records.user_id == user_id)).scalar()
-        b = db.session.query(db.exists().where(
-            Revisions.user_id == user_id)).scalar()
-        if a or b:
-            u = Users.query.filter_by(id=user_id).first()
-            u.isValid(False)
-            u.isMarkDeleted(True)
+def del_users(ids: list[int], force=False):
+    s = set()
+    for user_id in ids:
+        if force:
+            Records.query.filter_by(user_id=user_id).update({"user_id": 1})
+            Revisions.query.filter_by(user_id=user_id).update({"user_id": 1})
+            s.add(user_id)
         else:
-            Users.query.filter_by(id=user_id).delete()
-    db.session.commit()
+            a = db.session.query(db.exists().where(
+                Records.user_id == user_id)).scalar()
+            b = db.session.query(db.exists().where(
+                Revisions.user_id == user_id)).scalar()
+            if a or b:
+                u = Users.query.filter_by(id=user_id).first()
+                u.isValid(False)
+                u.isMarkDeleted(True)
+            else:
+                s.add(user_id)
+    if s:
+        Users.query.filter(Users.id.in_(s)).delete()
+        db.session.commit()
