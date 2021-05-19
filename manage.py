@@ -40,22 +40,29 @@ def reset(yes=False):
     db.drop_all()
     db.create_all()
 
+    db.session.add(
+        Users.new(
+            username="deleted",
+            name="此帳號已刪除",
+            classnum=0,
+            valid=False
+        )
+    )
     # test users will be removed in production
-    db.session.add(Users("deleted", "", "此帳號已刪除", 0, valid=False))
     users = [
-        Users(  # password: 123
-            "admin",
-            "$pbkdf2-sha256$29000$ujfGeG.NUUpJaa1VijHmfA$15ZVKxgUPhTL0si.qXhmnR6/fm70SNtRJ6gnBCF/bXo",
-            "Admin",
-            0,
+        Users.new(
+            username="admin",
+            password="123",
+            name="Admin",
+            classnum=0,
             email="admin@127.0.0.1",
             admin=True,
         ),
-        Users(  # password: 123
-            "user",
-            "$pbkdf2-sha256$29000$d06JESLk/L83xhijdA7BOA$foHk6yDuBg3vVwIBTH8Svg7WuIMZRjt6du036rlclAk",
-            "User",
-            0,
+        Users.new(
+            username="user",
+            password="123",
+            name="User",
+            classnum=0,
             admin=False,
         ),
     ]
@@ -101,7 +108,7 @@ def reset(yes=False):
                 randint(0, 59),
             ),
         )
-        for _ in range(100)
+        for _ in range(1000)
     ]
     records = [
         Records(1, 1, 1, "某個地方", "今天的紀錄"),

@@ -4,6 +4,8 @@ from app import create_app, db
 from app.database.model import Users
 
 # No authentication
+
+
 class NoAuthTest(unittest.TestCase):
     def setUp(self) -> None:
         self.app = create_app("testing")
@@ -45,11 +47,11 @@ class NormalUserAuthTest(unittest.TestCase):
         self.app_context.push()
         db.create_all()
         self.login_data = {"username": "user", "password": "123"}
-        self.user = Users(
-            "user",
-            "$pbkdf2-sha256$29000$d06JESLk/L83xhijdA7BOA$foHk6yDuBg3vVwIBTH8Svg7WuIMZRjt6du036rlclAk",
-            "User",
-            0,
+        self.user = Users(  # password: 123
+            username="user",
+            password_hash="$pbkdf2-sha256$29000$d06JESLk/L83xhijdA7BOA$foHk6yDuBg3vVwIBTH8Svg7WuIMZRjt6du036rlclAk",
+            name="User",
+            classnum=0,
             admin=False,
         )
         db.session.add(self.user)
@@ -110,10 +112,10 @@ class AdminAuthTest(NormalUserAuthTest):
         db.create_all()
         self.login_data = {"username": "admin", "password": "123"}
         self.test_admin = Users(
-            "admin",
-            "$pbkdf2-sha256$29000$ujfGeG.NUUpJaa1VijHmfA$15ZVKxgUPhTL0si.qXhmnR6/fm70SNtRJ6gnBCF/bXo",
-            "Admin",
-            0,
+            username="admin",
+            password_hash="$pbkdf2-sha256$29000$ujfGeG.NUUpJaa1VijHmfA$15ZVKxgUPhTL0si.qXhmnR6/fm70SNtRJ6gnBCF/bXo",
+            name="Admin",
+            classnum=0,
             email="admin@127.0.0.1",
             admin=True,
         )
