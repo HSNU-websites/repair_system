@@ -1,4 +1,4 @@
-from logging import NOTSET
+import csv
 from flask import request, render_template, current_app
 from flask_login import login_required
 from ..forms import ReportsFilterForm, AddOneUserForm, AddUsersByFileForm
@@ -106,12 +106,14 @@ def system_modification_page():
 @login_required
 def manage_user_page(page=1):
     form = AddOneUserForm()
+    form_csv=AddUsersByFileForm()
     if request.method == "GET":
         # Render all users
         current_app.logger.info("GET /manage_user")
-        return render_template("manage_user.html", form=form)
+        return render_template("manage_user.html", form=form, form_csv=form_csv)
     if request.method == "POST":
         # Add user
+        # Add one user
         if form.validate_on_submit():
             current_app.logger.info("POST /manage_user")
             username = form.username.data
@@ -123,7 +125,17 @@ def manage_user_page(page=1):
             add_user(username, password, name, classnum, email, isAdmin)
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")
-        return render_template("manage_user.html", form=form)
+        # Add users by csv
+        if form_csv.validate_on_submit():
+            current_app.logger.info("POST /manage_user")
+            csv_file = form_csv.csv_file.data
+            # data format: [{"username": "zxc", "name": "zxc", "password": "123", "classnum": "1400"}]
+            data = [row for row in csv.DictReader(csv_file.read().decode("big5").splitlines(), skipinitialspace=True)]
+            # TODO add_user_by_csv(data)
+        else:
+            current_app.logger.info("POST /manage_user: Invalid submit")
+
+        return render_template("manage_user.html", form=form, form_csv=form_csv)
     if request.method == "DELETE":
         # Delete user
         current_app.logger.info("DELETE /manage_user")

@@ -3,6 +3,7 @@ from flask_wtf.recaptcha import Recaptcha
 from flask_wtf.recaptcha import RecaptchaField
 from wtforms import PasswordField, SelectField, StringField, SubmitField
 from wtforms.fields.html5 import EmailField
+from flask_wtf.file import FileField, FileRequired
 from wtforms.validators import DataRequired, ValidationError
 
 
@@ -69,4 +70,5 @@ class AddOneUserForm(FlaskForm):
 
 
 class AddUsersByFileForm(FlaskForm):
-    pass
+    csv_file = FileField("CSV file", validators=[FileRequired()])
+    submit = SubmitField("新增")

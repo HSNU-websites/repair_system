@@ -9,32 +9,44 @@
 </head>
 
 <body>
-    <form action="/manage_user/", method="POST">
-        {{ form.csrf_token }}
-        <div class="field">
-            {{ form.username.label }}
-            {{ form.username }}
-        </div>
-        <div class="field">
-            {{ form.name.label }}
-            {{ form.name }}
-        </div>
-        <div class="field">
-            {{form.classnum.label}}
-            {{form.classnum}}
-        </div>
-        <div class="field">
-            {{form.password.label}}
-            {{form.password}}
-        </div>
-        <div class="field">
-            {{form.email.label}}
-            {{form.email}}
-        </div>
-        <div class="field">
-            {{form.submit}}
-        </div>
-    </form>
+    <div>
+        <form action="/manage_user/" , method="POST">
+            {{ form.csrf_token }}
+            <div class="field">
+                {{ form.username.label }}
+                {{ form.username }}
+            </div>
+            <div class="field">
+                {{ form.name.label }}
+                {{ form.name }}
+            </div>
+            <div class="field">
+                {{form.classnum.label}}
+                {{form.classnum}}
+            </div>
+            <div class="field">
+                {{form.password.label}}
+                {{form.password}}
+            </div>
+            <div class="field">
+                {{form.email.label}}
+                {{form.email}}
+            </div>
+            <div class="field">
+                {{form.submit}}
+            </div>
+        </form>
+        <form action="/manage_user/" method="POST" enctype="multipart/form-data">
+            {{ form_csv.csrf_token }}
+            <div class="field">
+                {{ form_csv.csv_file.label }}
+                {{ form_csv.csv_file }}
+            </div>
+            <div class="field">
+                {{ form_csv.submit }}
+            </div>
+        </form>
+    </div>
 </body>
 
 </html>
