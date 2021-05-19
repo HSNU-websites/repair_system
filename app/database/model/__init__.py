@@ -1,4 +1,4 @@
-from .common import db, timeformat, passwd_context
+from .common import db, timeformat, filetimeformat
 from .Buildings import Buildings
 from .Items import Items
 from .Records import Records
@@ -8,9 +8,9 @@ from .Unfinisheds import Unfinisheds
 from .Users import Users
 from .Offices import Offices
 
-tables = {Statuses, Offices, Items, Buildings, Users, Records, Revisions, Unfinisheds}
-tablenameRev = {t.__tablename__:t for t in tables}
-idTables = {t for t in tables if "id" in t.__dict__}
-sequenceTables = {t for t in tables if "sequence" in t.__dict__}
+allTables = {Buildings, Items, Records, Revisions, Statuses, Users,  Unfinisheds, Offices}
+tablenameRev = {t.__tablename__: t for t in allTables}
+idTables = {t for t in allTables if "id" in t.__mapper__.columns}
+sequenceTables = {t for t in allTables if "sequence" in t.__mapper__.columns}
 
 # __all__ = []

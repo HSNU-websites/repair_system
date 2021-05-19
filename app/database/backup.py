@@ -7,7 +7,7 @@ from .Archive import Archive
 from .db_helper import updateUnfinisheds
 
 defaultTables = idTables
-partition = 1000
+partition = 10000
 
 backup_dir = Path("Backup")
 
@@ -39,10 +39,14 @@ def get_dict(row):
             return value.strftime(timeformat)
         else:
             return value
-    return {
-        key: process_value(row.__dict__[key])
-        for key in type(row).__mapper__.columns.keys()
-    }
+
+    if type(row) not in allTables:
+        return {}
+    else:
+        return {
+            key: process_value(row.__dict__[key])
+            for key in type(row).__mapper__.columns.keys()
+        }
 
 
 def db_reprTest():
@@ -52,13 +56,16 @@ def db_reprTest():
     """
     b = True
     for t in defaultTables:
-        obj1 = t.query.first()
-        obj2 = eval(repr(obj1))
-        d1 = get_dict(obj1)
-        d2 = get_dict(obj2)
-        r = d1 == d2
-        print(t.__tablename__, r)
-        b = b and r
+        if obj1 := t.query.first():
+            obj2 = eval(repr(obj1))
+            d1 = get_dict(obj1)
+            d2 = get_dict(obj2)
+            r = d1 == d2
+            print(t.__tablename__, r)
+            b = b and r
+        else:
+            print(t.__tablename__, "no item!!")
+            b = False
     return b
 
 
@@ -88,7 +95,7 @@ def set_diff(a: set, b: set, modify=False) -> list[set]:
 
 def backup(tables: list[db.Model] = None):  # path not fix
     archiveName = "Backup_{time}.tar.xz".format(
-        time=datetime.datetime.now().strftime(timeformat))
+        time=datetime.datetime.now().strftime(filetimeformat))
     if tables is None:
         tables = defaultTables
     else:
@@ -96,23 +103,23 @@ def backup(tables: list[db.Model] = None):  # path not fix
 
     archive = Archive(backup_dir/archiveName, "w")
     for t in tables:
-        # max = t.query.count()
-        # if max <= partition:
-        filename = "{tablename}.json".format(tablename=t.__tablename__)
-        final = dict()
-        final[t.__tablename__] = [repr(row) for row in t.query.all()]
-        archive.write(filename, final)
-        # else:
-        #     p = t.query.paginate(per_page=partition)
-        #     while p.items:
-        #         filename = "{tablename}_{count}.json".format(
-        #             tablename=t.__tablename__, count=p.page)
-        #         final = dict()
-        #         final[t.__tablename__] = [
-        #             repr(row) for row in p.items
-        #         ]
-        #         archive.write(filename, final)
-        #         p = p.next()
+        max = t.query.count()
+        if max <= partition:
+            filename = "{tablename}.json".format(tablename=t.__tablename__)
+            final = dict()
+            final["tablename"] = t.__tablename__
+            final["data"] = [get_dict(row) for row in t.query.all()]
+            archive.write(filename, final)
+        else:
+            p = t.query.paginate(per_page=partition)
+            while p.items:
+                filename = "{tablename}_{count}.json".format(
+                    tablename=t.__tablename__, count=p.page)
+                final = dict()
+                final["tablename"] = t.__tablename__
+                final["data"] = [get_dict(row) for row in p.items]
+                archive.write(filename, final)
+                p = p.next()
     print("Backup finished, file: {}".format(archiveName))
 
 
