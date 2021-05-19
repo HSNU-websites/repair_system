@@ -129,8 +129,16 @@ def manage_user_page(page=1):
         if form_csv.validate_on_submit():
             current_app.logger.info("POST /manage_user")
             csv_file = form_csv.csv_file.data
+            rawdata = csv_file.read()
             # data format: [{"username": "zxc", "name": "zxc", "password": "123", "classnum": "1400"}]
-            data = [row for row in csv.DictReader(csv_file.read().decode("big5").splitlines(), skipinitialspace=True)]
+            try:
+                data = [row for row in csv.DictReader(rawdata.decode("utf-8").splitlines())]
+            except UnicodeDecodeError:
+                data = [row for row in csv.DictReader(rawdata.decode("big5").splitlines())]
+            except Exception:
+                data = [row for row in csv.DictReader(rawdata.decode("ANSI").splitlines())]
+            except:
+                return "Error"
             # TODO add_user_by_csv(data)
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")
