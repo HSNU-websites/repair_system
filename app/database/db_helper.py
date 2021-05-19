@@ -256,6 +256,7 @@ def delete(tablename: str, id: int):
 
 
 def add_user(username, password, name, classnum, email="", admin=False, valid=True):
+    # unique value issue should be fixed
     password_hash = passwd_context.hash(password)
     u = Users(username=username, password_hash=password_hash, name=name,
              classnum=classnum, email=email, admin=admin, valid=valid)

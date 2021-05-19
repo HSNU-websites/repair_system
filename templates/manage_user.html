@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理使用者</title>
+</head>
+
+<body>
+    <form action="/manage_user/", method="POST">
+        {{ form.csrf_token }}
+        <div class="field">
+            {{ form.username.label }}
+            {{ form.username }}
+        </div>
+        <div class="field">
+            {{ form.name.label }}
+            {{ form.name }}
+        </div>
+        <div class="field">
+            {{form.classnum.label}}
+            {{form.classnum}}
+        </div>
+        <div class="field">
+            {{form.password.label}}
+            {{form.password}}
+        </div>
+        <div class="field">
+            {{form.email.label}}
+            {{form.email}}
+        </div>
+        <div class="field">
+            {{form.submit}}
+        </div>
+    </form>
+</body>
+
+</html>
