@@ -47,9 +47,9 @@ class NormalUserAuthTest(unittest.TestCase):
         self.app_context.push()
         db.create_all()
         self.login_data = {"username": "user", "password": "123"}
-        self.user = Users(  # password: 123
+        self.user = Users.new(
             username="user",
-            password_hash="$pbkdf2-sha256$29000$d06JESLk/L83xhijdA7BOA$foHk6yDuBg3vVwIBTH8Svg7WuIMZRjt6du036rlclAk",
+            password="123",
             name="User",
             classnum=0,
             admin=False,
@@ -111,9 +111,9 @@ class AdminAuthTest(NormalUserAuthTest):
         self.app_context.push()
         db.create_all()
         self.login_data = {"username": "admin", "password": "123"}
-        self.test_admin = Users(
+        self.test_admin = Users.new(
             username="admin",
-            password_hash="$pbkdf2-sha256$29000$ujfGeG.NUUpJaa1VijHmfA$15ZVKxgUPhTL0si.qXhmnR6/fm70SNtRJ6gnBCF/bXo",
+            password="123",
             name="Admin",
             classnum=0,
             email="admin@127.0.0.1",

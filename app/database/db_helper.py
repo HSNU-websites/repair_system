@@ -56,12 +56,8 @@ def render_system_setting():
 
 def get_admin_emails():
     admins = (
-        # only "(properties & :mask) > 0" works with index
         db.session.query(Users.email)
-        .from_statement(
-            db.text("SELECT users.email FROM users WHERE (properties & :mask) > 0")
-        )
-        .params(mask=Users.flags.admin)
+        .filter(Users.is_admin)
         .all()
     )
     return [admin.email for admin in admins]
@@ -245,7 +241,7 @@ def insert(tablename: str, data: dict):
     Statuses, Offices, Items, Buildings only
     """
     try:
-        if t := tablenameRev[tablename] not in sequenceTables:
+        if (t := tablenameRev[tablename]) not in sequenceTables:
             return False
         db.session.add(t(**data))
         db.session.commit()
@@ -260,7 +256,7 @@ def update(tablename: str, data: dict):
     Statuses, Offices, Items, Buildings only
     """
     try:
-        if t := tablenameRev[tablename] not in sequenceTables:
+        if (t := tablenameRev[tablename]) not in sequenceTables:
             return False
         id = data.pop("id")
         t.query.filter_by(id=id).update(data)
@@ -275,7 +271,7 @@ def delete(tablename: str, id: int):
     Statuses, Offices, Items, Buildings only
     """
     try:
-        if t := tablenameRev[tablename] not in sequenceTables:
+        if (t := tablenameRev[tablename]) not in sequenceTables:
             return False
         t.query.filter_by(id=id).delete()
         db.session.commit()

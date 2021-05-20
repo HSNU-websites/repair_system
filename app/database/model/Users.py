@@ -65,7 +65,8 @@ class Users(db.Model):
     @is_admin.expression
     def is_admin(self):
         """
-        SQL query expression
+        SQL query expression that works with 'idx_users_admin'
+
         """
         return self.properties.op("&")(Users.flags.admin) == Users.flags.admin
 
