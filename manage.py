@@ -95,7 +95,7 @@ def reset(yes=False):
     current_timestamp = int(datetime.now().timestamp())
     random_records = [
         Records(
-            user_id=randint(2, len(users)),
+            user_id=randint(1, len(users)+1),
             item_id=randint(1, len(db_default.items) + 1),
             building_id=randint(1, len(db_default.buildings) + 1),
             location="某{}個地方".format(randint(1, 100000)),
@@ -122,7 +122,7 @@ def reset(yes=False):
     random_revisions = [
         Revisions(
             record_id=i,
-            user_id=randint(2, len(users)),
+            user_id=randint(1, len(users)+1),
             status_id=1,
             description="測試修訂{}紀錄".format(randint(1, 100000)),
         )
@@ -131,7 +131,7 @@ def reset(yes=False):
     random_revisions += [
         Revisions(
             record_id=i,
-            user_id=randint(2, len(users)),
+            user_id=randint(1, len(users)+1),
             status_id=2,
             description="測試修訂{}紀錄".format(randint(1, 100000)),
         )
