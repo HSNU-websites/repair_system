@@ -92,6 +92,7 @@ def reset(yes=False):
     db.session.commit()
 
     # "%Y-%m-%dT%H-%M-%S"
+    current_timestamp = int(datetime.now().timestamp())
     random_records = [
         Records(
             user_id=randint(2, len(users)),
@@ -99,14 +100,8 @@ def reset(yes=False):
             building_id=randint(1, len(db_default.buildings) + 1),
             location="某{}個地方".format(randint(1, 100000)),
             description="{}的紀錄".format(randint(1, 100000)),
-            insert_time="{:04}-{:02}-{:02}T{:02}:{:02}:{:02}".format(
-                randint(1980, 2021),
-                randint(1, 12),
-                randint(1, 28),
-                randint(0, 23),
-                randint(0, 59),
-                randint(0, 59),
-            ),
+            insert_time=datetime.fromtimestamp(
+                randint(0, current_timestamp)).strftime(timeformat)
         )
         for _ in range(1000)
     ]
