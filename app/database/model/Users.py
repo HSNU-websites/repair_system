@@ -12,7 +12,7 @@ class Users(db.Model):
     name: User's real name.
     classnum: User's class number, and 0 will be the value if the user is an admin.
     properties: See `setFlag` doc.
-    email: User's email, and students will have empty string since their email can be infered from their student id.
+    email: User's email, and students will have empty string since their email can be inferred from their student id.
     """
 
     __tablename__ = "users"
