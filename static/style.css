@@ -4,8 +4,7 @@ h1 {
     font-weight: normal;
 }
 
-input[type="text"],
-input[type="password"] {
+input[type="text"], input[type="password"] {
     font-family: 'Noto Sans TC', sans-serif;
     background: #FFFFFF;
     color: black;
@@ -19,8 +18,7 @@ input[type="password"] {
     transition: .18s ease-out;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
+input[type="text"]:focus, input[type="password"]:focus {
     border: 1px solid rgb(13, 142, 194);
     box-shadow: inset 5px 10px 4px rgba(13, 142, 194, 0.07)
 }
@@ -64,6 +62,12 @@ a:hover {
     margin-right: auto;
 }
 
+#messages {
+    width: 65vw;
+    display: block;
+    margin: 0 auto 0 auto;
+}
+
 #copyright {
     font-family: 'Noto Sans TC', sans-serif;
     position: absolute;
@@ -73,39 +77,30 @@ a:hover {
     height: 40px;
 }
 
-
 .container {
+    margin-top: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
     width: 60vw;
-    height: 70vh;
+    height: 62vh;
     margin-left: auto;
     margin-right: auto;
     -webkit-transition: .2s ease-out;
     -moz-transition: .2s ease-out;
     -o-transition: .2s ease-out;
     transition: .2s ease-out;
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 10px 10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.container:hover {
+    box-shadow: -10px -10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .container a {
     display: block;
     margin: 5px 0 5px 0;
-}
-
-@media only screen and (max-width: 600px) {
-    .container {
-        height: 55vh;
-    }
-}
-
-#index {
-    background-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 10px 10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-}
-
-#index:hover {
-    box-shadow: -10px -10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .field {

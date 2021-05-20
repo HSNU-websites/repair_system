@@ -40,27 +40,36 @@
                 </div>
             </caption>
             <thead>
-            <tr>
-                <th>報修人</th>
-                <th>大樓</th>
-                <th>地點</th>
-                <th>損壞物件</th>
-                <th>狀況描述</th>
-                <th>報修時間</th>
-            </tr>
+                <tr>
+                    <th>報修人</th>
+                    <th>大樓</th>
+                    <th>地點</th>
+                    <th>損壞物件</th>
+                    <th>狀況描述</th>
+                    <th>報修時間</th>
+                </tr>
             </thead>
             <tbody>
             {% for record in records["records"] %}
-            <tr>
-                <td>{{ record["user"]["classnum"] | string + " " + record["user"]["name"] }}</td>
-                <td>{{ record["building"] }}</td>
-                <td>{{ record["location"] }}</td>
-                <td>{{ record["item"] }}</td>
-                <td>{{ record["description"] }}</td>
-                <td>{{ record["insert_time"] }}</td>
-            </tr>
+                <tr>
+                    <td>{{ record["user"]["classnum"] | string + " " + record["user"]["name"] }}</td>
+                    <td>{{ record["building"] }}</td>
+                    <td>{{ record["location"] }}</td>
+                    <td>{{ record["item"] }}</td>
+                    <td>{{ record["description"] }}</td>
+                    <td>{{ record["insert_time"] }}</td>
+                </tr>
             {% endfor %}
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="6" class="pages">
+                        <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
+                        <span>{{ records["page"] }} / {{ records["pages"] }}</span>
+                        <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
+                    </td>
+                </tr>
+            </tfoot>
         </table>
     </div>
     <footer>

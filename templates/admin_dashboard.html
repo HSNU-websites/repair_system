@@ -46,7 +46,7 @@
         </div>
         <table>
             <caption>
-                <div id="pages">
+                <div class="pages">
                     <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
                     <span>{{ records["page"] }} / {{ records["pages"] }}</span>
                     <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
@@ -74,6 +74,15 @@
                 </tr>
                 {% endfor %}
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="6" class="pages">
+                        <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
+                        <span>{{ records["page"] }} / {{ records["pages"] }}</span>
+                        <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
+                    </td>
+                </tr>
+            </tfoot>
         </table>
     </div>
     <footer>

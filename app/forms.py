@@ -24,9 +24,6 @@ class ReportForm(FlaskForm):
     location = StringField("地點: ", validators=[DataRequired()])
     item = SelectField("損壞物件: ", validators=[DataRequired()])
     description = StringField("狀況描述: ", validators=[DataRequired()])
-    recaptcha = RecaptchaField(
-        validators=[Recaptcha(message="Please click 'I am not a robot.'")]
-    )
     submit = SubmitField("報修")
 
 

@@ -16,7 +16,8 @@
 
 <body>
     <a href="/"><img src="{{ url_for('static', filename='logo.png') }}" id="logo"></a>
-    <div class="container" id="index">
+    <div id="messages">{{ display_msg(messages) }}</div>
+    <div class="container">
         <form action="/" method="POST">
             {{ form.csrf_token }}
             <div class="field">
@@ -30,7 +31,6 @@
             <div class="field">
                 {{ form.submit }}
             </div>
-            <div>{{ display_msg(messages) }}</div>
         </form>
     </div>
     <footer>
