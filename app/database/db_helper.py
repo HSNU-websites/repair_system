@@ -156,11 +156,10 @@ def record_to_dict(record):
     for rev in Revisions.query.filter_by(record_id=record.id).all():
         status = db.session.query(Statuses.description).filter_by(
             id=rev.status_id).scalar()
-        time = rev.insert_time.strftime(timeformat)
         l.append({
             "user": get_user(rev.user_id),
             "status": status,
-            "insert_time": time,
+            "insert_time": rev.insert_time.strftime(timeformat),
             "description": rev.description
         })
 
