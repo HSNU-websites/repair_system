@@ -12,13 +12,13 @@ class ReportFormTest(unittest.TestCase):
         self.app_context.push()
         db.create_all()
         self.login_data = {"username": "admin", "password": "123"}
-        self.test_admin = Users(
-            "admin",
-            "$pbkdf2-sha256$29000$ujfGeG.NUUpJaa1VijHmfA$15ZVKxgUPhTL0si.qXhmnR6/fm70SNtRJ6gnBCF/bXo",
-            "Admin",
-            0,
+        self.test_admin = Users.new(
+            username="admin",
+            password="123",
+            name="Admin",
+            classnum=0,
             email="admin@127.0.0.1",
-            admin=True,
+            is_admin=True,
         )
         db.session.add(self.test_admin)
 

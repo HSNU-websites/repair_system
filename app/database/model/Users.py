@@ -1,4 +1,5 @@
 from .common import db, passwd_context
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class Users(db.Model):
@@ -11,7 +12,7 @@ class Users(db.Model):
     name: User's real name.
     classnum: User's class number, and 0 will be the value if the user is an admin.
     properties: See `setFlag` doc.
-    email: User's email, and students will have empty string since their email can be infered from their student id.
+    email: User's email, and students will have empty string since their email can be inferred from their student id.
     """
 
     __tablename__ = "users"
@@ -20,7 +21,7 @@ class Users(db.Model):
     # passwd_context.hash("pAs$W0rd")
     password_hash = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
-    classnum = db.Column(db.Integer, nullable=False)
+    classnum = db.Column(db.Integer, nullable=False, index=True)
     properties = db.Column(db.SmallInteger, nullable=False)
     email = db.Column(db.String(255), nullable=False)
 
@@ -36,37 +37,6 @@ class Users(db.Model):
         ),
     )
 
-    def __init__(
-        self,
-        username,
-        password_hash,
-        name,
-        classnum,
-        email="",
-        admin=False,
-        valid=True,
-        **kwargs
-    ):
-        self.username = username
-        self.password_hash = password_hash
-        self.name = name
-        self.classnum = classnum
-        self.email = email
-        if "id" in kwargs:
-            self.id = kwargs["id"]
-        if "properties" in kwargs:
-            self.properties = kwargs["properties"]
-        else:
-            self.properties = 0
-            self.isAdmin(admin)
-            self.isValid(valid)
-
-    def __repr__(self):
-        return (
-            "Users(id={id},username='{username}',password_hash='{password_hash}',name='{name}',classnum={classnum},email='{email}',properties={properties})"
-            .format(**self.__dict__)
-        )
-
     def setFlag(self, flag: int, value: bool):
         """
         In Linux file permission system, 1 is "executable", 2 is "writable", and 4 is "readable".
@@ -79,28 +49,67 @@ class Users(db.Model):
             self.properties = self.properties | flag
         else:
             self.properties = self.properties & (~flag)
-        db.session.commit()
 
     def readFlag(self, flag: int) -> bool:
         return bool(self.properties & flag)
 
-    def isAdmin(self, value: bool = None) -> bool:
-        if value is None:
-            return self.readFlag(Users.flags.admin)
-        else:
-            return self.setFlag(Users.flags.admin, value)
+    # hybrid_property for is_admin
+    @hybrid_property
+    def is_admin(self):
+        return self.readFlag(Users.flags.admin)
 
-    def isValid(self, value: bool = None) -> bool:
-        if value is None:
-            return self.readFlag(Users.flags.valid)
-        else:
-            return self.setFlag(Users.flags.valid, value)
+    @is_admin.setter
+    def is_admin(self, value):
+        self.setFlag(Users.flags.admin, value)
 
-    def isMarkDeleted(self, value: bool = None) -> bool:
-        if value is None:
-            return self.readFlag(Users.flags.deleted)
-        else:
-            return self.setFlag(Users.flags.deleted, value)
+    @is_admin.expression
+    def is_admin(self):
+        """
+        SQL query expression that works with 'idx_users_admin'
+
+        """
+        return self.properties.op("&")(Users.flags.admin) == Users.flags.admin
+
+    # hybrid_property for is_valid
+    @hybrid_property
+    def is_valid(self):
+        return self.readFlag(Users.flags.valid)
+
+    @is_valid.setter
+    def is_valid(self, value):
+        self.setFlag(Users.flags.valid, value)
+
+    @is_valid.expression
+    def is_valid(self):
+        return self.properties.op("&")(Users.flags.valid) == Users.flags.valid
+
+    # hybrid_property for is_mark_deleted
+    @hybrid_property
+    def is_mark_deleted(self):
+        return self.readFlag(Users.flags.deleted)
+
+    @is_mark_deleted.setter
+    def is_mark_deleted(self, value):
+        self.setFlag(Users.flags.deleted, value)
+
+    @is_mark_deleted.expression
+    def is_mark_deleted(self):
+        return self.properties.op("&")(Users.flags.deleted) == Users.flags.deleted
+
+    def __init__(self, id, username, password_hash, name, classnum, properties, email):
+        self.id = id
+        self.username = username
+        self.password_hash = password_hash
+        self.name = name
+        self.classnum = classnum
+        self.properties = properties
+        self.email = email
+
+    def __repr__(self):
+        return (
+            "Users(id={id},username='{username}',password_hash='{password_hash}',name='{name}',classnum={classnum},properties={properties},email='{email}')"
+            .format(**self.__dict__)
+        )
 
     def verify(self, password: str) -> bool:
         result, new_hash = passwd_context.verify_and_update(
@@ -110,3 +119,38 @@ class Users(db.Model):
             self.password_hash = new_hash
             db.session.commit()
         return result
+
+    @staticmethod
+    def username_exists(username):
+        return db.session.query(db.exists().where(Users.username == username)).scalar()
+
+    @staticmethod
+    def new(username, password="", name="", classnum=0, email="", is_admin=False, is_valid=True):
+        u = Users(
+            id=None,
+            username=username,
+            password_hash=passwd_context.hash(password) if password else "",
+            name=name,
+            classnum=classnum,
+            properties=0,
+            email=email
+        )
+        u.is_admin = is_admin
+        u.is_valid = is_valid
+        return u
+
+    def update(self, password=None, name=None, classnum=None, email=None, is_admin=None, is_valid=None, is_mark_deleted=None):
+        if password is not None:
+            self.password_hash = passwd_context.hash(password) if password else ""
+        if name is not None:
+            self.name = name
+        if classnum is not None:
+            self.classnum = classnum
+        if email is not None:
+            self.email = email
+        if is_admin is not None:
+            self.is_admin = is_admin
+        if is_valid is not None:
+            self.is_valid = is_valid
+        if is_mark_deleted is not None:
+            self.is_mark_deleted = is_mark_deleted

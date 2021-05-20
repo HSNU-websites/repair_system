@@ -40,23 +40,29 @@ def reset(yes=False):
     db.drop_all()
     db.create_all()
 
+    db.session.add(
+        Users.new(
+            username="deleted",
+            name="此帳號已刪除",
+            classnum=0,
+            is_valid=False
+        )
+    )
     # test users will be removed in production
-    db.session.add(Users("deleted", "", "此帳號已刪除", 0, valid=False))
     users = [
-        Users(  # password: 123
-            "admin",
-            "$pbkdf2-sha256$29000$ujfGeG.NUUpJaa1VijHmfA$15ZVKxgUPhTL0si.qXhmnR6/fm70SNtRJ6gnBCF/bXo",
-            "Admin",
-            0,
+        Users.new(
+            username="admin",
+            password="123",
+            name="Admin",
+            classnum=0,
             email="admin@127.0.0.1",
-            admin=True,
+            is_admin=True,
         ),
-        Users(  # password: 123
-            "user",
-            "$pbkdf2-sha256$29000$d06JESLk/L83xhijdA7BOA$foHk6yDuBg3vVwIBTH8Svg7WuIMZRjt6du036rlclAk",
-            "User",
-            0,
-            admin=False,
+        Users.new(
+            username="user",
+            password="123",
+            name="User",
+            classnum=0,
         ),
     ]
     db.session.add_all(users)
@@ -85,23 +91,18 @@ def reset(yes=False):
     db.session.commit()
 
     # "%Y-%m-%dT%H-%M-%S"
+    current_timestamp = int(datetime.now().timestamp())
     random_records = [
         Records(
-            user_id=randint(2, len(users)),
+            user_id=randint(1, len(users)+1),
             item_id=randint(1, len(db_default.items) + 1),
             building_id=randint(1, len(db_default.buildings) + 1),
             location="某{}個地方".format(randint(1, 100000)),
             description="{}的紀錄".format(randint(1, 100000)),
-            insert_time="{:04}-{:02}-{:02}T{:02}:{:02}:{:02}".format(
-                randint(1980, 2021),
-                randint(1, 12),
-                randint(1, 28),
-                randint(0, 23),
-                randint(0, 59),
-                randint(0, 59),
-            ),
+            insert_time=datetime.fromtimestamp(
+                randint(0, current_timestamp)).strftime(timeformat)
         )
-        for _ in range(100)
+        for _ in range(1000)
     ]
     records = [
         Records(1, 1, 1, "某個地方", "今天的紀錄"),
@@ -120,7 +121,7 @@ def reset(yes=False):
     random_revisions = [
         Revisions(
             record_id=i,
-            user_id=randint(2, len(users)),
+            user_id=randint(1, len(users)+1),
             status_id=1,
             description="測試修訂{}紀錄".format(randint(1, 100000)),
         )
@@ -129,7 +130,7 @@ def reset(yes=False):
     random_revisions += [
         Revisions(
             record_id=i,
-            user_id=randint(2, len(users)),
+            user_id=randint(1, len(users)+1),
             status_id=2,
             description="測試修訂{}紀錄".format(randint(1, 100000)),
         )

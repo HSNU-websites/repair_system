@@ -13,7 +13,7 @@ def admin_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
         if current_user.is_active:
-            if current_user.isAdmin:
+            if current_user.is_admin:
                 return func(*args, **kwargs)
             else:
                 return login_manager.forbidden()

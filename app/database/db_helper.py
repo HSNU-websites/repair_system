@@ -18,7 +18,7 @@ from .model import (
     sequenceTables,
     tablenameRev,
     timeformat,
-    passwd_context,
+    get_dict,
 )
 
 
@@ -27,53 +27,39 @@ class User(UserMixin):
 
 
 def render_statuses():
-    statuses = db.session.query(
-        Statuses.description).order_by(Statuses.sequence).all()
+    statuses = Statuses.query.order_by(Statuses.sequence).all()
     return [status.description for status in statuses]
 
 
 def render_items():
-    items = db.session.query(
-        Items.id, Items.description).order_by(Items.sequence).all()
+    items = Items.query.order_by(Items.sequence).all()
     return [(item.id, item.description) for item in items]
 
 
 def render_buildings():
-    buildings = (
-        db.session.query(Buildings.id, Buildings.description)
-        .order_by(Buildings.sequence)
-        .all()
-    )
+    buildings = Buildings.query.order_by(Buildings.sequence).all()
     return [(building.id, building.description) for building in buildings]
 
 
 def render_system_setting():
-    buildings = db.session.query(Buildings).order_by(Buildings.sequence).all()
-    items = db.session.query(Items).order_by(Items.sequence).all()
-    offices = db.session.query(Offices).order_by(Offices.sequence).all()
-    statuses = db.session.query(Statuses).order_by(Statuses.sequence).all()
+    buildings = map(get_dict, Buildings.query.order_by(Buildings.sequence).all())
+    items = map(get_dict, Items.query.order_by(Items.sequence).all())
+    offices = map(get_dict, Offices.query.order_by(Offices.sequence).all())
+    statuses = map(get_dict, Statuses.query.order_by(Statuses.sequence).all())
     return (buildings, items, offices, statuses)
 
 
 def get_admin_emails():
-    admins = (
-        # only "(properties & :mask) > 0" works with index
-        db.session.query(Users.email)
-        .from_statement(
-            db.text("SELECT users.email FROM users WHERE (properties & :mask) > 0")
-        )
-        .params(mask=Users.flags.admin)
-        .all()
-    )
+    admins = db.session.query(Users.email).filter(Users.is_admin).all()
     return [admin.email for admin in admins]
 
 
 def login_auth(username, password):
     user = Users.query.filter_by(username=username).first()
-    if user and user.verify(password) and user.isValid():
+    if user and user.verify(password) and user.is_valid:
         sessionUser = User()
         sessionUser.id = user.id
-        sessionUser.isAdmin = user.isAdmin()
+        sessionUser.is_admin = user.is_admin
         return sessionUser
     else:
         return None
@@ -82,10 +68,10 @@ def login_auth(username, password):
 def load_user(user_id: str):
     # whether user_id is str or int doesn't matter
     user = Users.query.filter_by(id=user_id).first()
-    if user and user.isValid():
+    if user and user.is_valid:
         sessionUser = User()
         sessionUser.id = user.id
-        sessionUser.isAdmin = user.isAdmin()
+        sessionUser.is_admin = user.is_admin
         return sessionUser
     else:
         return None
@@ -102,8 +88,8 @@ def updateUnfinisheds():
             .order_by(Revisions.id.desc()).first()
         )
         if not (r and r.status_id == finishedStatus_id):
-            l.append(Unfinisheds(record_id=record.id))
-    db.session.bulk_save_objects(l)
+            l.append({"record_id": record.id})
+    db.session.bulk_insert_mappings(Unfinisheds, l)
     db.session.commit()
 
 
@@ -153,60 +139,94 @@ def get_user(user_id) -> dict:
 
 
 def record_to_dict(record):
-    item = db.session.query(Items.description).filter_by(
-        id=record.item_id).first()[0]
-    building = db.session.query(Buildings.description).filter_by(
-        id=record.building_id).first()[0]
-    insert_time = record.insert_time.strftime(timeformat)
-    update_time = record.update_time.strftime(timeformat)
+    item = db.session.query(Items.description).filter_by(id=record.item_id).scalar()
+    building = db.session.query(Buildings.description).filter_by(id=record.building_id).scalar()
     l = []
     for rev in Revisions.query.filter_by(record_id=record.id).all():
-        status = db.session.query(Statuses.description).filter_by(
-            id=rev.status_id).first()[0]
-        time = rev.insert_time.strftime(timeformat)
+        status = db.session.query(Statuses.description).filter_by(id=rev.status_id).scalar()
         l.append({
+            "id": rev.id,
             "user": get_user(rev.user_id),
             "status": status,
-            "insert_time": time,
+            "insert_time": rev.insert_time.strftime(timeformat),
             "description": rev.description
         })
 
     return {
+        "id": record.id,
         "user": get_user(record.user_id),
         "item": item,
         "building": building,
         "location": record.location,
-        "insert_time": insert_time,
-        "update_time": update_time,
+        "insert_time": record.insert_time.strftime(timeformat),
+        "update_time": record.update_time.strftime(timeformat),
         "description": record.description,
         "revisions": l
     }
 
 
-def render_records(filter: dict = None, page=1, per_page=100) -> dict:
+def render_records(Filter=dict(), page=1, per_page=100) -> dict:
     q = Records.query
-    if filter is not None:
-        if "username" in filter:
-            u = db.session.query(Users.id).filter_by(
-                username=filter.pop("username")).first()
-            if u:
-                q = q.filter_by(user_id=u.id)
-        if "classnum" in filter:
-            u = db.session.query(Users.id).filter_by(
-                username=filter.pop("classnum")).first()
-            if u:
-                q = q.filter_by(user_id=u.id)
-        if filter:
-            q = q.filter_by(**filter)
+    valid = True
+    if "username" in Filter:
+        user_id = db.session.query(Users.id).filter_by(username=Filter.pop("username")).scalar()
+        if valid := valid and user_id is not None:
+            q = q.filter_by(user_id=user_id)
 
-    l = []
-    for record in q.order_by(Records.update_time.desc()).offset((page-1)*per_page).limit(per_page).all():
-        l.append(record_to_dict(record))
+    if valid and "classnum" in Filter:
+        unfin_query = db.session.query(Users.id).filter_by(classnum=Filter.pop("classnum"))
+        if valid := valid and unfin_query.count() > 0:
+            q = q.filter(Records.user_id.in_(unfin_query))
+
+    if valid:
+        Filter = {
+            key: value
+            for key, value in Filter.items()
+            if key in Records.__mapper__.columns
+        }
+        q = q.filter_by(**Filter)
+
+    if valid:
+        l = [
+            record_to_dict(record)
+            for record in q.order_by(Records.update_time.desc()).offset((page - 1) * per_page).limit(per_page).all()
+        ]
+    else:
+        l = []
 
     return {
         "page": page,
-        "pages": ceil(q.count()/per_page),
+        "pages": ceil(q.count() / per_page) if valid else 0,
         "records": l
+    }
+
+
+def render_users(Filter=dict(), page=1, per_page=100) -> dict:
+    q = db.session.query(
+        Users.username, Users.name, Users.classnum, Users.email
+    )
+    Filter = {
+        key: value
+        for key, value in Filter.items()
+        if key in Users.__mapper__.columns
+    }
+    q = q.filter_by(**Filter)
+    l = []
+    for user in q.offset((page - 1) * per_page).limit(per_page).all():
+        l.append({
+            "id": user.id,
+            "username": user.username,
+            "name": user.name,
+            "classnum": user.classnum,
+            "email": user.email,
+            "is_admin": user.is_admin,
+            "is_valid": user.is_valid,
+            "is_mark_deleted": user.is_mark_deleted,
+        })
+    return {
+        "page": page,
+        "pages": ceil(q.count() / per_page),
+        "users": l
     }
 
 
@@ -215,7 +235,7 @@ def insert(tablename: str, data: dict):
     Statuses, Offices, Items, Buildings only
     """
     try:
-        if t := tablenameRev[tablename] not in sequenceTables:
+        if (t := tablenameRev[tablename]) not in sequenceTables:
             return False
         db.session.add(t(**data))
         db.session.commit()
@@ -230,7 +250,7 @@ def update(tablename: str, data: dict):
     Statuses, Offices, Items, Buildings only
     """
     try:
-        if t := tablenameRev[tablename] not in sequenceTables:
+        if (t := tablenameRev[tablename]) not in sequenceTables:
             return False
         id = data.pop("id")
         t.query.filter_by(id=id).update(data)
@@ -245,7 +265,7 @@ def delete(tablename: str, id: int):
     Statuses, Offices, Items, Buildings only
     """
     try:
-        if t := tablenameRev[tablename] not in sequenceTables:
+        if (t := tablenameRev[tablename]) not in sequenceTables:
             return False
         t.query.filter_by(id=id).delete()
         db.session.commit()
@@ -255,30 +275,58 @@ def delete(tablename: str, id: int):
     # todo fix foreign key constraint
 
 
-def add_user(username, password, name, classnum, email="", admin=False, valid=True):
-    # unique value issue should be fixed
-    password_hash = passwd_context.hash(password)
-    u = Users(username=username, password_hash=password_hash, name=name,
-             classnum=classnum, email=email, admin=admin, valid=valid)
-    db.session.add(u)
+def add_users(data: list[dict]):
+    """
+    returns a list of username that already exist
+    """
+    l = []
+    already_exist = []
+    for d in data:
+        if "username" in d:
+            if Users.username_exists(d["username"]):
+                already_exist.append(d["username"])
+            else:
+                l.append(Users.new(**d))
+    db.session.bulk_save_objects(l)
+    db.session.commit()
+    return already_exist
+
+
+def update_users(data: list[dict]):
+    l = []
+    for d in data:
+        if "id" in d:
+            user = Users.query.filter_by(id=d.pop("id"))
+            user.update(**d)
+            l.append(user)
+    db.session.bulk_save_objects(l)
     db.session.commit()
 
 
-def del_user(user_id, force=False):
+def del_users(ids: list[int], force=False):
+    """
+    no force: mark users as deleted if user_id in records or revisions
+    force: update records and revisions set user_id = 1 (deleted)
+           and delete user
+    """
+    s = set()
     if force:
-        Records.query.filter_by(user_id=user_id).update({"user_id": 1})
-        Revisions.query.filter_by(user_id=user_id).update({"user_id": 1})
-        Users.query.filter_by(id=user_id).delete()
+        for user_id in ids:
+            Records.query.filter_by(user_id=user_id).update({"user_id": 1})
+            Revisions.query.filter_by(user_id=user_id).update({"user_id": 1})
+            s.add(user_id)
     else:
-        a = db.session.query(db.exists().where(
-            Records.user_id == user_id)).scalar()
-        b = db.session.query(db.exists().where(
-            Revisions.user_id == user_id)).scalar()
-        if a or b:
-            u = Users.query.filter_by(id=user_id).first()
-            u.isValid(False)
-            u.isMarkDeleted(True)
-        else:
-            Users.query.filter_by(id=user_id).delete()
-    db.session.commit()
-
+        for user_id in ids:
+            a = db.session.query(db.exists().where(
+                Records.user_id == user_id)).scalar()
+            b = db.session.query(db.exists().where(
+                Revisions.user_id == user_id)).scalar()
+            if a or b:
+                u = Users.query.filter_by(id=user_id).first()
+                u.is_valid = False
+                u.is_mark_deleted = True
+            else:
+                s.add(user_id)
+    if s:
+        Users.query.filter(Users.id.in_(s)).delete()
+        db.session.commit()

@@ -7,7 +7,7 @@ from .Archive import Archive
 from .db_helper import updateUnfinisheds
 
 defaultTables = idTables
-partition = 1000
+partition = 10000
 
 backup_dir = Path("Backup")
 
@@ -29,24 +29,23 @@ def convertTablename(filename: str):
         return m.group("tableName")
 
 
-def getDict(row):
-    import flask_sqlalchemy
-    import sqlalchemy
-
-    def valid(value):
-        return type(value) not in {list, sqlalchemy.orm.state.InstanceState, flask_sqlalchemy.model.DefaultMeta}
-    return {key: value for key, value in row.__dict__.items() if valid(value)}
-
-
 def db_reprTest():
+    """
+    Test if repr(eval(obj)) == obj for tables
+    that have at least one row.
+    """
     b = True
     for t in defaultTables:
-        obj1 = t.query.first()
-        obj2 = eval(repr(obj1))
-        d1 = getDict(obj1)
-        d2 = getDict(obj2)
-        print(t.__tablename__, d1 == d2)
-        b = b and (d1 == d2)
+        if obj1 := t.query.first():
+            obj2 = eval(repr(obj1))
+            d1 = get_dict(obj1)
+            d2 = get_dict(obj2)
+            r = d1 == d2
+            print(t.__tablename__, r)
+            b = b and r
+        else:
+            print(t.__tablename__, "no item!!")
+            b = False
     return b
 
 
@@ -76,31 +75,31 @@ def set_diff(a: set, b: set, modify=False) -> list[set]:
 
 def backup(tables: list[db.Model] = None):  # path not fix
     archiveName = "Backup_{time}.tar.xz".format(
-        time=datetime.datetime.now().strftime(timeformat))
+        time=datetime.datetime.now().strftime(filetimeformat))
     if tables is None:
         tables = defaultTables
     else:
         tables = filter(lambda x: x in idTables, tables)
 
-    archive = Archive(backup_dir/archiveName, "w")
+    archive = Archive(backup_dir / archiveName, "w")
     for t in tables:
-        # max = t.query.count()
-        # if max <= partition:
-        filename = "{tablename}.json".format(tablename=t.__tablename__)
-        final = dict()
-        final[t.__tablename__] = [repr(row) for row in t.query.all()]
-        archive.write(filename, final)
-        # else:
-        #     p = t.query.paginate(per_page=partition)
-        #     while p.items:
-        #         filename = "{tablename}_{count}.json".format(
-        #             tablename=t.__tablename__, count=p.page)
-        #         final = dict()
-        #         final[t.__tablename__] = [
-        #             repr(row) for row in p.items
-        #         ]
-        #         archive.write(filename, final)
-        #         p = p.next()
+        max = t.query.count()
+        if max <= partition:
+            filename = "{tablename}.json".format(tablename=t.__tablename__)
+            final = dict()
+            final["tablename"] = t.__tablename__
+            final["data"] = [get_dict(row) for row in t.query.all()]
+            archive.write(filename, final)
+        else:
+            p = t.query.paginate(per_page=partition)
+            while p.items:
+                filename = "{tablename}_{count}.json".format(
+                    tablename=t.__tablename__, count=p.page)
+                final = dict()
+                final["tablename"] = t.__tablename__
+                final["data"] = [get_dict(row) for row in p.items]
+                archive.write(filename, final)
+                p = p.next()
     print("Backup finished, file: {}".format(archiveName))
 
 
@@ -110,26 +109,26 @@ def restore(archiveName: str, tables: list = None, insert=True, update=True, del
         tables = defaultTables
     tablenames = [t.__tablename__ for t in tables]
     print("Restoring tables {}".format(tablenames))
-    archive = Archive(backup_dir/archiveName, "r")
-    print("Archive {} has {}".format(archiveName,archive.getFileNames()))
+    archive = Archive(backup_dir / archiveName, "r")
+    print("Archive {} has {}".format(archiveName, archive.getFileNames()))
     for filename in archive.getFileNames():
         tablename = convertTablename(filename)
         if tablename in tablenames:
             print("Restoring {}".format(tablename))
             t = tablenameRev[tablename]
             l = archive.read(filename)[tablename]
-            temp = [getDict(eval(obj)) for obj in l]
-            rows = {d["id"]:d for d in temp}
+            temp = [get_dict(eval(obj)) for obj in l]
+            rows = {d["id"]: d for d in temp}
             a = set(rows.keys())
             b = {row.id for row in db.session.query(t.id).all()}
-            result = set_diff(a,b,modify=True)
+            result = set_diff(a, b, modify=True)
             if insert:
                 print("Inserting {}".format(sorted(result[0])))
                 ld = [rows[id] for id in result[0]]
                 db.session.bulk_insert_mappings(t, ld)
             if update:
                 print("Updating {}".format(sorted(result[1])))
-                ld=[rows[id] for id in result[1]]
+                ld = [rows[id] for id in result[1]]
                 db.session.bulk_update_mappings(t, ld)
             if delete:
                 print("Deleting {}".format(sorted(result[2])))
