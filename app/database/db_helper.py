@@ -293,18 +293,10 @@ def add_users(data: list[dict]):
 
 
 def update_users(data: list[dict]):
-    l = []
     for d in data:
-        if "password" in d:
-            d["password_hash"] = Users.passwd_hash(d.pop("password"))
-        d = {
-            key: value
-            for key, value in d.items()
-            if key in Users.__mapper__.columns
-        }
-        if len(d) >= 2 and "id" in d:
-            l.append(d)
-    db.session.bulk_update_mappings(Users, l)
+        if "id" in d:
+            user = Users.query.filter_by(id=d.pop("id"))
+            user.update(**d)
     db.session.commit()
 
 

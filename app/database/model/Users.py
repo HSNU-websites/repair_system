@@ -121,10 +121,6 @@ class Users(db.Model):
         return result
 
     @staticmethod
-    def passwd_hash(password):
-        return passwd_context.hash(password)
-
-    @staticmethod
     def username_exists(username):
         return db.session.query(db.exists().where(Users.username == username)).scalar()
 
@@ -142,3 +138,19 @@ class Users(db.Model):
         u.is_admin = is_admin
         u.is_valid = is_valid
         return u
+
+    def update(self, password=None, name=None, classnum=None, email=None, is_admin=None, is_valid=None, is_mark_deleted=None):
+        if password is not None:
+            self.password_hash = passwd_context.hash(password) if password else ""
+        if name is not None:
+            self.name = name
+        if classnum is not None:
+            self.classnum = classnum
+        if email is not None:
+            self.email = email
+        if is_admin is not None:
+            self.is_admin = is_admin
+        if is_valid is not None:
+            self.is_valid = is_valid
+        if is_mark_deleted is not None:
+            self.is_mark_deleted = is_mark_deleted
