@@ -26,40 +26,30 @@ class User(UserMixin):
 
 
 def render_statuses():
-    statuses = db.session.query(
-        Statuses.description).order_by(Statuses.sequence).all()
+    statuses = Statuses.query.order_by(Statuses.sequence).all()
     return [status.description for status in statuses]
 
 
 def render_items():
-    items = db.session.query(
-        Items.id, Items.description).order_by(Items.sequence).all()
+    items = Items.query.order_by(Items.sequence).all()
     return [(item.id, item.description) for item in items]
 
 
 def render_buildings():
-    buildings = (
-        db.session.query(Buildings.id, Buildings.description)
-        .order_by(Buildings.sequence)
-        .all()
-    )
+    buildings = Buildings.query.order_by(Buildings.sequence).all()
     return [(building.id, building.description) for building in buildings]
 
 
 def render_system_setting():
-    buildings = db.session.query(Buildings).order_by(Buildings.sequence).all()
-    items = db.session.query(Items).order_by(Items.sequence).all()
-    offices = db.session.query(Offices).order_by(Offices.sequence).all()
-    statuses = db.session.query(Statuses).order_by(Statuses.sequence).all()
+    buildings = Buildings.query.order_by(Buildings.sequence).all()
+    items = Items.query.order_by(Items.sequence).all()
+    offices = Offices.query.order_by(Offices.sequence).all()
+    statuses = Statuses.query.order_by(Statuses.sequence).all()
     return (buildings, items, offices, statuses)
 
 
 def get_admin_emails():
-    admins = (
-        db.session.query(Users.email)
-        .filter(Users.is_admin)
-        .all()
-    )
+    admins = db.session.query(Users.email).filter(Users.is_admin).all()
     return [admin.email for admin in admins]
 
 
@@ -68,7 +58,7 @@ def login_auth(username, password):
     if user and user.verify(password) and user.is_valid:
         sessionUser = User()
         sessionUser.id = user.id
-        sessionUser.isAdmin = user.is_admin
+        sessionUser.is_admin = user.is_admin
         return sessionUser
     else:
         return None
@@ -80,7 +70,7 @@ def load_user(user_id: str):
     if user and user.is_valid:
         sessionUser = User()
         sessionUser.id = user.id
-        sessionUser.isAdmin = user.is_admin
+        sessionUser.is_admin = user.is_admin
         return sessionUser
     else:
         return None
@@ -97,8 +87,8 @@ def updateUnfinisheds():
             .order_by(Revisions.id.desc()).first()
         )
         if not (r and r.status_id == finishedStatus_id):
-            l.append(Unfinisheds(record_id=record.id))
-    db.session.bulk_save_objects(l)
+            l.append({"record_id": record.id})
+    db.session.bulk_insert_mappings(Unfinisheds, l)
     db.session.commit()
 
 
@@ -148,14 +138,11 @@ def get_user(user_id) -> dict:
 
 
 def record_to_dict(record):
-    item = db.session.query(Items.description).filter_by(
-        id=record.item_id).scalar()
-    building = db.session.query(Buildings.description).filter_by(
-        id=record.building_id).scalar()
+    item = db.session.query(Items.description).filter_by(id=record.item_id).scalar()
+    building = db.session.query(Buildings.description).filter_by(id=record.building_id).scalar()
     l = []
     for rev in Revisions.query.filter_by(record_id=record.id).all():
-        status = db.session.query(Statuses.description).filter_by(
-            id=rev.status_id).scalar()
+        status = db.session.query(Statuses.description).filter_by(id=rev.status_id).scalar()
         l.append({
             "user": get_user(rev.user_id),
             "status": status,
@@ -179,16 +166,12 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
     q = Records.query
     valid = True
     if "username" in Filter:
-        user_id = db.session.query(Users.id).filter_by(
-            username=Filter.pop("username")
-        ).scalar()
+        user_id = db.session.query(Users.id).filter_by(username=Filter.pop("username")).scalar()
         if valid := valid and user_id is not None:
             q = q.filter_by(user_id=user_id)
 
     if valid and "classnum" in Filter:
-        unfin_query = db.session.query(Users.id).filter_by(
-            classnum=Filter.pop("classnum")
-        )
+        unfin_query = db.session.query(Users.id).filter_by(classnum=Filter.pop("classnum"))
         if valid := valid and unfin_query.count() > 0:
             q = q.filter(Records.user_id.in_(unfin_query))
 
@@ -203,14 +186,14 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
     if valid:
         l = [
             record_to_dict(record)
-            for record in q.order_by(Records.update_time.desc()).offset((page-1)*per_page).limit(per_page).all()
+            for record in q.order_by(Records.update_time.desc()).offset((page - 1) * per_page).limit(per_page).all()
         ]
     else:
         l = []
 
     return {
         "page": page,
-        "pages": ceil(q.count()/per_page) if valid else 0,
+        "pages": ceil(q.count() / per_page) if valid else 0,
         "records": l
     }
 
@@ -226,7 +209,7 @@ def render_users(Filter=dict(), page=1, per_page=100) -> dict:
     }
     q = q.filter_by(**Filter)
     l = []
-    for user in q.offset((page-1)*per_page).limit(per_page).all():
+    for user in q.offset((page - 1) * per_page).limit(per_page).all():
         l.append({
             "username": user.username,
             "name": user.name,

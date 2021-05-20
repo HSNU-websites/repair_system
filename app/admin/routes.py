@@ -121,15 +121,15 @@ def manage_user_page(page=1):
             # classnum = form.classnum.data
             # password = form.password.data
             # email = form.email.data
-            # isAdmin = True if int(classnum) == 0 else False
-            # add_user(username, password, name, classnum, email, isAdmin)
+            # is_admin = True if int(classnum) == 0 else False
+            # add_user(username, password, name, classnum, email, is_admin)
             data = {
                 "username": form.username.data,
                 "name": form.name.data,
                 "classnum": form.classnum.data,
                 "password": form.password.data,
                 "email": form.email.data,
-                "admin": int(form.classnum.data) == 0
+                "is_admin": int(form.classnum.data) == 0
             }
             l = add_users([data])
             # TODO: handle already exist usernames

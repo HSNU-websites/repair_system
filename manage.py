@@ -45,7 +45,7 @@ def reset(yes=False):
             username="deleted",
             name="此帳號已刪除",
             classnum=0,
-            valid=False
+            is_valid=False
         )
     )
     # test users will be removed in production
@@ -56,14 +56,13 @@ def reset(yes=False):
             name="Admin",
             classnum=0,
             email="admin@127.0.0.1",
-            admin=True,
+            is_admin=True,
         ),
         Users.new(
             username="user",
             password="123",
             name="User",
             classnum=0,
-            admin=False,
         ),
     ]
     db.session.add_all(users)

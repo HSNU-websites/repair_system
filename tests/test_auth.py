@@ -52,7 +52,7 @@ class NormalUserAuthTest(unittest.TestCase):
             password="123",
             name="User",
             classnum=0,
-            admin=False,
+            is_admin=False,
         )
         db.session.add(self.user)
 
@@ -117,7 +117,7 @@ class AdminAuthTest(NormalUserAuthTest):
             name="Admin",
             classnum=0,
             email="admin@127.0.0.1",
-            admin=True,
+            is_admin=True,
         )
         db.session.add(self.test_admin)
 

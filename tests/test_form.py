@@ -18,7 +18,7 @@ class ReportFormTest(unittest.TestCase):
             name="Admin",
             classnum=0,
             email="admin@127.0.0.1",
-            admin=True,
+            is_admin=True,
         )
         db.session.add(self.test_admin)
 
