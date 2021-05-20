@@ -9,9 +9,14 @@ from . import mail
 
 def send_report_mail(user_id, building_id, location, item_id, description):
     subject = "報修成功通知"
-    user = Users.query.filter_by(id=user_id).first()
-    building = Buildings.query.filter_by(id=building_id).first()
-    item = Items.query.filter_by(id=item_id).first()
+    user = db.session.query(
+        Users.username, Users.name).filter_by(id=user_id).first()
+    building = db.session.query(
+        Buildings.description).filter_by(id=building_id).first()
+    item = db.session.query(
+        Items.office_id, Items.description).filter_by(id=item_id).first()
+    office = db.session.query(
+        Offices.description).filter_by(id=item.office_id).first()
     content = """
     <h3>報修:</h3>
     <main>
@@ -27,7 +32,7 @@ def send_report_mail(user_id, building_id, location, item_id, description):
         building=building.description,
         location=location,
         item=item.description,
-        office=item.office.description,
+        office=office.description,
         description=description,
     )
     if user.email:
