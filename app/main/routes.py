@@ -9,7 +9,7 @@ from ..users import *
 @main_bp.route("/", methods=["GET", "POST"])
 def index_page():  # index page is login page
     if current_user.is_active:
-        if current_user.isAdmin:
+        if current_user.is_admin:
             return redirect(url_for("admin.dashboard_page"))
         else:
             return redirect(url_for("user.report_page"))
@@ -24,7 +24,7 @@ def index_page():  # index page is login page
                 password = form.password.data
                 if user := login_auth(username, password):
                     login_user(user)
-                    if user.isAdmin:
+                    if user.is_admin:
                         return redirect(url_for("admin.dashboard_page"))
                     else:
                         return redirect(url_for("user.report_page"))

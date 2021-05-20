@@ -25,9 +25,9 @@
         <div id="buildings">
             <h3>大樓</h3>
             {% for building in buildings %}
-            <div id="buildings_{{ building.id }}">
-                <input type="text" value="{{ building.description }}">
-                <input type="text" value="{{ building.sequence }}">
+            <div id="buildings_{{ building['id'] }}">
+                <input type="text" value="{{ building['description'] }}">
+                <input type="text" value="{{ building['sequence'] }}">
                 <button class="remove" onclick="send_remove(this);">移除</button>
             </div>
             {% endfor %}
@@ -42,16 +42,16 @@
         <div id="items">
             <h3>物件</h3>
             {% for item in items %}
-            <div id="items_{{ item.id }}">
-                <input type="text" value="{{ item.description }}">
-                <input type="text" value="{{ item.sequence }}">
+            <div id="items_{{ item['id'] }}">
+                <input type="text" value="{{ item['description'] }}">
+                <input type="text" value="{{ item['sequence'] }}">
                 <button class="remove" onclick="send_remove(this);">移除</button>
             </div>
             {% endfor %}
             <input type="text" name="add">
             <select name="offices" id="offices">
                 {% for office in offices %}
-                    <option value="{{ office.id }}">{{ office.description }}</option>
+                    <option value="{{ office['id'] }}">{{ office['description'] }}</option>
                 {% endfor %}
             </select>
             <button class="add" onclick="send_add(this);">新增</button>
@@ -64,9 +64,9 @@
         <div id="offices">
             <h3>處室</h3>
             {% for office in offices %}
-            <div id="offices_{{ office.id }}">
-                <input type="text" value="{{ office.description }}">
-                <input type="text" value="{{ office.sequence }}">
+            <div id="offices_{{ office['id'] }}">
+                <input type="text" value="{{ office['description'] }}">
+                <input type="text" value="{{ office['sequence'] }}">
                 <button class="remove" onclick="send_remove(this);">移除</button>
             </div>
             {% endfor %}
@@ -81,9 +81,9 @@
         <div id="statuses">
             <h3>狀態</h3>
             {% for status in statuses %}
-            <div id="statuses_{{ status.id }}">
-                <input type="text" value="{{ status.description }}">
-                <input type="text" value="{{ status.sequence }}">
+            <div id="statuses_{{ status['id'] }}">
+                <input type="text" value="{{ status['description'] }}">
+                <input type="text" value="{{ status['sequence'] }}">
                 <button class="remove" onclick="send_remove(this);">移除</button>
             </div>
             {% endfor %}

@@ -9,7 +9,7 @@ from ..database.db_helper import (
     update,
     insert,
     render_records,
-    add_user,
+    add_users,
 )
 from ..users import admin_required
 
@@ -106,7 +106,7 @@ def system_modification_page():
 @login_required
 def manage_user_page(page=1):
     form = AddOneUserForm()
-    form_csv=AddUsersByFileForm()
+    form_csv = AddUsersByFileForm()
     if request.method == "GET":
         # Render all users
         current_app.logger.info("GET /manage_user")
@@ -116,13 +116,23 @@ def manage_user_page(page=1):
         # Add one user
         if form.validate_on_submit():
             current_app.logger.info("POST /manage_user")
-            username = form.username.data
-            name = form.name.data
-            classnum = form.classnum.data
-            password = form.password.data
-            email = form.email.data
-            isAdmin = True if int(classnum) == 0 else False
-            add_user(username, password, name, classnum, email, isAdmin)
+            # username = form.username.data
+            # name = form.name.data
+            # classnum = form.classnum.data
+            # password = form.password.data
+            # email = form.email.data
+            # is_admin = True if int(classnum) == 0 else False
+            # add_user(username, password, name, classnum, email, is_admin)
+            data = {
+                "username": form.username.data,
+                "name": form.name.data,
+                "classnum": form.classnum.data,
+                "password": form.password.data,
+                "email": form.email.data,
+                "is_admin": int(form.classnum.data) == 0
+            }
+            l = add_users([data])
+            # TODO: handle already exist usernames
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")
         # Add users by csv
