@@ -29,26 +29,6 @@ def convertTablename(filename: str):
         return m.group("tableName")
 
 
-def get_dict(row):
-    """
-    Get pure dict from table without relationship.
-    datetime.datetime will be converted to str
-    """
-    def process_value(value):
-        if isinstance(value, datetime.datetime):
-            return value.strftime(timeformat)
-        else:
-            return value
-
-    if type(row) not in allTables:
-        return {}
-    else:
-        return {
-            key: process_value(row.__dict__[key])
-            for key in type(row).__mapper__.columns.keys()
-        }
-
-
 def db_reprTest():
     """
     Test if repr(eval(obj)) == obj for tables
@@ -101,7 +81,7 @@ def backup(tables: list[db.Model] = None):  # path not fix
     else:
         tables = filter(lambda x: x in idTables, tables)
 
-    archive = Archive(backup_dir/archiveName, "w")
+    archive = Archive(backup_dir / archiveName, "w")
     for t in tables:
         max = t.query.count()
         if max <= partition:
@@ -129,7 +109,7 @@ def restore(archiveName: str, tables: list = None, insert=True, update=True, del
         tables = defaultTables
     tablenames = [t.__tablename__ for t in tables]
     print("Restoring tables {}".format(tablenames))
-    archive = Archive(backup_dir/archiveName, "r")
+    archive = Archive(backup_dir / archiveName, "r")
     print("Archive {} has {}".format(archiveName, archive.getFileNames()))
     for filename in archive.getFileNames():
         tablename = convertTablename(filename)

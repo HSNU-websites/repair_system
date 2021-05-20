@@ -18,6 +18,7 @@ from .model import (
     sequenceTables,
     tablenameRev,
     timeformat,
+    get_dict,
 )
 
 
@@ -41,10 +42,10 @@ def render_buildings():
 
 
 def render_system_setting():
-    buildings = Buildings.query.order_by(Buildings.sequence).all()
-    items = Items.query.order_by(Items.sequence).all()
-    offices = Offices.query.order_by(Offices.sequence).all()
-    statuses = Statuses.query.order_by(Statuses.sequence).all()
+    buildings = map(get_dict, Buildings.query.order_by(Buildings.sequence).all())
+    items = map(get_dict, Items.query.order_by(Items.sequence).all())
+    offices = map(get_dict, Offices.query.order_by(Offices.sequence).all())
+    statuses = map(get_dict, Statuses.query.order_by(Statuses.sequence).all())
     return (buildings, items, offices, statuses)
 
 
@@ -144,6 +145,7 @@ def record_to_dict(record):
     for rev in Revisions.query.filter_by(record_id=record.id).all():
         status = db.session.query(Statuses.description).filter_by(id=rev.status_id).scalar()
         l.append({
+            "id": rev.id,
             "user": get_user(rev.user_id),
             "status": status,
             "insert_time": rev.insert_time.strftime(timeformat),
@@ -151,6 +153,7 @@ def record_to_dict(record):
         })
 
     return {
+        "id": record.id,
         "user": get_user(record.user_id),
         "item": item,
         "building": building,
@@ -211,11 +214,20 @@ def render_users(Filter=dict(), page=1, per_page=100) -> dict:
     l = []
     for user in q.offset((page - 1) * per_page).limit(per_page).all():
         l.append({
+            "id": user.id,
             "username": user.username,
             "name": user.name,
             "classnum": user.classnum,
-            "email": user.email
+            "email": user.email,
+            "is_admin": user.is_admin,
+            "is_valid": user.is_valid,
+            "is_mark_deleted": user.is_mark_deleted,
         })
+    return {
+        "page": page,
+        "pages": ceil(q.count() / per_page),
+        "users": l
+    }
 
 
 def insert(tablename: str, data: dict):
@@ -268,16 +280,16 @@ def add_users(data: list[dict]):
     returns a list of username that already exist
     """
     l = []
-    ae = []
+    already_exist = []
     for d in data:
         if "username" in d:
             if Users.username_exists(d["username"]):
-                ae.append(d["username"])
+                already_exist.append(d["username"])
             else:
                 l.append(Users.new(**d))
     db.session.bulk_save_objects(l)
     db.session.commit()
-    return ae
+    return already_exist
 
 
 def update_users(data: list[dict]):
@@ -297,21 +309,27 @@ def update_users(data: list[dict]):
 
 
 def del_users(ids: list[int], force=False):
+    """
+    no force: mark users as deleted if user_id in records or revisions
+    force: update records and revisions set user_id = 1 (deleted)
+           and delete user
+    """
     s = set()
-    for user_id in ids:
-        if force:
+    if force:
+        for user_id in ids:
             Records.query.filter_by(user_id=user_id).update({"user_id": 1})
             Revisions.query.filter_by(user_id=user_id).update({"user_id": 1})
             s.add(user_id)
-        else:
+    else:
+        for user_id in ids:
             a = db.session.query(db.exists().where(
                 Records.user_id == user_id)).scalar()
             b = db.session.query(db.exists().where(
                 Revisions.user_id == user_id)).scalar()
             if a or b:
                 u = Users.query.filter_by(id=user_id).first()
-                u.isValid(False)
-                u.isMarkDeleted(True)
+                u.is_valid = False
+                u.is_mark_deleted = True
             else:
                 s.add(user_id)
     if s:
