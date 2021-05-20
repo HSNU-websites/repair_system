@@ -93,6 +93,14 @@ input[type="submit"] {
     opacity: 0.8;
 }
 
+
+.field {
+    font-family: 'Noto Sans TC', sans-serif;
+    margin: 10px 0 10px 0;
+    color: black;
+    font-size: 20px;
+}
+
 #sidebar {
     display: block;
     position: fixed;
@@ -104,7 +112,6 @@ input[type="submit"] {
     margin: 5px 0 5px 0;
 }
 
-
 #copyright {
     font-family: 'Noto Sans TC', sans-serif;
     height: 40px;
@@ -112,13 +119,6 @@ input[type="submit"] {
     text-align: center;
     bottom: 0px;
     width: 100%;
-}
-
-.field {
-    font-family: 'Noto Sans TC', sans-serif;
-    margin: 10px 0 10px 0;
-    color: black;
-    font-size: 20px;
 }
 
 @media only screen and (max-width: 1200px) {

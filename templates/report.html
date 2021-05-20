@@ -8,6 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
     <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
@@ -15,6 +16,15 @@
 </head>
 
 <body>
+    <nav>
+        <span><a href="/report" class="active">報修</a></span>
+        <span><a href="/dashboard">報修紀錄</a></span>
+        {% if current_user.is_admin %}
+        <span><a href="/admin_dashboard">全體報修紀錄</a></span>
+        <span><a href="/system">系統設定</a></span>
+        {% endif %}
+        <span id="logout"><a href="/logout">登出</a></span>
+    </nav>
     <div style="min-height: 100%;">
         <h1>報修</h1>
         <div id="messages" class="report_page">{{ display_msg(messages) }}</div>

@@ -6,21 +6,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
     <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
     <title>Admin Dashboard</title>
     {% if records["pages"] != 0 %}
-    {% if records["page"] < 1 %} <script>window.location.replace("1");</script>
-        {% endif %}
-        {% if records["page"] > records["pages"] %}
-        <script>window.location.replace("{{ records['pages'] }}");</script>
-        {% endif %}
-        {% endif %}
+    {% if records["page"] < 1 %} <script>window.location.replace("1");</script>{% endif %}
+    {% if records["page"] > records["pages"] %} <script>window.location.replace("{{ records['pages'] }}");</script> {% endif %}
+    {% endif %}
 </head>
 
 <body>
     <div style="min-height: 100%;">
+        <nav>
+            <span><a href="/report">報修</a></span>
+            <span><a href="/dashboard">報修紀錄</a></span>
+            <span><a href="/admin_dashboard" class="active">全體報修紀錄</a></span>
+            <span><a href="/system">系統設定</a></span>
+            <span id="logout"><a href="/logout">登出</a></span>
+        </nav>    
         <h1>Admin Dashboard</h1>
         <div id="sidebar">
             <form action="/admin_dashboard/" method="POST">
@@ -39,10 +44,6 @@
                     {{ form.submit }}
                 </div>
             </form>
-            <a href="/report">報修</a>
-            <a href="/dashboard">報修紀錄</a>
-            <a href="/system">系統設定(管理員)</a>
-            <a href="/logout">登出</a>
         </div>
         <table>
             <caption>

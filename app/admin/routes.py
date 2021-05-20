@@ -116,13 +116,6 @@ def manage_user_page(page=1):
         # Add one user
         if form.validate_on_submit():
             current_app.logger.info("POST /manage_user")
-            # username = form.username.data
-            # name = form.name.data
-            # classnum = form.classnum.data
-            # password = form.password.data
-            # email = form.email.data
-            # is_admin = True if int(classnum) == 0 else False
-            # add_user(username, password, name, classnum, email, is_admin)
             data = {
                 "username": form.username.data,
                 "name": form.name.data,

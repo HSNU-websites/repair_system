@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
     <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
@@ -21,19 +22,20 @@
 </head>
 
 <body>
-    <h1>Dashboard</h1>
-    <div id="sidebar">
-        <a href="/report">報修</a>
+    <nav>
+        <span><a href="/report">報修</a></span>
+        <span><a href="/dashboard" class="active">報修紀錄</a></span>
         {% if current_user.is_admin %}
-        <a href="/admin_dashboard">全體報修紀錄(管理員)</a>
-        <a href="/system">系統設定(管理員)</a>
+        <span><a href="/admin_dashboard">全體報修紀錄</a></span>
+        <span><a href="/system">系統設定</a></span>
         {% endif %}
-        <a href="/logout">登出</a>
-    </div>
+        <span id="logout"><a href="/logout">登出</a></span>
+    </nav>
+    <h1>Dashboard</h1>
     <div style="display: block; min-height: 100%;">
         <table>
             <caption>
-                <div id="pages">
+                <div class="pages">
                     <a href="{{ records['page'] - 1 }}" {% if records['page'] <= 1 %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8249;</a>
                     <span>{{ records.page }} / {{ records.pages }}</span>
                     <a href="{{ records['page'] + 1 }}" {% if records['page'] >= records['pages'] %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8250;</a>

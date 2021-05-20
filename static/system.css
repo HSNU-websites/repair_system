@@ -92,17 +92,6 @@ button:hover {
     color: blue;
 }
 
-#sidebar {
-    display: block;
-    position: fixed;
-    margin: 10px auto 10px 30px;
-}
-
-#sidebar a {
-    display: block;
-    margin: 5px 0 5px 0;
-}
-
 #tip {
     font-family: 'Noto Sans TC', sans-serif;
     text-align: center;
