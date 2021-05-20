@@ -1,11 +1,10 @@
 from flask_wtf import FlaskForm
 from flask_wtf.recaptcha import Recaptcha
 from flask_wtf.recaptcha import RecaptchaField
-from wtforms import PasswordField
-from wtforms import SelectField
-from wtforms import StringField
-from wtforms import SubmitField
-from wtforms.validators import DataRequired
+from wtforms import PasswordField, SelectField, StringField, SubmitField
+from wtforms.fields.html5 import EmailField
+from flask_wtf.file import FileField, FileRequired
+from wtforms.validators import DataRequired, ValidationError
 
 
 class LoginForm(FlaskForm):
@@ -32,6 +31,44 @@ class ReportForm(FlaskForm):
 
 
 class ReportsFilterForm(FlaskForm):
-    username = StringField("報修人學號: ")
-    classnum = StringField("班級: ")
+    username = StringField(
+        "報修人學號: ",
+        render_kw={"placeholder": "Username"},
+    )
+    classnum = StringField(
+        "班級: ",
+        render_kw={"placeholder": "Class Number"},
+    )
     submit = SubmitField("送出")
+
+
+class AddOneUserForm(FlaskForm):
+    username = StringField(
+        "學號 (登入帳號): ",
+        validators=[DataRequired()],
+        render_kw={"placeholder": "Username"},
+    )
+    name = StringField(
+        "姓名: ",
+        validators=[DataRequired()],
+        render_kw={"placeholder": "Name"},
+    )
+    classnum = StringField(
+        "班號 (管理員請填 0): ",
+        validators=[DataRequired()],
+        render_kw={"placeholder": "Class Number"},
+    )
+    password = PasswordField(
+        "密碼: ", validators=[DataRequired()], render_kw={"placeholder": "Password"}
+    )
+    email = EmailField("電子郵件 (僅管理員需要)", render_kw={"placeholder": "Email"})
+    submit = SubmitField("新增")
+
+    def validate_email(self, field):
+        if self.classnum.data == "0" and self.email.data == "":
+            raise ValidationError("Email is required for admin.")
+
+
+class AddUsersByFileForm(FlaskForm):
+    csv_file = FileField("CSV file", validators=[FileRequired()])
+    submit = SubmitField("新增")
