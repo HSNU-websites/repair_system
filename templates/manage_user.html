@@ -7,8 +7,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='system.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
     <script src="{{ url_for('static', filename='msg.js') }}"></script>
+    <script>
+        if (window.innerWidth <= 800) {
+            alert("不建議在行動裝置上使用此頁面");
+        }
+    </script>
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
     <title>使用者管理</title>
 </head>
@@ -90,6 +96,9 @@
                     <input type="checkbox" {% if user["is_admin"] %} checked {% endif %} {% if user["is_marked_deleted"] %} disabled {% endif %}></input>
                     <input type="checkbox" {% if user["is_valid"] %} checked {% endif %} {% if user["is_marked_deleted"] %} disabled {% endif %}></input>
                     <input type="checkbox" {% if user["is_marked_deleted"] %} checked {% endif %} disabled></input>
+                    <button class="update">更新</button>
+                    <button class="remove">刪除</button>
+                    <button class="reset">重設密碼</button>
                 </div>
                 {% endfor %}
             </div>

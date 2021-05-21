@@ -116,6 +116,12 @@ input[type="submit"] {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin-left: 300px;
+}
+
+#main_content div {
+    margin-top: 3px;
+    margin-bottom: 3px;
 }
 
 .column span {

@@ -11,6 +11,7 @@ from ..database.db_helper import (
     render_records,
     render_users,
     add_users,
+    update_users,
 )
 from ..users import admin_required
 
@@ -101,8 +102,8 @@ def system_modification_page():
         return "OK"
 
 
-@admin_bp.route("/manage_user/", methods=["GET", "POST", "DELETE"])
-@admin_bp.route("/manage_user/<int:page>", methods=["GET", "POST", "DELETE"])
+@admin_bp.route("/manage_user/", methods=["GET", "POST", "DELETE", "UPDATE"])
+@admin_bp.route("/manage_user/<int:page>", methods=["GET", "POST", "DELETE", "UPDATE"])
 @admin_required
 @login_required
 def manage_user_page(page=1):
@@ -125,7 +126,7 @@ def manage_user_page(page=1):
                 "email": form.email.data,
                 "is_admin": int(form.classnum.data) == 0
             }
-            l = add_users([data])
+            add_users([data])
             # TODO: handle already exist usernames
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")
@@ -143,11 +144,13 @@ def manage_user_page(page=1):
                 data = [row for row in csv.DictReader(rawdata.decode("ANSI").splitlines())]
             except:
                 return "Error"
-            # TODO add_user_by_csv(data)
+            add_users(data)
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")
-
-        return render_template("manage_user.html", form=form, form_csv=form_csv)
+        return render_template("manage_user.html", form=form, form_csv=form_csv, users=render_users())
     if request.method == "DELETE":
         # Delete user
         current_app.logger.info("DELETE /manage_user")
+    if request.method == "UPDATE":
+        # Update users
+        current_app.logger.info("UPDATE /manage_user")
