@@ -297,7 +297,7 @@ def update_users(data: list[dict]):
     l = []
     for d in data:
         if "id" in d:
-            user = Users.query.filter_by(id=d.pop("id"))
+            user = Users.query.filter_by(id=d.pop("id")).first()
             user.update(**d)
             l.append(user)
     db.session.bulk_save_objects(l)

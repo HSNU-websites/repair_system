@@ -157,8 +157,12 @@ def manage_user_backend_page():
     if request.method == "DELETE":
         # Delete user
         current_app.logger.info("DELETE /manage_user_backend")
-        print(request.get_data())
         data = request.get_json(force=True)
-        print(data)
         del_users([data["user_id"]])
+        return "OK"
+    if request.method == "UPDATE":
+        # Update user
+        current_app.logger.info("UPDATE /manage_user_backend")
+        data = request.get_json(force=True)
+        update_users([data])
         return "OK"

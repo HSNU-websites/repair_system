@@ -5,7 +5,7 @@ function send_remove(element) {
     $.ajax({
         url: "/system_modification",
         type: "delete",
-        data: JSON.stringify({ 'category': category, 'id': id }),
+        data: JSON.stringify({ "category": category, "id": id }),
         dataType: "json",
     })
         .always(function (r) {
@@ -29,7 +29,7 @@ function send_add(element) {
         alert("Empty value is invalid.");
         return;
     }
-    
+
     if (office.length != 0) {
         var data = JSON.stringify({ "category": category, "value": value, "office": parseInt(office[0].value) });
     }
