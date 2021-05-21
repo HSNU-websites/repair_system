@@ -5,48 +5,106 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理使用者</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
+    <script src="{{ url_for('static', filename='msg.js') }}"></script>
+    <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
+    <title>使用者管理</title>
 </head>
 
 <body>
-    <div>
-        <form action="/manage_user/" , method="POST">
-            {{ form.csrf_token }}
-            <div class="field">
-                {{ form.username.label }}
-                {{ form.username }}
+    <div style="min-height: 100%;">
+        <nav>
+            <span><a href="/report">報修</a></span>
+            <span><a href="/dashboard">報修紀錄</a></span>
+            <span><a href="/admin_dashboard">全體報修紀錄</a></span>
+            <span><a href="/system">系統設定</a></span>
+            <span><a href="/manage_user" class="active">使用者管理</a></span>
+            <span id="logout"><a href="/logout">登出</a></span>
+        </nav>
+        <h1>使用者管理</h1>
+        <div id="sidebar">
+            <form action="/manage_user/" , method="POST">
+                {{ form.csrf_token }}
+                <div class="field">
+                    {{ form.username.label }}
+                    {{ form.username }}
+                </div>
+                <div class="field">
+                    {{ form.name.label }}
+                    {{ form.name }}
+                </div>
+                <div class="field">
+                    {{form.classnum.label}}
+                    {{form.classnum}}
+                </div>
+                <div class="field">
+                    {{form.password.label}}
+                    {{form.password}}
+                </div>
+                <div class="field">
+                    {{form.email.label}}
+                    {{form.email}}
+                </div>
+                <div class="field">
+                    {{form.submit}}
+                </div>
+            </form>
+            <hr>
+            <form action="/manage_user/" method="POST" enctype="multipart/form-data">
+                {{ form_csv.csrf_token }}
+                <div class="field">
+                    {{ form_csv.csv_file.label }}
+                    {{ form_csv.csv_file }}
+                </div>
+                <div class="field">
+                    {{ form_csv.submit }}
+                </div>
+            </form>
+        </div>
+        <div id="main_content">
+            <div class="pages">
+                <a href="{{ users['page'] - 1 }}" {% if users['page'] <=1 %}
+                    style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
+                <span>{{ users["page"] }} / {{ users["pages"] }}</span>
+                <a href="{{ users['page'] + 1 }}" {% if users['page']>= users['pages'] %} style="pointer-events: none;
+                    background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
             </div>
-            <div class="field">
-                {{ form.name.label }}
-                {{ form.name }}
+            <div class="column">
+                <div>
+                    <span>帳號(學號)</span>
+                    <span>姓名</span> <!-- editable -->
+                    <span>班號</span> <!-- editable -->
+                    <span style="width: 100px;">Email</span> <!-- editable -->
+                    <span>管理員</span> <!-- editable -->
+                    <span>可登入</span> <!-- editable -->
+                    <span>已刪除</span>
+                </div>
+                {% for user in users["users"] %}
+                <div>
+                    <span>{{ user["username"] }}</span>
+                    <input value="{{ user["name"] }}" {% if user["is_marked_deleted"] %} disabled {% endif %}></input>
+                    <input value="{{ user["classnum"] }}" {% if user["is_marked_deleted"] %} disabled {% endif %}></input>
+                    <input value="{{ user["email"] }}" {% if user["is_marked_deleted"] %} disabled {% endif %} class="email"></input>
+                    <input type="checkbox" {% if user["is_admin"] %} checked {% endif %} {% if user["is_marked_deleted"] %} disabled {% endif %}></input>
+                    <input type="checkbox" {% if user["is_valid"] %} checked {% endif %} {% if user["is_marked_deleted"] %} disabled {% endif %}></input>
+                    <input type="checkbox" {% if user["is_marked_deleted"] %} checked {% endif %} disabled></input>
+                </div>
+                {% endfor %}
             </div>
-            <div class="field">
-                {{form.classnum.label}}
-                {{form.classnum}}
+            <div class="pages">
+                <a href="{{ users['page'] - 1 }}" {% if users['page'] <=1 %}
+                    style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
+                <span>{{ users["page"] }} / {{ users["pages"] }}</span>
+                <a href="{{ users['page'] + 1 }}" {% if users['page']>= users['pages'] %} style="pointer-events: none;
+                    background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
             </div>
-            <div class="field">
-                {{form.password.label}}
-                {{form.password}}
-            </div>
-            <div class="field">
-                {{form.email.label}}
-                {{form.email}}
-            </div>
-            <div class="field">
-                {{form.submit}}
-            </div>
-        </form>
-        <form action="/manage_user/" method="POST" enctype="multipart/form-data">
-            {{ form_csv.csrf_token }}
-            <div class="field">
-                {{ form_csv.csv_file.label }}
-                {{ form_csv.csv_file }}
-            </div>
-            <div class="field">
-                {{ form_csv.submit }}
-            </div>
-        </form>
+        </div>
     </div>
+    <footer>
+        <div id="copyright">© 2021 <a href="https://github.com/HSNU-websites" target="_blank">師大附中網站更新計畫</a></div>
+    </footer>
 </body>
 
 </html>

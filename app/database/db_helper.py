@@ -42,10 +42,10 @@ def render_buildings():
 
 
 def render_system_setting():
-    buildings = map(get_dict, Buildings.query.order_by(Buildings.sequence).all())
-    items = map(get_dict, Items.query.order_by(Items.sequence).all())
-    offices = map(get_dict, Offices.query.order_by(Offices.sequence).all())
-    statuses = map(get_dict, Statuses.query.order_by(Statuses.sequence).all())
+    buildings = list(map(get_dict, Buildings.query.order_by(Buildings.sequence).all()))
+    items = list(map(get_dict, Items.query.order_by(Items.sequence).all()))
+    offices = list(map(get_dict, Offices.query.order_by(Offices.sequence).all()))
+    statuses = list(map(get_dict, Statuses.query.order_by(Statuses.sequence).all()))
     return (buildings, items, offices, statuses)
 
 
@@ -202,9 +202,10 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
 
 
 def render_users(Filter=dict(), page=1, per_page=100) -> dict:
-    q = db.session.query(
-        Users.username, Users.name, Users.classnum, Users.email
-    )
+    # q = db.session.query(
+    #     Users.username, Users.name, Users.classnum, Users.email
+    # )
+    q = Users.query
     Filter = {
         key: value
         for key, value in Filter.items()

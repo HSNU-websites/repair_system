@@ -9,6 +9,7 @@ from ..database.db_helper import (
     update,
     insert,
     render_records,
+    render_users,
     add_users,
 )
 from ..users import admin_required
@@ -110,7 +111,7 @@ def manage_user_page(page=1):
     if request.method == "GET":
         # Render all users
         current_app.logger.info("GET /manage_user")
-        return render_template("manage_user.html", form=form, form_csv=form_csv)
+        return render_template("manage_user.html", form=form, form_csv=form_csv, users=render_users())
     if request.method == "POST":
         # Add user
         # Add one user
