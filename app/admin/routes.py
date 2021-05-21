@@ -11,6 +11,7 @@ from ..database.db_helper import (
     render_records,
     render_users,
     add_users,
+    del_users,
     update_users,
 )
 from ..users import admin_required
@@ -102,8 +103,8 @@ def system_modification_page():
         return "OK"
 
 
-@admin_bp.route("/manage_user/", methods=["GET", "POST", "DELETE", "UPDATE"])
-@admin_bp.route("/manage_user/<int:page>", methods=["GET", "POST", "DELETE", "UPDATE"])
+@admin_bp.route("/manage_user/", methods=["GET", "POST"])
+@admin_bp.route("/manage_user/<int:page>", methods=["GET", "POST"])
 @admin_required
 @login_required
 def manage_user_page(page=1):
@@ -148,9 +149,16 @@ def manage_user_page(page=1):
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")
         return render_template("manage_user.html", form=form, form_csv=form_csv, users=render_users())
+
+@admin_bp.route("/manage_user_backend", methods=["DELETE", "UPDATE"])
+@admin_required
+@login_required
+def manage_user_backend_page():
     if request.method == "DELETE":
         # Delete user
-        current_app.logger.info("DELETE /manage_user")
-    if request.method == "UPDATE":
-        # Update users
-        current_app.logger.info("UPDATE /manage_user")
+        current_app.logger.info("DELETE /manage_user_backend")
+        print(request.get_data())
+        data = request.get_json(force=True)
+        print(data)
+        del_users([data["user_id"]])
+        return "OK"

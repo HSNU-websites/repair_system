@@ -7,9 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='system.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
-    <script src="{{ url_for('static', filename='msg.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='manage_user.js') }}"></script>
     <script>
         if (window.innerWidth <= 800) {
             alert("不建議在行動裝置上使用此頁面");
@@ -42,19 +42,19 @@
                     {{ form.name }}
                 </div>
                 <div class="field">
-                    {{form.classnum.label}}
-                    {{form.classnum}}
+                    {{ form.classnum.label }}
+                    {{ form.classnum }}
                 </div>
                 <div class="field">
-                    {{form.password.label}}
-                    {{form.password}}
+                    {{ form.password.label }}
+                    {{ form.password }}
                 </div>
                 <div class="field">
-                    {{form.email.label}}
-                    {{form.email}}
+                    {{ form.email.label }}
+                    {{ form.email }}
                 </div>
                 <div class="field">
-                    {{form.submit}}
+                    {{ form.submit }}
                 </div>
             </form>
             <hr>
@@ -89,16 +89,16 @@
                 </div>
                 {% for user in users["users"] %}
                 <div>
-                    <span>{{ user["username"] }}</span>
-                    <input value="{{ user["name"] }}" {% if user["is_marked_deleted"] %} disabled {% endif %}></input>
-                    <input value="{{ user["classnum"] }}" {% if user["is_marked_deleted"] %} disabled {% endif %}></input>
-                    <input value="{{ user["email"] }}" {% if user["is_marked_deleted"] %} disabled {% endif %} class="email"></input>
+                    <span id="{{ user['id'] }}">{{ user["username"] }}</span>
+                    <input value="{{ user["name"] }}" {% if user["is_marked_deleted"] %} disabled {% endif %} type="text"></input>
+                    <input value="{{ user["classnum"] }}" {% if user["is_marked_deleted"] %} disabled {% endif %} type="text"></input>
+                    <input value="{{ user["email"] }}" {% if user["is_marked_deleted"] %} disabled {% endif %} class="email" type="text"></input>
                     <input type="checkbox" {% if user["is_admin"] %} checked {% endif %} {% if user["is_marked_deleted"] %} disabled {% endif %}></input>
                     <input type="checkbox" {% if user["is_valid"] %} checked {% endif %} {% if user["is_marked_deleted"] %} disabled {% endif %}></input>
                     <input type="checkbox" {% if user["is_marked_deleted"] %} checked {% endif %} disabled></input>
-                    <button class="update">更新</button>
-                    <button class="remove">刪除</button>
-                    <button class="reset">重設密碼</button>
+                    <button class="update" onclick="send_update(this);">更新</button>
+                    <button class="remove" onclick="send_remove(this);">刪除</button>
+                    <button class="reset" onclick="send_reset(this);">重設密碼</button>
                 </div>
                 {% endfor %}
             </div>

@@ -131,12 +131,18 @@ input[type="submit"] {
     text-align: center;
 }
 
-.column input {
-    width: 74px;
+.column div input {
+    margin: 0 0 0 0;
+    border: 0px;
+    width: 76px;
+}
+
+.column div input[type="checkbox"] {
+    width: 80px;
 }
 
 .column .email {
-    width: 94px;
+    width: 96px;
 }
 
 #copyright {
