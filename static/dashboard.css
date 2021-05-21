@@ -153,9 +153,3 @@ input[type="submit"] {
     bottom: 0px;
     width: 100%;
 }
-
-@media only screen and (max-width: 1200px) {
-    #sidebar {
-        position: relative;
-    }
-}

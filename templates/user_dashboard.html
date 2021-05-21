@@ -22,18 +22,18 @@
 </head>
 
 <body>
-    <nav>
-        <span><a href="/report">報修</a></span>
-        <span><a href="/dashboard" class="active">報修紀錄</a></span>
-        {% if current_user.is_admin %}
-        <span><a href="/admin_dashboard">全體報修紀錄</a></span>
-        <span><a href="/system">系統設定</a></span>
-        <span><a href="/manage_user">使用者管理</a></span>
-        {% endif %}
-        <span id="logout"><a href="/logout">登出</a></span>
-    </nav>
-    <h1>Dashboard</h1>
     <div style="display: block; min-height: 100%;">
+        <nav>
+            <span><a href="/report">報修</a></span>
+            <span><a href="/dashboard" class="active">報修紀錄</a></span>
+            {% if current_user.is_admin %}
+            <span><a href="/admin_dashboard">全體報修紀錄</a></span>
+            <span><a href="/system">系統設定</a></span>
+            <span><a href="/manage_user">使用者管理</a></span>
+            {% endif %}
+            <span id="logout"><a href="/logout">登出</a></span>
+        </nav>
+        <h1>Dashboard</h1>
         <table>
             <caption>
                 <div class="pages">
@@ -50,6 +50,7 @@
                     <th>損壞物件</th>
                     <th>狀況描述</th>
                     <th>報修時間</th>
+                    <th>維修紀錄</th>
                 </tr>
             </thead>
             <tbody>
@@ -61,6 +62,17 @@
                     <td>{{ record["item"] }}</td>
                     <td>{{ record["description"] }}</td>
                     <td>{{ record["insert_time"] }}</td>
+                    <td style="width: 200px;">
+                        <div style="text-align: left;">
+                            {% for revision in record["revisions"] %}
+                            <div><b>維護人: </b>{{ revision["user"]["username"] }}</div>
+                            <div><b>狀態: </b>{{ revision["status"] }}</div>
+                            <div><b>時間: </b>{{ revision["insert_time"] }}</div>
+                            <div><b>描述: </b>{{ revision["description"] }}</div>
+                            {% if loop.index < record["revisions"] | length %}<hr>{% endif %}
+                            {% endfor %}
+                        </div>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
