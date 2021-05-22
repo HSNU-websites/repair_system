@@ -6,20 +6,21 @@ nav {
     background-color: rgb(173, 216, 230);
 }
 
-nav a {
+nav span {
     font-size: 16px;
-    margin: 9px 8px 9px 8px;
+    margin: 9px 6px 9px 6px;
     text-decoration: none;
     color: black;
     display: inline-block;
     text-underline-offset: 5px;
 }
 
-nav a:first-child {
+nav span:first-child {
     margin-left: 12px;
 }
 
-nav a:last-child {
+nav span:nth-last-child(2) {
+    /* reverse order due to "float: right" */
     margin-right: 12px;
 }
 
@@ -32,13 +33,13 @@ nav a.active {
     text-decoration: underline;
 }
 
-#logout {
+.right {
     float: right;
 }
 
-@media only screen and (max-width: 500px) {
-    nav a {
-        font-size: 13px;
-        margin: 11px 10px 11px 10px;
+@media only screen and (max-width: 600px) {
+    nav span {
+        font-size: 12px;
+        margin: 11px 1px 11px 1px;
     }
 }

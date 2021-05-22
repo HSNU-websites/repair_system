@@ -129,12 +129,13 @@ def add_record(user_id, building_id, location, item_id, description):
 
 def get_user(user_id) -> dict:
     user = db.session.query(
-        Users.username, Users.name, Users.classnum
+        Users.username, Users.name, Users.classnum, Users.email
     ).filter_by(id=user_id).first()
     return {
         "username": user.username,
         "name": user.name,
-        "classnum": user.classnum
+        "classnum": user.classnum,
+        "email": user.email,
     }
 
 

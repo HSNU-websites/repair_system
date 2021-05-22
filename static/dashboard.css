@@ -124,6 +124,18 @@ input[type="submit"] {
     margin-bottom: 3px;
 }
 
+#user_setting {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#user_setting form div {
+    margin: 10px 5px 10px 5px;
+    height: 40px;
+}
+
 .column span {
     display: inline-block;
     width: 80px;
