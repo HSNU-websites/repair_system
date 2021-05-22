@@ -1,5 +1,6 @@
 import csv
 from flask import request, render_template, current_app
+from flask.helpers import flash
 from flask_login import login_required
 from ..forms import ReportsFilterForm, AddOneUserForm, AddUsersByFileForm
 from . import admin_bp
@@ -127,7 +128,8 @@ def manage_user_page(page=1):
                 "email": form.email.data,
                 "is_admin": int(form.classnum.data) == 0
             }
-            add_users([data])
+            alreay_exists = add_users([data])
+            flash(", ".join(alreay_exists) + " 已經存在", category="alert")
             # TODO: handle already exist usernames
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")
@@ -145,7 +147,8 @@ def manage_user_page(page=1):
                 data = [row for row in csv.DictReader(rawdata.decode("ANSI").splitlines())]
             except:
                 return "Error"
-            add_users(data)
+            alreay_exists = add_users(data)
+            flash(", ".join(alreay_exists) + " 已經存在", category="alert")
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")
         return render_template("manage_user.html", form=form, form_csv=form_csv, users=render_users())

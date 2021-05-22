@@ -27,7 +27,7 @@
         <span class="right"><a href="/user_setting" class="active">使用者設定</a></span>
     </nav>
     <div id="messages">{{ display_msg(messages) }}</div>
-    <div id="user_setting">
+    <div id="user_setting" style="min-height: 100%;">
         <form action="/user_setting" method="POST">
             <div><b>帳號(學號): </b>{{ user.username }}</div>
             <div><b>姓名: </b>{{ user.name }}</div>
@@ -37,5 +37,8 @@
             <input type="submit" value="更新">
         </form>
     </div>
+    <footer>
+        <div id="copyright">© 2021 <a href="https://github.com/HSNU-websites" target="_blank">師大附中網站更新計畫</a></div>
+    </footer>
 </body>
 </html>

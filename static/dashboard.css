@@ -40,11 +40,6 @@ tr:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-tfoot td {
-    border: none;
-    padding-top: 10px;
-}
-
 input[type="text"], input[type="password"] {
     background: #FFFFFF;
     color: black;
@@ -74,6 +69,8 @@ input[type="submit"] {
     color: black;
     margin: 10px 0 10px 30px;
     font-weight: bold;
+    border: none;
+    padding-top: 10px;
 }
 
 .pages a {
@@ -136,6 +133,15 @@ input[type="submit"] {
     height: 40px;
 }
 
+#copyright {
+    font-family: 'Noto Sans TC', sans-serif;
+    height: 40px;
+    position: relative;
+    text-align: center;
+    bottom: 0px;
+    width: 100%;
+}
+
 .column span {
     display: inline-block;
     width: 80px;
@@ -155,13 +161,4 @@ input[type="submit"] {
 
 .column .email {
     width: 96px;
-}
-
-#copyright {
-    font-family: 'Noto Sans TC', sans-serif;
-    height: 40px;
-    position: relative;
-    text-align: center;
-    bottom: 0px;
-    width: 100%;
 }

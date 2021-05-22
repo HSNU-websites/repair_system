@@ -7,8 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
-    <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
     <title>Dashboard</title>
     {% if records["pages"] != 0 %}
@@ -36,14 +34,14 @@
         </nav>
         <h1>Dashboard</h1>
         <table>
-            <caption>
-                <div class="pages">
-                    <a href="{{ records['page'] - 1 }}" {% if records['page'] <= 1 %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8249;</a>
-                    <span>{{ records.page }} / {{ records.pages }}</span>
-                    <a href="{{ records['page'] + 1 }}" {% if records['page'] >= records['pages'] %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8250;</a>
-                </div>
-            </caption>
             <thead>
+                <tr>
+                    <td colspan="7" class="pages">
+                        <a href="{{ records['page'] - 1 }}" {% if records['page'] <= 1 %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8249;</a>
+                        <span>{{ records.page }} / {{ records.pages }}</span>
+                        <a href="{{ records['page'] + 1 }}" {% if records['page'] >= records['pages'] %}style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);"{% endif %}>&#8250;</a>    
+                    </td>
+                </tr>
                 <tr>
                     <th>報修人</th>
                     <th>大樓</th>
@@ -79,7 +77,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="6" class="pages">
+                    <td colspan="7" class="pages">
                         <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
                         <span>{{ records["page"] }} / {{ records["pages"] }}</span>
                         <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
