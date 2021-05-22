@@ -202,9 +202,7 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
 
 
 def render_users(Filter=dict(), page=1, per_page=100) -> dict:
-    q = db.session.query(
-        Users.username, Users.name, Users.classnum, Users.email
-    )
+    q = Users.query
     Filter = {
         key: value
         for key, value in Filter.items()
@@ -296,12 +294,13 @@ def update_users(data: list[dict]):
     l = []
     for d in data:
         if "id" in d:
-            user = Users.query.filter_by(id=d.pop("id"))
-            user.update(**d)
-            l.append(user)
+            user = Users.query.filter_by(id=d.pop("id")).first()
+            if user:
+                user.update(**d)
+                l.append(user)
     db.session.bulk_save_objects(l)
     db.session.commit()
-
+ 
 
 def del_users(ids: list[int], force=False):
     """

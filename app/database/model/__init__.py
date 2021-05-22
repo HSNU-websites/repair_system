@@ -1,5 +1,3 @@
-import datetime
-
 from .common import db, timeformat, filetimeformat
 from .Buildings import Buildings
 from .Items import Items
@@ -23,6 +21,8 @@ def get_dict(row):
     Get pure dict from table without relationship.
     datetime.datetime will be converted to str
     """
+    import datetime
+
     def process_value(value):
         if isinstance(value, datetime.datetime):
             return value.strftime(timeformat)

@@ -125,7 +125,7 @@ class Users(db.Model):
         return db.session.query(db.exists().where(Users.username == username)).scalar()
 
     @staticmethod
-    def new(username, password="", name="", classnum=0, email="", is_admin=False, is_valid=True):
+    def new(username, password="", name="", classnum=0, email="", is_admin=False, is_valid=True, is_mark_deleted=False):
         u = Users(
             id=None,
             username=username,
@@ -137,6 +137,7 @@ class Users(db.Model):
         )
         u.is_admin = is_admin
         u.is_valid = is_valid
+        u.is_mark_deleted = is_mark_deleted
         return u
 
     def update(self, password=None, name=None, classnum=None, email=None, is_admin=None, is_valid=None, is_mark_deleted=None):
