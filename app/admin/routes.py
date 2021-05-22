@@ -1,5 +1,6 @@
 import csv
 from flask import request, render_template, current_app
+from flask.helpers import flash
 from flask_login import login_required
 from ..forms import ReportsFilterForm, AddOneUserForm, AddUsersByFileForm
 from . import admin_bp
@@ -9,7 +10,10 @@ from ..database.db_helper import (
     update,
     insert,
     render_records,
+    render_users,
     add_users,
+    del_users,
+    update_users,
 )
 from ..users import admin_required
 
@@ -100,8 +104,8 @@ def system_modification_page():
         return "OK"
 
 
-@admin_bp.route("/manage_user/", methods=["GET", "POST", "DELETE"])
-@admin_bp.route("/manage_user/<int:page>", methods=["GET", "POST", "DELETE"])
+@admin_bp.route("/manage_user/", methods=["GET", "POST"])
+@admin_bp.route("/manage_user/<int:page>", methods=["GET", "POST"])
 @admin_required
 @login_required
 def manage_user_page(page=1):
@@ -110,19 +114,12 @@ def manage_user_page(page=1):
     if request.method == "GET":
         # Render all users
         current_app.logger.info("GET /manage_user")
-        return render_template("manage_user.html", form=form, form_csv=form_csv)
+        return render_template("manage_user.html", form=form, form_csv=form_csv, users=render_users())
     if request.method == "POST":
         # Add user
         # Add one user
         if form.validate_on_submit():
             current_app.logger.info("POST /manage_user")
-            # username = form.username.data
-            # name = form.name.data
-            # classnum = form.classnum.data
-            # password = form.password.data
-            # email = form.email.data
-            # is_admin = True if int(classnum) == 0 else False
-            # add_user(username, password, name, classnum, email, is_admin)
             data = {
                 "username": form.username.data,
                 "name": form.name.data,
@@ -131,7 +128,8 @@ def manage_user_page(page=1):
                 "email": form.email.data,
                 "is_admin": int(form.classnum.data) == 0
             }
-            l = add_users([data])
+            alreay_exists = add_users([data])
+            flash(", ".join(alreay_exists) + " 已經存在", category="alert")
             # TODO: handle already exist usernames
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")
@@ -149,11 +147,25 @@ def manage_user_page(page=1):
                 data = [row for row in csv.DictReader(rawdata.decode("ANSI").splitlines())]
             except:
                 return "Error"
-            # TODO add_user_by_csv(data)
+            alreay_exists = add_users(data)
+            flash(", ".join(alreay_exists) + " 已經存在", category="alert")
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")
+        return render_template("manage_user.html", form=form, form_csv=form_csv, users=render_users())
 
-        return render_template("manage_user.html", form=form, form_csv=form_csv)
+@admin_bp.route("/manage_user_backend", methods=["DELETE", "UPDATE"])
+@admin_required
+@login_required
+def manage_user_backend_page():
     if request.method == "DELETE":
         # Delete user
-        current_app.logger.info("DELETE /manage_user")
+        current_app.logger.info("DELETE /manage_user_backend")
+        data = request.get_json(force=True)
+        del_users([data["user_id"]])
+        return "OK"
+    if request.method == "UPDATE":
+        # Update user
+        current_app.logger.info("UPDATE /manage_user_backend")
+        data = request.get_json(force=True)
+        update_users([data])
+        return "OK"

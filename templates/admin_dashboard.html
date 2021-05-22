@@ -6,21 +6,35 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
+    <style>
+        @media only screen and (max-width: 1400px) {
+            #sidebar {
+                position: relative;
+            }
+        }
+    </style>
     <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
     <title>Admin Dashboard</title>
     {% if records["pages"] != 0 %}
-    {% if records["page"] < 1 %} <script>window.location.replace("1");</script>
-        {% endif %}
+    {% if records["page"] < 1 %} <script>window.location.replace("1");</script>{% endif %}
         {% if records["page"] > records["pages"] %}
-        <script>window.location.replace("{{ records['pages'] }}");</script>
-        {% endif %}
+        <script>window.location.replace("{{ records['pages'] }}");</script> {% endif %}
         {% endif %}
 </head>
 
 <body>
     <div style="min-height: 100%;">
+        <nav>
+            <span><a href="/report">報修</a></span>
+            <span><a href="/dashboard">報修紀錄</a></span>
+            <span><a href="/admin_dashboard" class="active">控制台</a></span>
+            <span><a href="/system">系統設定</a></span>
+            <span><a href="/manage_user">使用者管理</a></span>
+            <span class="right"><a href="/logout">登出</a></span>
+            <span class="right"><a href="/user_setting">使用者設定</a></span>
+        </nav>
         <h1>Admin Dashboard</h1>
         <div id="sidebar">
             <form action="/admin_dashboard/" method="POST">
@@ -39,20 +53,18 @@
                     {{ form.submit }}
                 </div>
             </form>
-            <a href="/report">報修</a>
-            <a href="/dashboard">報修紀錄</a>
-            <a href="/system">系統設定(管理員)</a>
-            <a href="/logout">登出</a>
         </div>
         <table>
-            <caption>
-                <div id="pages">
-                    <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
-                    <span>{{ records["page"] }} / {{ records["pages"] }}</span>
-                    <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %} style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
-                </div>
-            </caption>
             <thead>
+                <tr>
+                    <td colspan="7" class="pages">
+                        <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %}
+                        style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
+                    <span>{{ records["page"] }} / {{ records["pages"] }}</span>
+                    <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
+                        style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
+                    </td>
+                </tr>
                 <tr>
                     <th>報修人</th>
                     <th>大樓</th>
@@ -60,6 +72,7 @@
                     <th>損壞物件</th>
                     <th>狀況描述</th>
                     <th>報修時間</th>
+                    <th>維修紀錄</th>
                 </tr>
             </thead>
             <tbody>
@@ -71,9 +84,31 @@
                     <td>{{ record["item"] }}</td>
                     <td>{{ record["description"] }}</td>
                     <td>{{ record["insert_time"] }}</td>
+                    <td style="width: 200px;">
+                        <div style="text-align: left;">
+                            {% for revision in record["revisions"] %}
+                            <div><b>維護人: </b>{{ revision["user"]["username"] }}</div>
+                            <div><b>狀態: </b>{{ revision["status"] }}</div>
+                            <div><b>時間: </b>{{ revision["insert_time"] }}</div>
+                            <div><b>描述: </b>{{ revision["description"] }}</div>
+                            {% if loop.index < record["revisions"] | length %}<hr>{% endif %}
+                            {% endfor %}
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="7" class="pages">
+                        <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %}
+                            style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
+                        <span>{{ records["page"] }} / {{ records["pages"] }}</span>
+                        <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
+                            style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
+                    </td>
+                </tr>
+            </tfoot>
         </table>
     </div>
     <footer>
