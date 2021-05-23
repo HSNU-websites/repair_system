@@ -46,7 +46,7 @@ def reset(yes=False):
             name="此帳號已刪除",
             classnum=0,
             is_valid=False,
-            is_mark_deleted=True
+            is_marked_deleted=True
         )
     )
     # test users will be removed in production

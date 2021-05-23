@@ -83,17 +83,17 @@ class Users(db.Model):
     def is_valid(self):
         return self.properties.op("&")(Users.flags.valid) == Users.flags.valid
 
-    # hybrid_property for is_mark_deleted
+    # hybrid_property for is_marked_deleted
     @hybrid_property
-    def is_mark_deleted(self):
+    def is_marked_deleted(self):
         return self.readFlag(Users.flags.deleted)
 
-    @is_mark_deleted.setter
-    def is_mark_deleted(self, value):
+    @is_marked_deleted.setter
+    def is_marked_deleted(self, value):
         self.setFlag(Users.flags.deleted, value)
 
-    @is_mark_deleted.expression
-    def is_mark_deleted(self):
+    @is_marked_deleted.expression
+    def is_marked_deleted(self):
         return self.properties.op("&")(Users.flags.deleted) == Users.flags.deleted
 
     def __init__(self, id, username, password_hash, name, classnum, properties, email):
@@ -125,7 +125,7 @@ class Users(db.Model):
         return db.session.query(db.exists().where(Users.username == username)).scalar()
 
     @staticmethod
-    def new(username, password="", name="", classnum=0, email="", is_admin=False, is_valid=True, is_mark_deleted=False):
+    def new(username, password="", name="", classnum=0, email="", is_admin=False, is_valid=True, is_marked_deleted=False):
         u = Users(
             id=None,
             username=username,
@@ -137,10 +137,10 @@ class Users(db.Model):
         )
         u.is_admin = is_admin
         u.is_valid = is_valid
-        u.is_mark_deleted = is_mark_deleted
+        u.is_marked_deleted = is_marked_deleted
         return u
 
-    def update(self, password=None, name=None, classnum=None, email=None, is_admin=None, is_valid=None, is_mark_deleted=None):
+    def update(self, password=None, name=None, classnum=None, email=None, is_admin=None, is_valid=None, is_marked_deleted=None):
         if password is not None:
             self.password_hash = passwd_context.hash(password) if password else ""
         if name is not None:
@@ -153,5 +153,5 @@ class Users(db.Model):
             self.is_admin = is_admin
         if is_valid is not None:
             self.is_valid = is_valid
-        if is_mark_deleted is not None:
-            self.is_mark_deleted = is_mark_deleted
+        if is_marked_deleted is not None:
+            self.is_marked_deleted = is_marked_deleted

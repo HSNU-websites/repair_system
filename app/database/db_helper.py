@@ -220,7 +220,7 @@ def render_users(Filter=dict(), page=1, per_page=100) -> dict:
             "email": user.email,
             "is_admin": user.is_admin,
             "is_valid": user.is_valid,
-            "is_mark_deleted": user.is_mark_deleted,
+            "is_marked_deleted": user.is_marked_deleted,
         })
     return {
         "page": page,
@@ -324,7 +324,7 @@ def del_users(ids: list[int], force=False):
             if a or b:
                 u = Users.query.filter_by(id=user_id).first()
                 u.is_valid = False
-                u.is_mark_deleted = True
+                u.is_marked_deleted = True
             else:
                 s.add(user_id)
     if s:
