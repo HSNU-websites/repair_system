@@ -1,5 +1,5 @@
 import csv
-from flask import request, render_template, current_app
+from flask import request, render_template, current_app, make_response
 from flask.helpers import flash
 from flask_login import login_required
 from ..forms import ReportsFilterForm, AddOneUserForm, AddUsersByFileForm
@@ -23,25 +23,42 @@ from ..users import admin_required
 @admin_required
 @login_required
 def dashboard_page(page=1):
+    # cookies are used to save filter when user turns page
     form = ReportsFilterForm()
     if request.method == "GET":
         current_app.logger.info("GET /admin_dashboard")
+        Filter = {}
+        if username:= request.cookies.get("username"):
+            Filter["username"] = username
+        if classnum:= request.cookies.get("classnum"):
+            Filter["classnum"] = classnum
         return render_template(
             "admin_dashboard.html",
-            records=render_records(page=page),
+            records=render_records(Filter=Filter, page=page),
             form=form,
         )
     if request.method == "POST":
         if form.validate_on_submit():
             current_app.logger.info("POST /admin_dashboard")
             Filter = dict()
+            cookies = []
             if username := form.username.data:
                 Filter["username"] = username
+                cookies.append(("username", username))
             if classnum := form.classnum.data:
                 Filter["classnum"] = classnum
-            return render_template(
-                "admin_dashboard.html", records=render_records(Filter), form=form
+                cookies.append(("classnum", classnum))
+
+            response = make_response(
+                render_template(
+                    "admin_dashboard.html", records=render_records(Filter), form=form
+                )
             )
+            response.delete_cookie("username")
+            response.delete_cookie("classnum")
+            for cookie in cookies:
+                response.set_cookie(*cookie, max_age=120)
+            return response
         else:
             current_app.logger.info("POST /admin_dashboard: Invalid submit")
 
@@ -114,7 +131,9 @@ def manage_user_page(page=1):
     if request.method == "GET":
         # Render all users
         current_app.logger.info("GET /manage_user")
-        return render_template("manage_user.html", form=form, form_csv=form_csv, users=render_users())
+        return render_template(
+            "manage_user.html", form=form, form_csv=form_csv, users=render_users()
+        )
     if request.method == "POST":
         # Add user
         # Add one user
@@ -126,10 +145,12 @@ def manage_user_page(page=1):
                 "classnum": form.classnum.data,
                 "password": form.password.data,
                 "email": form.email.data,
-                "is_admin": int(form.classnum.data) == 0
+                "is_admin": int(form.classnum.data) == 0,
             }
             if len(data["password"]) < 6:
-                flash("Password is too short (at least 6 characters).", category="alert")
+                flash(
+                    "Password is too short (at least 6 characters).", category="alert"
+                )
             elif already_exists := add_users(data):
                 flash(", ".join(already_exists) + " 已經存在", category="alert")
         else:
@@ -141,18 +162,26 @@ def manage_user_page(page=1):
             rawdata = csv_file.read()
             # data format: [{"username": "zxc", "name": "zxc", "password": "123", "classnum": "1400"}]
             try:
-                data = [row for row in csv.DictReader(rawdata.decode("utf-8").splitlines())]
+                data = [
+                    row for row in csv.DictReader(rawdata.decode("utf-8").splitlines())
+                ]
             except UnicodeDecodeError:
-                data = [row for row in csv.DictReader(rawdata.decode("big5").splitlines())]
+                data = [
+                    row for row in csv.DictReader(rawdata.decode("big5").splitlines())
+                ]
             except Exception:
-                data = [row for row in csv.DictReader(rawdata.decode("ANSI").splitlines())]
+                data = [
+                    row for row in csv.DictReader(rawdata.decode("ANSI").splitlines())
+                ]
             except:
                 return "Error"
             if already_exists := add_users(data):
                 flash(", ".join(already_exists) + " 已經存在", category="alert")
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")
-        return render_template("manage_user.html", form=form, form_csv=form_csv, users=render_users())
+        return render_template(
+            "manage_user.html", form=form, form_csv=form_csv, users=render_users()
+        )
 
 
 @admin_bp.route("/manage_user_backend", methods=["DELETE", "UPDATE"])

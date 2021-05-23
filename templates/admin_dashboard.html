@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
     <style>
         @media only screen and (max-width: 1400px) {
             #sidebar {
@@ -37,6 +38,7 @@
         </nav>
         <h1>Admin Dashboard</h1>
         <div id="sidebar">
+            <h2>篩選器</h2>
             <form action="/admin_dashboard/" method="POST">
                 {{ form.csrf_token }}
                 <div class="field">
@@ -49,6 +51,7 @@
                     <br>
                     {{ form.classnum }}
                 </div>
+                <div>直接送出即可清空篩選器</div>
                 <div class="field">
                     {{ form.submit }}
                 </div>
@@ -58,11 +61,15 @@
             <thead>
                 <tr>
                     <td colspan="7" class="pages">
+                        <a href="1" {% if records['page'] <=1 %}
+                        style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;&#8249;</a>
                         <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %}
                         style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
                     <span>{{ records["page"] }} / {{ records["pages"] }}</span>
                     <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
                         style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
+                        <a href="{{ records['pages'] }}" {% if records['page']>= records['pages'] %}
+                            style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;&#8250;</a>
                     </td>
                 </tr>
                 <tr>
@@ -78,7 +85,7 @@
             <tbody>
                 {% for record in records["records"] %}
                 <tr>
-                    <td>{{ record["user"]["classnum"] | string + " " + record["user"]["name"] }}</td>
+                    <td>{{ record["user"]["classnum"] | string + " " + record["user"]["username"] }}</td>
                     <td>{{ record["building"] }}</td>
                     <td>{{ record["location"] }}</td>
                     <td>{{ record["item"] }}</td>
@@ -101,11 +108,15 @@
             <tfoot>
                 <tr>
                     <td colspan="7" class="pages">
+                        <a href="1" {% if records['page'] <=1 %}
+                        style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;&#8249;</a>
                         <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %}
-                            style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
-                        <span>{{ records["page"] }} / {{ records["pages"] }}</span>
-                        <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
-                            style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
+                        style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
+                    <span>{{ records["page"] }} / {{ records["pages"] }}</span>
+                    <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
+                        style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
+                        <a href="{{ records['pages'] }}" {% if records['page']>= records['pages'] %}
+                            style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;&#8250;</a>
                     </td>
                 </tr>
             </tfoot>
