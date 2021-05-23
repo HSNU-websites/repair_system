@@ -89,6 +89,31 @@ input[type="submit"] {
     opacity: 0.8;
 }
 
+.pages a.end {
+    pointer-events: none; background-color: rgba(0, 0, 0, 0.2);
+}
+
+.column span {
+    display: inline-block;
+    width: 80px;
+    height: 20px;
+    text-align: center;
+}
+
+.column div input {
+    margin: 0 0 0 0;
+    border: 0px;
+    width: 76px;
+}
+
+.column div input[type="checkbox"] {
+    width: 80px;
+}
+
+.column .email {
+    width: 96px;
+}
+
 .field {
     font-family: 'Noto Sans TC', sans-serif;
     margin: 10px 0 10px 0;
@@ -97,7 +122,7 @@ input[type="submit"] {
 }
 
 #sidebar {
-    font-size: 10px;
+    font-size: 12px;
     display: block;
     position: fixed;
     margin: 10px auto 10px 30px;
@@ -106,6 +131,18 @@ input[type="submit"] {
 #sidebar a {
     display: block;
     margin: 5px 0 5px 0;
+}
+
+#reply_window {
+    visibility: hidden;
+}
+
+#reply_window label {
+    font-size: 14px;
+}
+
+#reply_window input {
+    width: 100px;
 }
 
 #main_content {
@@ -142,23 +179,3 @@ input[type="submit"] {
     width: 100%;
 }
 
-.column span {
-    display: inline-block;
-    width: 80px;
-    height: 20px;
-    text-align: center;
-}
-
-.column div input {
-    margin: 0 0 0 0;
-    border: 0px;
-    width: 76px;
-}
-
-.column div input[type="checkbox"] {
-    width: 80px;
-}
-
-.column .email {
-    width: 96px;
-}

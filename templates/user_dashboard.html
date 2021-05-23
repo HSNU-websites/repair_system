@@ -38,14 +38,17 @@
                 <tr>
                     <td colspan="7" class="pages">
                         <a href="1" {% if records['page'] <=1 %}
-                        style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;&#8249;</a>
+                            class="end" {% endif
+                            %}>&#8249;&#8249;</a>
                         <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %}
-                        style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
-                    <span>{{ records["page"] }} / {{ records["pages"] }}</span>
-                    <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
-                        style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
+                            class="end" {% endif %}>&#8249;</a>
+                        <span>{{ records["page"] }} / {{ records["pages"] }}</span>
+                        <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
+                            class="end" {% endif
+                            %}>&#8250;</a>
                         <a href="{{ records['pages'] }}" {% if records['page']>= records['pages'] %}
-                            style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;&#8250;</a>
+                            class="end" {% endif
+                            %}>&#8250;&#8250;</a>
                     </td>
                 </tr>
                 <tr>
@@ -85,14 +88,17 @@
                 <tr>
                     <td colspan="7" class="pages">
                         <a href="1" {% if records['page'] <=1 %}
-                        style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;&#8249;</a>
+                            class="end" {% endif
+                            %}>&#8249;&#8249;</a>
                         <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %}
-                        style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
-                    <span>{{ records["page"] }} / {{ records["pages"] }}</span>
-                    <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
-                        style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
+                            class="end" {% endif %}>&#8249;</a>
+                        <span>{{ records["page"] }} / {{ records["pages"] }}</span>
+                        <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
+                            class="end" {% endif
+                            %}>&#8250;</a>
                         <a href="{{ records['pages'] }}" {% if records['page']>= records['pages'] %}
-                            style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;&#8250;</a>
+                            class="end" {% endif
+                            %}>&#8250;&#8250;</a>
                     </td>
                 </tr>
             </tfoot>

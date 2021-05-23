@@ -31,15 +31,14 @@
         }
     </script>
     {% if users["pages"] != 0 %}
-        {% if users["page"] < 1 %}
-        <script>window.location.replace("1");</script>
+    {% if users["page"] < 1 %} <script>window.location.replace("1");</script>
         {% endif %}
         {% if users["page"] > users["pages"] %}
         <script>window.location.replace("{{ users['pages'] }}");</script>
         {% endif %}
-    {% endif %}
-    <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
-    <title>使用者管理</title>
+        {% endif %}
+        <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
+        <title>使用者管理</title>
 </head>
 
 <body>
@@ -96,11 +95,15 @@
         <div id="main_content">
             <div id="messages">{{ display_msg(messages) }}</div>
             <div class="pages">
-                <a href="{{ users['page'] - 1 }}" {% if users['page'] <=1 %}
-                    style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
-                <span>{{ users["page"] }} / {{ users["pages"] }}</span>
-                <a href="{{ users['page'] + 1 }}" {% if users['page']>= users['pages'] %} style="pointer-events: none;
-                    background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
+                <a href="1" {% if records['page'] <=1 %} class="end" {% endif %}>&#8249;&#8249;</a>
+                <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %} class="end" {% endif %}>&#8249;</a>
+                <span>{{ records["page"] }} / {{ records["pages"] }}</span>
+                <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
+                    class="end" {% endif
+                    %}>&#8250;</a>
+                <a href="{{ records['pages'] }}" {% if records['page']>= records['pages'] %}
+                    class="end" {% endif
+                    %}>&#8250;&#8250;</a>
             </div>
             <div class="column">
                 <div>
@@ -117,20 +120,20 @@
                 <div>
                     <span id="{{ user['id'] }}">{{ user["username"] }}</span>
                     {% if user["is_marked_deleted"] %}
-                    <input value="{{ user["name"] }}" type="text" disabled></input>
-                    <input value="{{ user["classnum"] }}" type="text" disabled></input>
+                    <input value="{{ user[" name"] }}" type="text" disabled></input>
+                    <input value="{{ user[" classnum"] }}" type="text" disabled></input>
                     <input type="password" placeholder="未更改" disabled>
-                    <input value="{{ user["email"] }}" class="email" type="text" disabled></input>
+                    <input value="{{ user[" email"] }}" class="email" type="text" disabled></input>
                     <input type="checkbox" {% if user["is_admin"] %} checked {% endif %} disabled></input>
                     <input type="checkbox" {% if user["is_valid"] %} checked {% endif %} disabled></input>
                     <input type="checkbox" checked disabled></input>
                     {% else %}
-                    <input value="{{ user["name"] }}" type="text"></input>
-                    <input value="{{ user["classnum"] }}" type="text"></input>
+                    <input value="{{ user[" name"] }}" type="text"></input>
+                    <input value="{{ user[" classnum"] }}" type="text"></input>
                     <input type="password" placeholder="未更改">
-                    <input value="{{ user["email"] }}" class="email" type="text"></input>
-                    <input type="checkbox" {% if user["is_admin"] %} checked {% endif %} ></input>
-                    <input type="checkbox" {% if user["is_valid"] %} checked {% endif %} ></input>
+                    <input value="{{ user[" email"] }}" class="email" type="text"></input>
+                    <input type="checkbox" {% if user["is_admin"] %} checked {% endif %}></input>
+                    <input type="checkbox" {% if user["is_valid"] %} checked {% endif %}></input>
                     <input type="checkbox" disabled></input>
                     {% endif %}
                     <button class="update" onclick="send_update(this);">更新</button>
@@ -139,11 +142,15 @@
                 {% endfor %}
             </div>
             <div class="pages">
-                <a href="{{ users['page'] - 1 }}" {% if users['page'] <=1 %}
-                    style="pointer-events: none; background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8249;</a>
-                <span>{{ users["page"] }} / {{ users["pages"] }}</span>
-                <a href="{{ users['page'] + 1 }}" {% if users['page']>= users['pages'] %} style="pointer-events: none;
-                    background-color: rgba(0, 0, 0, 0.2);" {% endif %}>&#8250;</a>
+                <a href="1" {% if records['page'] <=1 %} class="end" {% endif %}>&#8249;&#8249;</a>
+                <a href="{{ records['page'] - 1 }}" {% if records['page'] <=1 %} class="end" {% endif %}>&#8249;</a>
+                <span>{{ records["page"] }} / {{ records["pages"] }}</span>
+                <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
+                    class="end" {% endif
+                    %}>&#8250;</a>
+                <a href="{{ records['pages'] }}" {% if records['page']>= records['pages'] %}
+                    class="end" {% endif
+                    %}>&#8250;&#8250;</a>
             </div>
         </div>
     </div>

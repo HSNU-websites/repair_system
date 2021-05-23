@@ -16,6 +16,7 @@ from ..database.db_helper import (
     update_users,
 )
 from ..users import admin_required
+from app import admin
 
 
 @admin_bp.route("/admin_dashboard/", methods=["GET", "POST"])
@@ -36,6 +37,7 @@ def dashboard_page(page=1):
             "admin_dashboard.html",
             records=render_records(Filter=Filter, page=page),
             form=form,
+            statuses=render_system_setting()[3]
         )
     if request.method == "POST":
         if form.validate_on_submit():
@@ -51,7 +53,7 @@ def dashboard_page(page=1):
 
             response = make_response(
                 render_template(
-                    "admin_dashboard.html", records=render_records(Filter), form=form
+                    "admin_dashboard.html", records=render_records(Filter), form=form, statuses=render_system_setting()[3]
                 )
             )
             response.delete_cookie("username")
@@ -61,6 +63,20 @@ def dashboard_page(page=1):
             return response
         else:
             current_app.logger.info("POST /admin_dashboard: Invalid submit")
+
+
+@admin_bp.route("/admin_dashboard_backend", methods=["POST", "DELETE"])
+@admin_required
+@login_required
+def admin_dashboard_backend_page():
+    if request.method == "POST":
+        data = request.get_json(force=True)
+        print(data)
+        return "OK"
+    if request.method == "DELETE":
+        data = request.get_json(force=True)
+        print(data)
+        return "OK"
 
 
 @admin_bp.route("/system", methods=["GET"])
