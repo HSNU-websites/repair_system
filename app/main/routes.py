@@ -6,6 +6,7 @@ from ..database.db_helper import login_auth
 from ..users import *
 
 
+# Login page.
 @main_bp.route("/", methods=["GET", "POST"])
 def index_page():  # index page is login page
     if current_user.is_active:
@@ -38,6 +39,7 @@ def index_page():  # index page is login page
                 return redirect(url_for("main.index_page"))
 
 
+# Logout page.
 @main_bp.route("/logout", methods=["GET"])
 def logout_page():
     current_app.logger.info("GET /logout")

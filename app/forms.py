@@ -71,7 +71,7 @@ class AddUsersByFileForm(FlaskForm):
 
 class UserSettingForm(FlaskForm):
     email = EmailField(
-        "Email: ", validators=[DataRequired()], render_kw={"placeholder": "Email"}
+        "Email: ", render_kw={"placeholder": "Email"}
     )
     password = PasswordField("密碼: ", render_kw={"placeholder": "未更改"})
     submit = SubmitField("更改")

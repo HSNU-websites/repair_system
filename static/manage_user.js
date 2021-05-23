@@ -27,6 +27,7 @@ function send_update(element) {
     var is_admin = parent.children[5].checked;
     var is_valid = parent.children[6].checked;
     var data = { "id": user_id, "name": name, "classnum": classnum, "email": email, "is_admin": is_admin, "is_valid": is_valid }
+    // validate password
     if (password != "") {
         if (password.length < 6) {
             alert("Password is too short (at least 6 characters).");
@@ -36,7 +37,11 @@ function send_update(element) {
             data.password = password;
         }
     }
-    console.log(data)
+    // validate email
+    if (is_admin & email == "") {
+        alert("Email is required for admin.");
+        return;
+    }
     $.ajax({
         url: "/manage_user_backend",
         type: "update",
