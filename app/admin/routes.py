@@ -128,9 +128,8 @@ def manage_user_page(page=1):
                 "email": form.email.data,
                 "is_admin": int(form.classnum.data) == 0
             }
-            alreay_exists = add_users([data])
-            flash(", ".join(alreay_exists) + " 已經存在", category="alert")
-            # TODO: handle already exist usernames
+            if already_exists := add_users(data):
+                flash(", ".join(already_exists) + " 已經存在", category="alert")
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")
         # Add users by csv
@@ -147,11 +146,12 @@ def manage_user_page(page=1):
                 data = [row for row in csv.DictReader(rawdata.decode("ANSI").splitlines())]
             except:
                 return "Error"
-            alreay_exists = add_users(data)
-            flash(", ".join(alreay_exists) + " 已經存在", category="alert")
+            if already_exists := add_users(data):
+                flash(", ".join(already_exists) + " 已經存在", category="alert")
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")
         return render_template("manage_user.html", form=form, form_csv=form_csv, users=render_users())
+
 
 @admin_bp.route("/manage_user_backend", methods=["DELETE", "UPDATE"])
 @admin_required

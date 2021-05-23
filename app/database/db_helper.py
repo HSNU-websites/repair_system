@@ -203,9 +203,6 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
 
 
 def render_users(Filter=dict(), page=1, per_page=100) -> dict:
-    # q = db.session.query(
-    #     Users.username, Users.name, Users.classnum, Users.email
-    # )
     q = Users.query
     Filter = {
         key: value
@@ -223,7 +220,7 @@ def render_users(Filter=dict(), page=1, per_page=100) -> dict:
             "email": user.email,
             "is_admin": user.is_admin,
             "is_valid": user.is_valid,
-            "is_mark_deleted": user.is_mark_deleted,
+            "is_marked_deleted": user.is_marked_deleted,
         })
     return {
         "page": page,
@@ -299,11 +296,12 @@ def update_users(data: list[dict]):
     for d in data:
         if "id" in d:
             user = Users.query.filter_by(id=d.pop("id")).first()
-            user.update(**d)
-            l.append(user)
+            if user:
+                user.update(**d)
+                l.append(user)
     db.session.bulk_save_objects(l)
     db.session.commit()
-
+ 
 
 def del_users(ids: list[int], force=False):
     """
@@ -326,7 +324,7 @@ def del_users(ids: list[int], force=False):
             if a or b:
                 u = Users.query.filter_by(id=user_id).first()
                 u.is_valid = False
-                u.is_mark_deleted = True
+                u.is_marked_deleted = True
             else:
                 s.add(user_id)
     if s:
