@@ -8,7 +8,7 @@ from ..database.db_helper import (
     get_user,
     update_users,
 )
-from ..forms import ReportForm
+from ..forms import ReportForm, UserSettingForm
 from ..mail_helper import send_report_mail
 from . import user_bp
 
@@ -60,15 +60,24 @@ def dashboard_page(page=1):
 @user_bp.route("/user_setting", methods=["GET", "POST"])
 @login_required
 def user_setting_page():
+    user = get_user(current_user.id)
+    form = UserSettingForm(email=user["email"])
     if request.method == "GET":
         current_app.logger.info("GET /user_setting")
-        return render_template("user_setting.html", user=get_user(current_user.id))
+        return render_template("user_setting.html", user=user, form=form)
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
-        data = {"id": current_user.id, "email": email}
-        if password != "":
-            data["password"] = password
-        update_users([data])
-        flash("OK", category="success")
-        return render_template("user_setting.html", user=get_user(current_user.id))
+        if form.validate_on_submit():
+            current_app.logger.info("POST /user_setting")
+            email = form.email.data
+            password = form.password.data
+            data = {"id": current_user.id, "email": email}
+            if password != "":
+                data["password"] = password
+            update_users([data])
+            flash("OK", category="success")
+        else:
+            current_app.logger.info("POST /user_setting: Invalid submit.")
+            for _, errorMessages in form.errors.items():
+                for err in errorMessages:
+                    flash(err, category="alert")
+        return render_template("user_setting.html", user=user, form=form)

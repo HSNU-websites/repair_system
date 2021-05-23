@@ -128,7 +128,9 @@ def manage_user_page(page=1):
                 "email": form.email.data,
                 "is_admin": int(form.classnum.data) == 0
             }
-            if already_exists := add_users(data):
+            if len(data["password"]) < 6:
+                flash("Password is too short (at least 6 characters).", category="alert")
+            elif already_exists := add_users(data):
                 flash(", ".join(already_exists) + " 已經存在", category="alert")
         else:
             current_app.logger.info("POST /manage_user: Invalid submit")

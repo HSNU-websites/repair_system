@@ -29,11 +29,18 @@
     <div id="messages">{{ display_msg(messages) }}</div>
     <div id="user_setting" style="min-height: 100%;">
         <form action="/user_setting" method="POST">
-            <div><b>帳號(學號): </b>{{ user.username }}</div>
-            <div><b>姓名: </b>{{ user.name }}</div>
-            <div><b>班級: </b>{{ user.classnum }}</div>
-            <div><b>Email: </b><input type="email" value="{{ user.email }}" name="email"></div>
-            <div><b>密碼: </b><input type="password" name="password"></div>
+            {{ form.csrf_token }}
+            <div>帳號(學號): {{ user.username }}</div>
+            <div>姓名: {{ user.name }}</div>
+            <div>班級: {{ user.classnum }}</div>
+            <div class="field">
+                {{ form.email.label }}
+                {{ form.email }}
+            </div>
+            <div class="field">
+                {{ form.password.label }}
+                {{ form.password }}
+            </div>
             <input type="submit" value="更新">
         </form>
     </div>

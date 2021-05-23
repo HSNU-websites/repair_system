@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, SelectField, StringField, SubmitField
 from wtforms.fields.html5 import EmailField
 from flask_wtf.file import FileField, FileRequired
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import DataRequired, ValidationError, Length
 
 
 class LoginForm(FlaskForm):
@@ -56,7 +56,7 @@ class AddOneUserForm(FlaskForm):
     password = PasswordField(
         "密碼: ", validators=[DataRequired()], render_kw={"placeholder": "Password"}
     )
-    email = EmailField("電子郵件 (僅管理員需要)", render_kw={"placeholder": "Email"})
+    email = EmailField("電子郵件 (僅管理員需要): ", render_kw={"placeholder": "Email"})
     submit = SubmitField("新增")
 
     def validate_email(self, field):
@@ -67,3 +67,15 @@ class AddOneUserForm(FlaskForm):
 class AddUsersByFileForm(FlaskForm):
     csv_file = FileField("CSV file", validators=[FileRequired()])
     submit = SubmitField("新增")
+
+
+class UserSettingForm(FlaskForm):
+    email = EmailField(
+        "Email: ", validators=[DataRequired()], render_kw={"placeholder": "Email"}
+    )
+    password = PasswordField("密碼: ", render_kw={"placeholder": "未更改"})
+    submit = SubmitField("更改")
+
+    def validate_password(self, field):
+        if field.data != "" and len(field.data) < 6:
+            raise ValidationError("Password is too short (at least 6 characters).")

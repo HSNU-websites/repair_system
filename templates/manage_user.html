@@ -107,6 +107,7 @@
                     <span>帳號(學號)</span>
                     <span>姓名</span> <!-- editable -->
                     <span>班號</span> <!-- editable -->
+                    <span>密碼</span> <!-- editable -->
                     <span style="width: 100px;">Email</span> <!-- editable -->
                     <span>管理員</span> <!-- editable -->
                     <span>可登入</span> <!-- editable -->
@@ -115,15 +116,25 @@
                 {% for user in users["users"] %}
                 <div>
                     <span id="{{ user['id'] }}">{{ user["username"] }}</span>
-                    <input value="{{ user["name"] }}" {% if user["is_marked_deleted"] %} disabled {% endif %} type="text"></input>
-                    <input value="{{ user["classnum"] }}" {% if user["is_marked_deleted"] %} disabled {% endif %} type="text"></input>
-                    <input value="{{ user["email"] }}" {% if user["is_marked_deleted"] %} disabled {% endif %} class="email" type="text"></input>
-                    <input type="checkbox" {% if user["is_admin"] %} checked {% endif %} {% if user["is_marked_deleted"] %} disabled {% endif %}></input>
-                    <input type="checkbox" {% if user["is_valid"] %} checked {% endif %} {% if user["is_marked_deleted"] %} disabled {% endif %}></input>
-                    <input type="checkbox" {% if user["is_marked_deleted"] %} checked {% endif %} disabled></input>
+                    {% if user["is_marked_deleted"] %}
+                    <input value="{{ user["name"] }}" type="text" disabled></input>
+                    <input value="{{ user["classnum"] }}" type="text" disabled></input>
+                    <input type="password" placeholder="未更改" disabled>
+                    <input value="{{ user["email"] }}" class="email" type="text" disabled></input>
+                    <input type="checkbox" {% if user["is_admin"] %} checked {% endif %} disabled></input>
+                    <input type="checkbox" {% if user["is_valid"] %} checked {% endif %} disabled></input>
+                    <input type="checkbox" checked disabled></input>
+                    {% else %}
+                    <input value="{{ user["name"] }}" type="text"></input>
+                    <input value="{{ user["classnum"] }}" type="text"></input>
+                    <input type="password" placeholder="未更改">
+                    <input value="{{ user["email"] }}" class="email" type="text"></input>
+                    <input type="checkbox" {% if user["is_admin"] %} checked {% endif %} ></input>
+                    <input type="checkbox" {% if user["is_valid"] %} checked {% endif %} ></input>
+                    <input type="checkbox" disabled></input>
+                    {% endif %}
                     <button class="update" onclick="send_update(this);">更新</button>
                     <button class="remove" onclick="send_remove(this);">刪除</button>
-                    <button class="reset" onclick="send_reset(this);">重設密碼</button> <!-- TODO -->
                 </div>
                 {% endfor %}
             </div>
