@@ -3,10 +3,6 @@ from os import getenv
 
 class Config:
     SECRET_KEY = getenv("SECRET_KEY")
-    # RECAPTCHA
-    RECAPTCHA_ENABLED = True
-    RECAPTCHA_PUBLIC_KEY = getenv("RECAPTCHA_PUBLIC_KEY")
-    RECAPTCHA_PRIVATE_KEY = getenv("RECAPTCHA_PRIVATE_KEY")
     # SQLAlchemy
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"

@@ -1,0 +1,44 @@
+{% from 'msg.jinja' import display_msg %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
+    <script src="{{ url_for('static', filename='msg.js') }}"></script>
+    <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
+    <title>使用者設定</title>
+</head>
+<body>
+    <nav>
+        <span><a href="/report">報修</a></span>
+        <span><a href="/dashboard">報修紀錄</a></span>
+        {% if current_user.is_admin %}
+        <span><a href="/admin_dashboard">控制台</a></span>
+        <span><a href="/system">系統設定</a></span>
+        <span><a href="/manage_user">使用者管理</a></span>
+        {% endif %}
+        <span class="right"><a href="/logout">登出</a></span>
+        <span class="right"><a href="/user_setting" class="active">使用者設定</a></span>
+    </nav>
+    <div id="messages">{{ display_msg(messages) }}</div>
+    <div id="user_setting" style="min-height: 100%;">
+        <form action="/user_setting" method="POST">
+            <div><b>帳號(學號): </b>{{ user.username }}</div>
+            <div><b>姓名: </b>{{ user.name }}</div>
+            <div><b>班級: </b>{{ user.classnum }}</div>
+            <div><b>Email: </b><input type="email" value="{{ user.email }}" name="email"></div>
+            <div><b>密碼: </b><input type="password" name="password"></div>
+            <input type="submit" value="更新">
+        </form>
+    </div>
+    <footer>
+        <div id="copyright">© 2021 <a href="https://github.com/HSNU-websites" target="_blank">師大附中網站更新計畫</a></div>
+    </footer>
+</body>
+</html>

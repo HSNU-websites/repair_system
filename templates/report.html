@@ -8,49 +8,53 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
     <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
     <title>報修</title>
 </head>
 
 <body>
-    <h1>報修</h1>
-    <div class="container" style="background-color: rgba(0, 0, 0, .00000001);">
-        <form action="/report" method="POST">
-            {{ form.csrf_token }}
-            <div class="field">
-                {{ form.building.label }}
-                <br> {{ form.building }}
-            </div>
-            <div class="field">
-                {{ form.location.label }}
-                <br> {{ form.location }}
-            </div>
-            <div class="field">
-                {{ form.item.label }}
-                <br> {{ form.item }}
-            </div>
-            <div class="field">
-                {{ form.description.label }}
-                <br> {{ form.description }}
-            </div>
-            <div class="field" id="recaptcha">
-                {{ form.recaptcha }}
-            </div>
-            <div class="field">
-                {{ form.submit }}
-            </div>
-            <div>{{ display_msg(messages) }}</div>
-            <div>
-                <a href="/dashboard">報修紀錄</a>
-                {% if current_user.is_admin %}
-                <a href="/admin_dashboard">全體報修紀錄(管理員)</a>
-                <a href="/system">系統設定(管理員)</a>
-                {% endif %}
-                <a href="/logout">登出</a>
-            </div>
-        </form>
+    <nav>
+        <span><a href="/report" class="active">報修</a></span>
+        <span><a href="/dashboard">報修紀錄</a></span>
+        {% if current_user.is_admin %}
+        <span><a href="/admin_dashboard">控制台</a></span>
+        <span><a href="/system">系統設定</a></span>
+        <span><a href="/manage_user">使用者管理</a></span>
+        {% endif %}
+        <span class="right"><a href="/logout">登出</a></span>
+        <span class="right"><a href="/user_setting">使用者設定</a></span>
+    </nav>
+    <div style="min-height: 100%;">
+        <h1>報修</h1>
+        <div id="messages" class="report_page">{{ display_msg(messages) }}</div>
+        <div class="container" style="margin-top: 30px;">
+            <form action="/report" method="POST">
+                {{ form.csrf_token }}
+                <div class="field">
+                    {{ form.building.label }}
+                    <br> {{ form.building }}
+                </div>
+                <div class="field">
+                    {{ form.location.label }}
+                    <br> {{ form.location }}
+                </div>
+                <div class="field">
+                    {{ form.item.label }}
+                    <br> {{ form.item }}
+                </div>
+                <div class="field">
+                    {{ form.description.label }}
+                    <br> {{ form.description }}
+                </div>
+                <div class="field">
+                    {{ form.submit }}
+                </div>
+            </form>
+        </div>
     </div>
     <footer>
         <div id="copyright">© 2021 <a href="https://github.com/HSNU-websites" target="_blank">師大附中網站更新計畫</a></div>

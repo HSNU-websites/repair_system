@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='system.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <script src="{{ url_for('static', filename='system.js') }}"></script>
@@ -13,14 +15,19 @@
 </head>
 
 <body>
+    <nav>
+        <nav>
+            <span><a href="/report">報修</a></span>
+            <span><a href="/dashboard">報修紀錄</a></span>
+            <span><a href="/admin_dashboard">控制台</a></span>
+            <span><a href="/system" class="active">系統設定</a></span>
+            <span><a href="/manage_user">使用者管理</a></span>
+            <span class="right"><a href="/logout">登出</a></span>
+            <span class="right"><a href="/user_setting">使用者設定</a></span>
+        </nav>
+    </nav>
     <h1>系統設定</h1>
     <p id="tip">前者為名稱，後者為顯示順序</p>
-    <div id="sidebar">
-        <a href="/report">報修</a>
-        <a href="/dashboard">報修紀錄</a>
-        <a href="/system">系統設定(管理員)</a>
-        <a href="/logout">登出</a>
-    </div>
     <div class="container">
         <div id="buildings">
             <h3>大樓</h3>

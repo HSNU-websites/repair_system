@@ -40,7 +40,6 @@ tr:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-
 input[type="text"], input[type="password"] {
     background: #FFFFFF;
     color: black;
@@ -66,24 +65,15 @@ input[type="submit"] {
     border-radius: 10px;
 }
 
-#sidebar {
-    display: block;
-    position: fixed;
-    margin: 10px auto 10px 30px;
-}
-
-#sidebar a {
-    display: block;
-    margin: 5px 0 5px 0;
-}
-
-#pages {
+.pages {
     color: black;
     margin: 10px 0 10px 30px;
     font-weight: bold;
+    border: none;
+    padding-top: 10px;
 }
 
-#pages a {
+.pages a {
     display: inline-block;
     background-color: rgba(255, 255, 255, 0.3);
     text-decoration: none;
@@ -95,8 +85,52 @@ input[type="submit"] {
     height: 20px;
 }
 
-#pages a:hover {
+.pages a:hover {
     opacity: 0.8;
+}
+
+.field {
+    font-family: 'Noto Sans TC', sans-serif;
+    margin: 10px 0 10px 0;
+    color: black;
+    font-size: 16px;
+}
+
+#sidebar {
+    font-size: 10px;
+    display: block;
+    position: fixed;
+    margin: 10px auto 10px 30px;
+}
+
+#sidebar a {
+    display: block;
+    margin: 5px 0 5px 0;
+}
+
+#main_content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-left: 300px;
+}
+
+#main_content div {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+#user_setting {
+    margin-top: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#user_setting form div {
+    margin: 10px 5px 10px 5px;
+    height: 40px;
 }
 
 #copyright {
@@ -108,15 +142,23 @@ input[type="submit"] {
     width: 100%;
 }
 
-.field {
-    font-family: 'Noto Sans TC', sans-serif;
-    margin: 10px 0 10px 0;
-    color: black;
-    font-size: 20px;
+.column span {
+    display: inline-block;
+    width: 80px;
+    height: 20px;
+    text-align: center;
 }
 
-@media only screen and (max-width: 1200px) {
-    #sidebar {
-        position: relative;
-    }
+.column div input {
+    margin: 0 0 0 0;
+    border: 0px;
+    width: 76px;
+}
+
+.column div input[type="checkbox"] {
+    width: 80px;
+}
+
+.column .email {
+    width: 96px;
 }

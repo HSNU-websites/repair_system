@@ -1,3 +1,9 @@
+#messages {
+    width: 65vw;
+    display: block;
+    margin: 0 auto 0 auto;
+}
+
 .flash-message {
     color: white;
     transition: 0.3s;

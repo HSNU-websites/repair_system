@@ -6,11 +6,11 @@ from ..database.db_helper import (
     render_items,
     render_records,
     get_user,
+    update_users,
 )
 from ..forms import ReportForm
 from ..mail_helper import send_report_mail
 from . import user_bp
-from app import user
 
 
 @user_bp.route("/report", methods=["GET", "POST"])
@@ -25,10 +25,10 @@ def report_page():
     if request.method == "POST":
         if form.validate_on_submit():
             current_app.logger.info("POST /report")
-            building_id = form.building.data  # type: int
-            location = form.location.data  # type: str
-            item_id = form.item.data  # type: int
-            description = form.description.data  # type: str
+            building_id: int = form.building.data
+            location: str = form.location.data
+            item_id: int = form.item.data
+            description: str = form.description.data
             add_record(current_user.id, building_id, location, item_id, description)
             send_report_mail(
                 current_user.id, building_id, location, item_id, description
@@ -55,3 +55,20 @@ def dashboard_page(page=1):
             {"user_id": current_user.id}, page
         ),
     )
+
+
+@user_bp.route("/user_setting", methods=["GET", "POST"])
+@login_required
+def user_setting_page():
+    if request.method == "GET":
+        current_app.logger.info("GET /user_setting")
+        return render_template("user_setting.html", user=get_user(current_user.id))
+    if request.method == "POST":
+        email = request.form.get("email")
+        password = request.form.get("password")
+        data = {"id": current_user.id, "email": email}
+        if password != "":
+            data["password"] = password
+        update_users([data])
+        flash("OK", category="success")
+        return render_template("user_setting.html", user=get_user(current_user.id))

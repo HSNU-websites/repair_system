@@ -29,78 +29,10 @@ hr {
     width: 420px
 }
 
-input[type="text"] {
-    margin: 5px 10px 5px 10px;
-}
-
-input[type="text"] {
-    margin: 5px 10px 5px 10px;
-    font-family: 'Noto Sans TC', sans-serif;
-    background: #FFFFFF;
-    color: black;
-    border: 1px solid #d1d1d1;
-    border-radius: 5px;
-    height: 20px;
-    outline: none;
-    -webkit-transition: .18s ease-out;
-    -moz-transition: .18s ease-out;
-    -o-transition: .18s ease-out;
-    transition: .18s ease-out;
-}
-
-input[type="text"]:focus {
-    border: 1px solid rgb(13, 142, 194);
-    box-shadow: inset 5px 10px 4px rgba(13, 142, 194, 0.07)
-}
-
-select {
-    background-color: white;
-    height: 25px;
-    border-radius: 3px;
-    outline: none;
-}
-
-button {
-    font-family: 'Noto Sans TC', sans-serif;
-    margin-left: 10px;
-    border-color: rgba(255, 255, 255, 0);
-    border-radius: 5px;
-    height: 30px;
-    width: 50px;
-    background-color: white;
-}
-
-button:hover {
-    opacity: 0.8;
-}
-
 .container {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.add {
-    color: rgb(38, 168, 38);
-}
-
-.remove {
-    color: crimson;
-}
-
-.update {
-    color: blue;
-}
-
-#sidebar {
-    display: block;
-    position: fixed;
-    margin: 10px auto 10px 30px;
-}
-
-#sidebar a {
-    display: block;
-    margin: 5px 0 5px 0;
 }
 
 #tip {
@@ -124,10 +56,4 @@ button:hover {
 
 #copyright a:hover {
     text-decoration: underline;
-}
-
-@media only screen and (max-width: 700px) {
-    #sidebar {
-        position: relative;
-    }
 }

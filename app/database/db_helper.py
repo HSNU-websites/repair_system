@@ -42,10 +42,10 @@ def render_buildings():
 
 
 def render_system_setting():
-    buildings = map(get_dict, Buildings.query.order_by(Buildings.sequence).all())
-    items = map(get_dict, Items.query.order_by(Items.sequence).all())
-    offices = map(get_dict, Offices.query.order_by(Offices.sequence).all())
-    statuses = map(get_dict, Statuses.query.order_by(Statuses.sequence).all())
+    buildings = list(map(get_dict, Buildings.query.order_by(Buildings.sequence).all()))
+    items = list(map(get_dict, Items.query.order_by(Items.sequence).all()))
+    offices = list(map(get_dict, Offices.query.order_by(Offices.sequence).all()))
+    statuses = list(map(get_dict, Statuses.query.order_by(Statuses.sequence).all()))
     return (buildings, items, offices, statuses)
 
 
@@ -129,12 +129,13 @@ def add_record(user_id, building_id, location, item_id, description):
 
 def get_user(user_id) -> dict:
     user = db.session.query(
-        Users.username, Users.name, Users.classnum
+        Users.username, Users.name, Users.classnum, Users.email
     ).filter_by(id=user_id).first()
     return {
         "username": user.username,
         "name": user.name,
-        "classnum": user.classnum
+        "classnum": user.classnum,
+        "email": user.email,
     }
 
 

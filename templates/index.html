@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
     <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
     <title>國立臺灣師大附中校園修繕線上通報系統</title>
@@ -16,7 +17,8 @@
 
 <body>
     <a href="/"><img src="{{ url_for('static', filename='logo.png') }}" id="logo"></a>
-    <div class="container" id="index">
+    <div id="messages">{{ display_msg(messages) }}</div>
+    <div class="container">
         <form action="/" method="POST">
             {{ form.csrf_token }}
             <div class="field">
@@ -30,7 +32,6 @@
             <div class="field">
                 {{ form.submit }}
             </div>
-            <div>{{ display_msg(messages) }}</div>
         </form>
     </div>
     <footer>

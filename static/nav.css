@@ -1,0 +1,46 @@
+nav {
+    z-index: 100;
+    width: 100%;
+    top: 0;
+    position: sticky;
+    height: 40px;
+    background-color: rgb(173, 216, 230);
+}
+
+nav span {
+    font-size: 16px;
+    margin: 9px 6px 9px 6px;
+    text-decoration: none;
+    color: black;
+    display: inline-block;
+    text-underline-offset: 5px;
+}
+
+nav span:first-child {
+    margin-left: 10px;
+}
+
+nav span:nth-last-child(2) {
+    /* reverse order due to "float: right" */
+    margin-right: 10px;
+}
+
+nav a:hover {
+    color: rgba(0, 0, 0, 0.5);
+    text-decoration: underline;
+}
+
+nav a.active {
+    text-decoration: underline;
+}
+
+.right {
+    float: right;
+}
+
+@media only screen and (max-width: 600px) {
+    nav span {
+        font-size: 12px;
+        margin: 11px 1px 11px 1px;
+    }
+}

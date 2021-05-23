@@ -1,6 +1,4 @@
 from flask_wtf import FlaskForm
-from flask_wtf.recaptcha import Recaptcha
-from flask_wtf.recaptcha import RecaptchaField
 from wtforms import PasswordField, SelectField, StringField, SubmitField
 from wtforms.fields.html5 import EmailField
 from flask_wtf.file import FileField, FileRequired
@@ -24,9 +22,6 @@ class ReportForm(FlaskForm):
     location = StringField("地點: ", validators=[DataRequired()])
     item = SelectField("損壞物件: ", validators=[DataRequired()])
     description = StringField("狀況描述: ", validators=[DataRequired()])
-    recaptcha = RecaptchaField(
-        validators=[Recaptcha(message="Please click 'I am not a robot.'")]
-    )
     submit = SubmitField("報修")
 
 
