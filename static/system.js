@@ -61,17 +61,22 @@ function send_update(element) {
     for (var i = 0; i < info.length; i++) {
         if (info[i].tagName == "DIV") {
             var description = info[i].children[0].value;
-            var sequence = parseInt(info[i].children[1].value);
             // check whether empty
-            if (description == "" || sequence == "") {
+            if (description == "") {
                 alert("Empty value is invalid.");
                 return;
             }
-            result.push({
+            var data = {
                 id: parseInt(info[i].id.split("_")[1]),
                 description: description,
-                sequence: sequence
-            })
+                sequence: i
+            }
+            if (category == "items") {
+                var office = info[i].children[1];
+                var office_id = office.options[office.selectedIndex].value;
+                data.office_id = parseInt(office_id);
+            }
+            result.push(data)
         }
     }
     $.ajax({
@@ -90,3 +95,13 @@ function send_update(element) {
             }
         })
 }
+
+// drag effect
+$(function () {
+    $(".container div").sortable({
+        items: "div",
+        cursor: "move",
+        opacity: 0.6,
+        containment: "parent",
+    });
+});

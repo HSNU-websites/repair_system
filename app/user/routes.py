@@ -8,11 +8,12 @@ from ..database.db_helper import (
     get_user,
     update_users,
 )
-from ..forms import ReportForm
+from ..forms import ReportForm, UserSettingForm
 from ..mail_helper import send_report_mail
 from . import user_bp
 
 
+# The page allows students to report broken items.
 @user_bp.route("/report", methods=["GET", "POST"])
 @login_required
 def report_page():
@@ -44,6 +45,7 @@ def report_page():
             return render_template("report.html", form=form)
 
 
+# The page is student's dashboard, and he or she can browse all his or her reports here.
 @user_bp.route("/dashboard/", methods=["GET"])
 @user_bp.route("/dashboard/<int:page>", methods=["GET"])
 @login_required
@@ -57,18 +59,28 @@ def dashboard_page(page=1):
     )
 
 
+# The page allows users, whether they are students or admins, to set their emails and passwords.
 @user_bp.route("/user_setting", methods=["GET", "POST"])
 @login_required
 def user_setting_page():
+    user = get_user(current_user.id)
+    form = UserSettingForm(email=user["email"])
     if request.method == "GET":
         current_app.logger.info("GET /user_setting")
-        return render_template("user_setting.html", user=get_user(current_user.id))
+        return render_template("user_setting.html", user=user, form=form)
     if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
-        data = {"id": current_user.id, "email": email}
-        if password != "":
-            data["password"] = password
-        update_users([data])
-        flash("OK", category="success")
-        return render_template("user_setting.html", user=get_user(current_user.id))
+        if form.validate_on_submit():
+            current_app.logger.info("POST /user_setting")
+            email = form.email.data
+            password = form.password.data
+            data = {"id": current_user.id, "email": email}
+            if password != "":
+                data["password"] = password
+            update_users([data])
+            flash("OK", category="success")
+        else:
+            current_app.logger.info("POST /user_setting: Invalid submit.")
+            for _, errorMessages in form.errors.items():
+                for err in errorMessages:
+                    flash(err, category="alert")
+        return render_template("user_setting.html", user=user, form=form)
