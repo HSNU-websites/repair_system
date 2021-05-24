@@ -65,6 +65,7 @@
             </form>
         </div>
         <div id="reply_window">
+            <div class="closebtn" onclick="hide(this.parentElement);">&#10006;</div>
             <div class="field">
                 <label for="status">狀態: </label>
                 <select name="status" id="status">
@@ -120,7 +121,7 @@
                     <td style="width: 200px;">
                         <div style="text-align: left;">
                             {% for revision in record["revisions"] %}
-                            <div><b>維護人: </b>{{ revision["user"]["username"] }}</div>
+                            <div><b>維護人: </b>{{ revision["user"]["name"] }}</div>
                             <div><b>狀態: </b>{{ revision["status"] }}</div>
                             <div><b>時間: </b>{{ revision["insert_time"] }}</div>
                             <div><b>描述: </b>{{ revision["description"] }}</div>

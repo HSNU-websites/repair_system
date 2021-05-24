@@ -8,10 +8,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='system.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
     <script src="//code.jquery.com/jquery-1.12.4.js"></script>
-    <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
-    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
     <script src="{{ url_for('static', filename='system.js') }}"></script>
     <title>系統設定</title>
 </head>
@@ -29,12 +30,13 @@
         </nav>
     </nav>
     <h1>系統設定</h1>
-    <p id="tip">拖曳可改變順序</p>
+    <p id="tip">長按左邊按鈕可拖曳改變順序</p>
     <div class="container">
         <div id="buildings">
             <h3>大樓</h3>
             {% for building in buildings %}
             <div id="buildings_{{ building['id'] }}">
+                <span class="hamburger">&#8801;</span>
                 <input type="text" value="{{ building['description'] }}">
                 <button class="remove" onclick="send_remove(this);">移除</button>
             </div>
@@ -51,12 +53,14 @@
             <h3>物件</h3>
             {% for item in items %}
             <div id="items_{{ item['id'] }}">
+                <span class="hamburger">&#8801;</span>
                 <input type="text" value="{{ item['description'] }}">
                 <select>
                     {% for office in offices %}
-                    <option value="{{ office['id'] }}" {% if office["id"] == item["office_id"] %} selected {% endif %}>{{ office['description'] }}</option>
+                    <option value="{{ office['id'] }}" {% if office["id"]==item["office_id"] %} selected {% endif %}>{{
+                        office['description'] }}</option>
                     {% endfor %}
-                </select>    
+                </select>
                 <button class="remove" onclick="send_remove(this);">移除</button>
             </div>
             {% endfor %}
@@ -77,6 +81,7 @@
             <h3>處室</h3>
             {% for office in offices %}
             <div id="offices_{{ office['id'] }}">
+                <span class="hamburger">&#8801;</span>
                 <input type="text" value="{{ office['description'] }}">
                 <button class="remove" onclick="send_remove(this);">移除</button>
             </div>
@@ -93,6 +98,7 @@
             <h3>狀態</h3>
             {% for status in statuses %}
             <div id="statuses_{{ status['id'] }}">
+                <span class="hamburger">&#8801;</span>
                 <input type="text" value="{{ status['description'] }}">
                 <button class="remove" onclick="send_remove(this);">移除</button>
             </div>

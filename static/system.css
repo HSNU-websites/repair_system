@@ -35,6 +35,19 @@ hr {
     align-items: center;
 }
 
+.hamburger {
+    display: inline-block;
+    text-align: center;
+    font-weight: bolder;
+    width: 25px;
+    height: 22px;
+    cursor: move;
+}
+
+.hamburger:hover {
+    opacity: 0.8;
+}
+
 #tip {
     font-family: 'Noto Sans TC', sans-serif;
     text-align: center;

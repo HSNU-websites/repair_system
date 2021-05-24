@@ -139,6 +139,9 @@ input[type="submit"] {
     display: block;
     right: 10px;
     visibility: hidden;
+    padding: 20px 10px 20px 10px;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: 0.3s;
 }
 
 #reply_window label {
@@ -147,6 +150,18 @@ input[type="submit"] {
 
 #reply_window input {
     width: 100px;
+}
+
+#reply_window .closebtn {
+    cursor: pointer;
+    color: black;
+    float: right;
+    font-size: 18px;
+    transition: 0.3s;
+}
+
+#reply_window .closebtn:hover {
+    color: red;
 }
 
 #main_content {
