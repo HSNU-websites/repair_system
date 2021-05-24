@@ -63,14 +63,14 @@ function send_update(element) {
             var description = info[i].children[0].value;
             var sequence = parseInt(info[i].children[1].value);
             // check whether empty
-            if (description == "" || sequence == "") {
+            if (description == "") {
                 alert("Empty value is invalid.");
                 return;
             }
             result.push({
                 id: parseInt(info[i].id.split("_")[1]),
                 description: description,
-                sequence: sequence
+                sequence: i
             })
         }
     }
@@ -90,3 +90,13 @@ function send_update(element) {
             }
         })
 }
+
+// drag effect
+$(function() {
+    $( ".container div" ).sortable({
+        items: "div",
+        cursor: "move",
+        opacity: 0.6,
+        containment: "parent",   
+    });
+});
