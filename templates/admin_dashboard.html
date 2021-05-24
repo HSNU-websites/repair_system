@@ -124,14 +124,14 @@
                             <div><b>狀態: </b>{{ revision["status"] }}</div>
                             <div><b>時間: </b>{{ revision["insert_time"] }}</div>
                             <div><b>描述: </b>{{ revision["description"] }}</div>
-                            <button class="remove" onclick="send_remove('revision', {{ revision['id'] }});">刪除</button>
+                            <button class="remove" onclick="send_remove('revision', {{ revision['id'] }});" style="margin: 3px 0 3px 1px;">刪除</button>
                             {% if loop.index < record["revisions"] | length %}<hr>{% endif %}
                                 {% endfor %}
                         </div>
                     </td>
                     <td style="border: none;">
                         <button class="update" onclick="show_reply_window(this, {{ record['id'] }});">回覆</button>
-                        <div style="height: 10px;"></div>
+                        <div style="height: 5px;"></div>
                         <button class="remove" onclick="send_remove('record', {{ record['id'] }});">刪除</button>
                     </td>
                 </tr>

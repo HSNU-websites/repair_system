@@ -48,18 +48,22 @@
     <hr>
     <div class="container">
         <div id="items">
-            <!-- TODO render office -->
             <h3>物件</h3>
             {% for item in items %}
             <div id="items_{{ item['id'] }}">
                 <input type="text" value="{{ item['description'] }}">
+                <select>
+                    {% for office in offices %}
+                    <option value="{{ office['id'] }}" {% if office["id"] == item["office_id"] %} selected {% endif %}>{{ office['description'] }}</option>
+                    {% endfor %}
+                </select>    
                 <button class="remove" onclick="send_remove(this);">移除</button>
             </div>
             {% endfor %}
             <input type="text" name="add">
             <select name="offices" id="offices">
                 {% for office in offices %}
-                    <option value="{{ office['id'] }}">{{ office['description'] }}</option>
+                <option value="{{ office['id'] }}">{{ office['description'] }}</option>
                 {% endfor %}
             </select>
             <button class="add" onclick="send_add(this);">新增</button>

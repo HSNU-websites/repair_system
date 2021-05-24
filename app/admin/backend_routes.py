@@ -21,7 +21,12 @@ from ..database.db_helper import (
 def admin_dashboard_backend_page():
     if request.method == "POST":
         data = request.get_json(force=True)
-        add_revision(int(data["record_id"]), current_user.id, int(data["status_id"]), data["description"])
+        add_revision(
+            int(data["record_id"]),
+            current_user.id,
+            int(data["status_id"]),
+            data["description"],
+        )
         return "OK"
     if request.method == "DELETE":
         data = request.get_json(force=True)
@@ -65,14 +70,14 @@ def system_modification_page():
         data = request.get_json(force=True)
         category = data[0]["category"]
         for r in data[1:]:
-            if not update(
-                category,
-                {
-                    "id": r["id"],
-                    "description": r["description"],
-                    "sequence": r["sequence"],
-                },
-            ):
+            new = {
+                "id": r["id"],
+                "description": r["description"],
+                "sequence": r["sequence"],
+            }
+            if r.get("office_id", None):
+                new["office_id"] = r["office_id"]
+            if not update(category, new):
                 return "Error", 400
         return "OK"
 
