@@ -63,24 +63,23 @@
                     {{ form.submit }}
                 </div>
             </form>
-            <hr>
-            <div id="reply_window">
-                <div class="field">
-                    <label for="status">狀態: </label>
-                    <select name="status" id="status">
-                        {% for status in statuses %}
-                        <option value="{{ status['id'] }}">{{ status['description'] }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="field">
-                    <label for="description">額外敘述: </label>
-                    <br>
-                    <textarea name="description" placeholder="Description" cols="20" rows="10"></textarea>
-                </div>
-                <div class="field">
-                    <button class="add" onclick="send_reply_record(this)">回覆</button>
-                </div>
+        </div>
+        <div id="reply_window">
+            <div class="field">
+                <label for="status">狀態: </label>
+                <select name="status" id="status">
+                    {% for status in statuses %}
+                    <option value="{{ status['id'] }}">{{ status['description'] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label for="description">額外敘述: </label>
+                <br>
+                <textarea name="description" placeholder="Description" cols="20" rows="10"></textarea>
+            </div>
+            <div class="field">
+                <button class="add" onclick="send_reply_record(this);">回覆</button>
             </div>
         </div>
         <table>
@@ -131,7 +130,7 @@
                         </div>
                     </td>
                     <td style="border: none;">
-                        <button class="update" onclick="show_reply_window({{ record['id'] }});">回覆</button>
+                        <button class="update" onclick="show_reply_window(this, {{ record['id'] }});">回覆</button>
                         <div style="height: 10px;"></div>
                         <button class="remove" onclick="send_remove('record', {{ record['id'] }});">刪除</button>
                     </td>

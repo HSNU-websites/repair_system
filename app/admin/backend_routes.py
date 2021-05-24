@@ -1,8 +1,17 @@
 from flask import request, current_app
-from flask_login import login_required
+from flask_login import login_required, current_user
 from . import admin_bp
 from ..users import admin_required
-from ..database.db_helper import delete, update, insert, del_users, update_users
+from ..database.db_helper import (
+    delete,
+    update,
+    insert,
+    del_users,
+    update_users,
+    add_revision,
+    del_revisions,
+    del_records,
+)
 
 
 # The page receives the response to the report and the command to delete a report or a revision.
@@ -12,11 +21,16 @@ from ..database.db_helper import delete, update, insert, del_users, update_users
 def admin_dashboard_backend_page():
     if request.method == "POST":
         data = request.get_json(force=True)
-        print(data)
+        add_revision(int(data["record_id"]), current_user.id, int(data["status_id"]), data["description"])
         return "OK"
     if request.method == "DELETE":
         data = request.get_json(force=True)
-        print(data)
+        category = data["category"]
+        id = int(data["id"])
+        if category == "record":
+            del_records([id])
+        if category == "revision":
+            del_revisions([id])
         return "OK"
 
 

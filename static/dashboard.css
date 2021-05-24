@@ -134,6 +134,10 @@ input[type="submit"] {
 }
 
 #reply_window {
+    font-size: 12px;
+    position: fixed;
+    display: block;
+    right: 10px;
     visibility: hidden;
 }
 

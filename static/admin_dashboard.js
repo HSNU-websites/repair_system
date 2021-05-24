@@ -16,7 +16,12 @@ function send_remove(category, id) {
         })
 }
 
-function show_reply_window(record_id) {
+function show_reply_window(element, record_id) {
+    var parent = element.parentElement.parentElement.parentElement;
+    for (i=0;i<parent.children.length;i++){
+        parent.children[i].style.backgroundColor = "rgba(255, 255, 255, 0)";
+    }
+    element.parentElement.parentElement.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
     var reply_window = document.getElementById("reply_window");
     reply_window.children[2].children[0].id = record_id;
     reply_window.style.visibility = "visible";
