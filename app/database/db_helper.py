@@ -125,7 +125,26 @@ def add_record(user_id, building_id, location, item_id, description):
         Records(user_id, item_id, building_id, location, description)
     )
     db.session.commit()
+    # TODO unfinisheds
 
+def del_records(ids:list[int]):
+    for id in ids:
+        Revisions.query.filter_by(record_id=id).delete()
+        Unfinisheds.query.filter_by(record_id=id).delete()
+        Records.query.filter_by(id=id).delete()
+    db.session.commit()
+
+
+def add_revision(record_id, user_id, status_id, description):
+    rev = Revisions(record_id=record_id, user_id=user_id,status_id=status_id, description=description)
+    db.session.add(rev)
+    db.session.commit()
+    # TODO: update_time
+
+def del_revisions(ids:list[int]):
+    for id in ids:
+        Revisions.query.filter_by(id=id).delete()
+    db.session.commit()
 
 def get_user(user_id) -> dict:
     user = db.session.query(
