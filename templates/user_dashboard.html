@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&display=swap" rel="stylesheet">
     <title>報修紀錄</title>
     {% if records["pages"] != 0 %}
         {% if records["page"] < 1 %}

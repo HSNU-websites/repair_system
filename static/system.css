@@ -18,6 +18,7 @@ a:hover {
 h1 {
     font-family: 'Noto Sans TC', sans-serif;
     text-align: center;
+    font-weight: normal;
 }
 
 h3 {
@@ -69,4 +70,10 @@ hr {
 
 #copyright a:hover {
     text-decoration: underline;
+}
+
+@media only screen and (max-height: 500px) {
+    #copyright {
+        visibility: hidden;
+    }
 }
