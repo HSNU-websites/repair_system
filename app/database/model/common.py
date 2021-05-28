@@ -11,25 +11,3 @@ finishedStatus_id = 2
 passwd_context = CryptContext(  # First scheme will be default
     schemes=["pbkdf2_sha256", "sha512_crypt"], deprecated="auto"
 )
-
-
-def get_dict(row):
-    """
-    Get pure dict from table without relationship.
-    datetime.datetime will be converted to str
-    """
-    import datetime
-
-    def process_value(value):
-        if isinstance(value, datetime.datetime):
-            return value.strftime(timeformat)
-        else:
-            return value
-
-    if type(row) not in allTables:
-        return {}
-    else:
-        return {
-            key: process_value(row.__dict__[key])
-            for key in type(row).__mapper__.columns.keys()
-        }
