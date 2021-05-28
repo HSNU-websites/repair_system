@@ -13,20 +13,27 @@ class Items(db.Model):
 
     __tablename__ = "items"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    sequence = db.Column(db.Integer, server_default="0",
-                         nullable=False, index=True)
+    sequence = db.Column(db.Integer, nullable=False, index=True)
     office_id = db.Column(db.ForeignKey("offices.id"), nullable=False)
     description = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, description, office_id, sequence=None, **kwargs):
+    def __init__(self, id, sequence, office_id, description):
+        self.id = id
         self.sequence = sequence
         self.office_id = office_id
         self.description = description
-        if "id" in kwargs:
-            self.id = kwargs["id"]
 
     def __repr__(self):
         return (
             "Items(id={id},sequence={sequence},office_id={office_id},description='{description}')"
             .format(**self.__dict__)
+        )
+
+    @classmethod
+    def new(cls, description, office_id, sequence=0):
+        return cls(
+            id=None,
+            sequence=sequence,
+            office_id=office_id,
+            description=description
         )

@@ -12,7 +12,8 @@ class Records(db.Model):
     item_id: `id` in `Items` table.
     building_id: `id` in `Buildings` table.
     location: The detailed place which is written by the reporter.
-    time: Revision time. The value will be automatically added.
+    insert_time: Revision time. The value will be automatically added.
+    update_time: Should be updated when new revision is added.
     description: The detailed description about the broken items and is written by the reporter.
     """
 
@@ -21,32 +22,20 @@ class Records(db.Model):
     user_id = db.Column(db.ForeignKey("users.id"), nullable=False, index=True)
     item_id = db.Column(db.ForeignKey("items.id"), nullable=False)
     building_id = db.Column(db.ForeignKey("buildings.id"), nullable=False)
+    insert_time = db.Column(db.TIMESTAMP, nullable=False)
+    update_time = db.Column(db.TIMESTAMP, nullable=False, index=True)
     location = db.Column(db.String(255), nullable=False)
-    insert_time = db.Column(
-        db.TIMESTAMP, server_default=db.func.now(), nullable=False
-    )
-    update_time = db.Column(
-        db.TIMESTAMP, server_default=db.func.now(), nullable=False, index=True
-    )
     description = db.Column(db.String(255), nullable=False)
-    # revisions = db.relationship("Revisions")
 
-    def __init__(self, user_id, item_id, building_id, location, description, **kwargs):
+    def __init__(self, id, user_id, item_id, building_id, insert_time, update_time, location, description):
+        self.id = id
         self.user_id = user_id
         self.item_id = item_id
         self.building_id = building_id
+        self.insert_time = insert_time
+        self.update_time = update_time
         self.location = location
         self.description = description
-        if "id" in kwargs:
-            self.id = kwargs["id"]
-        if "insert_time" in kwargs:
-            self.insert_time = datetime.datetime.strptime(
-                kwargs["insert_time"], timeformat)
-        if "update_time" in kwargs:
-            self.update_time = datetime.datetime.strptime(
-                kwargs["update_time"], timeformat)
-        else:
-            self.update_time = self.insert_time
 
     def __repr__(self):
         return (
@@ -54,7 +43,25 @@ class Records(db.Model):
             .format(myinserttime=self.insert_time.strftime(timeformat), myupdatetime=self.update_time.strftime(timeformat), **self.__dict__)
         )
 
-    @staticmethod
-    def update(id):
-        Records.query.filter_by(id=id).update(
-            {"update_time": db.text("CURRENT_TIMESTAMP")})
+    @classmethod
+    def new(cls, user_id, item_id, building_id, location="", description="", insert_time=None, update_time=None):
+        if insert_time is not None:
+            it = datetime.datetime.strptime(insert_time, timeformat)
+        else:
+            it = datetime.datetime.now().replace(microsecond=0)
+
+        if update_time is not None:
+            ut = datetime.datetime.strptime(update_time, timeformat)
+        else:
+            ut = it
+
+        return cls(
+            id=None,
+            user_id=user_id,
+            item_id=item_id,
+            building_id=building_id,
+            insert_time=it,
+            update_time=ut,
+            location=location,
+            description=description
+        )
