@@ -277,7 +277,7 @@ def insert(tablename: str, data: dict):
     try:
         if (t := tablenameRev[tablename]) not in sequenceTables:
             return False
-        db.session.add(t(**data))
+        db.session.add(t.new(**data))
         db.session.commit()
         updateSequence([t])
         return True
