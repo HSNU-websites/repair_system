@@ -219,6 +219,11 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
         if valid := valid and unfin_query.count() > 0:
             q = q.filter(Records.user_id.in_(unfin_query))
 
+    if valid and "unfinished_only" in Filter and Filter.pop("unfinished_only"):
+        unfin_query = db.session.query(Unfinisheds.record_id)
+        q = q.filter(Records.id.in_(unfin_query))
+
+
     if valid:
         Filter = {
             key: value
