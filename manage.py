@@ -2,14 +2,14 @@ import unittest
 from datetime import datetime, timedelta
 from random import randint
 
-from flask_script import Command, Manager
+from flask_script import Manager
 
 import app.database.backup as b
 import app.database.db_helper as h
 import app.mail_helper as m
 import db_default
 from app import create_app, db
-from app.database.model import *
+from app.database.model import Users, Buildings, Items, Offices, Records, Revisions, Statuses, timeformat
 
 app = create_app("development")
 manager = Manager(app)

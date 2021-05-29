@@ -4,7 +4,11 @@ from app import create_app, db
 from app.database.model import Users
 
 
-class ReportFormTest(unittest.TestCase):
+class FormTest(unittest.TestCase):
+    """
+    A test model to help other tests related to forms.
+    """
+
     def setUp(self) -> None:
         self.app = create_app("testing")
         self.client = self.app.test_client()
@@ -31,10 +35,16 @@ class ReportFormTest(unittest.TestCase):
     def login(self):
         return self.client.post(url_for("main.index_page"), data=self.login_data)
 
+
+class ReportFormTest(FormTest):
+    """
+    In this test, we test whether report form behaves properly.
+    """
+
     def test_report_page(self):
         with self.client:
             self.login()
-            r = self.client.post(
+            response = self.client.post(
                 url_for("user.report_page"),
                 data={
                     "building": "None",
@@ -43,22 +53,28 @@ class ReportFormTest(unittest.TestCase):
                     "description": "None",
                 },
             )
-            self.assertTrue(r.status_code == 200)
+            self.assertTrue(response.status_code == 200)
+
+
+class SystemModificationTest(FormTest):
+    """
+    In this test, we test whether operations to system settings is available.
+    """
 
     def test_system_modification_page_ok(self):
         with self.client:
             self.login()
-            r = self.client.delete(
+            response = self.client.delete(
                 url_for("admin.system_modification_page"),
                 json={"category": "offices", "id": "1"},
             )
-            self.assertTrue(r.status_code == 200)
+            self.assertTrue(response.status_code == 200)
 
     def test_system_modification_page_bad_request(self):
         with self.client:
             self.login()
-            r = self.client.post(
+            response = self.client.post(
                 url_for("admin.system_modification_page"),
                 json={"category": "items", "value": "test_item"},
             )
-            self.assertTrue(r.status_code == 400)
+            self.assertTrue(response.status_code == 400)

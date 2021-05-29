@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&display=swap" rel="stylesheet">
     <style>
         @media only screen and (max-width: 1200px) {
             #sidebar {
@@ -98,12 +100,12 @@
                 <a href="1" {% if users['page'] <=1 %} class="end" {% endif %}>&#8249;&#8249;</a>
                 <a href="{{ users['page'] - 1 }}" {% if users['page'] <=1 %} class="end" {% endif %}>&#8249;</a>
                 <span>{{ users["page"] }} / {{ users["pages"] }}</span>
-                <a href="{{ users['page'] + 1 }}" {% if users['page']>= users['pages'] %}
-                    class="end" {% endif
-                    %}>&#8250;</a>
-                <a href="{{ users['pages'] }}" {% if users['page']>= users['pages'] %}
-                    class="end" {% endif
-                    %}>&#8250;&#8250;</a>
+                <a href="{{ users['page'] + 1 }}" {% if users['page']>= users['pages'] %} class="end" {% endif %}>
+                    &#8250;
+                </a>
+                <a href="{{ users['pages'] }}" {% if users['page']>= users['pages'] %} class="end" {% endif %}>
+                    &#8250;&#8250;
+                </a>
             </div>
             <div class="column">
                 <div>

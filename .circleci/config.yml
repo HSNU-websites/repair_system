@@ -18,7 +18,6 @@ jobs:
             SECRET_KEY: ${SECRET_KEY}
 
 
-
 workflows:
   main:
     jobs:
