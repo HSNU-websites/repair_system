@@ -1,5 +1,6 @@
 import random
 import math
+import string
 
 from flask_login import UserMixin
 
@@ -112,7 +113,7 @@ def updateSequence(tables=None):
 
 
 def random_string(length):
-    s = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    s = string.digits + string.ascii_letters
     return "".join(random.choices(s, k=length))
 
 
