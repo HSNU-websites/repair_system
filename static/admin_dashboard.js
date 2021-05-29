@@ -30,7 +30,7 @@ function show_reply_window(element, record_id) {
     // change color because the one is chosen to reply
     element.parentElement.parentElement.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
     var reply_window = document.getElementById("reply_window");
-    reply_window.children[2].children[0].id = record_id;
+    reply_window.children[3].children[0].id = record_id;
     reply_window.style.display = "block";
 }
 
@@ -48,10 +48,10 @@ function send_reply_record(element) {
     // record_id
     var record_id = element.id
     // status
-    var status = parent.children[0].children[1];
-    var status_id = parseInt(status.options[status.selectedIndex].value);
+    var status = parent.children[1].children[1];
+    var status_id = parseInt(status[status.selectedIndex].value);
     // description
-    var description = parent.children[1].children[2].value;
+    var description = parent.children[2].children[2].value;
     $.ajax({
         url: "/admin_dashboard_backend",
         type: "post",

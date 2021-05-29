@@ -118,7 +118,7 @@
                     <td>{{ record["location"] }}</td>
                     <td>{{ record["item"] }}</td>
                     <td>{{ record["description"] }}</td>
-                    <td>{{ record["insert_time"] }}</td>
+                    <td title="{{ record['insert_time'] }}">{{ record["insert_date"] }}</td>
                     <td>
                         <div>
                             {% for revision in record["revisions"] %}

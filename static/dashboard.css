@@ -54,15 +54,23 @@ tbody tr:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
+td {
+    word-break: break-word;
+    word-wrap: break-word;
+}
+
 td:nth-child(3) {
     width: 100px;
-    word-wrap: break-word;
+}
+
+td:nth-child(2) {
+    /* building field */
+    width: 80px;
 }
 
 td:nth-child(5) {
     /* description field */
     width: 200px;
-    word-wrap: break-word;
 }
 
 td:nth-child(7) > div {
