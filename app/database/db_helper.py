@@ -1,7 +1,6 @@
-from base64 import b64decode, b64encode
-from hashlib import sha256
-from math import ceil
-from os import urandom
+import random
+import math
+import string
 
 from flask_login import UserMixin
 
@@ -18,7 +17,9 @@ from .model import (
     sequenceTables,
     tablenameRev,
     timeformat,
+    dateformat,
     get_dict,
+    finishedStatus_id
 )
 
 
@@ -42,10 +43,10 @@ def render_buildings():
 
 
 def render_system_setting():
-    buildings = list(map(get_dict, Buildings.query.order_by(Buildings.sequence).all()))
-    items = list(map(get_dict, Items.query.order_by(Items.sequence).all()))
-    offices = list(map(get_dict, Offices.query.order_by(Offices.sequence).all()))
-    statuses = list(map(get_dict, Statuses.query.order_by(Statuses.sequence).all()))
+    buildings = [get_dict(row) for row in Buildings.query.order_by(Buildings.sequence).all()]
+    items = [get_dict(row) for row in Items.query.order_by(Items.sequence).all()]
+    offices = [get_dict(row) for row in Offices.query.order_by(Offices.sequence).all()]
+    statuses = [get_dict(row) for row in Statuses.query.order_by(Statuses.sequence).all()]
     return (buildings, items, offices, statuses)
 
 
@@ -78,16 +79,11 @@ def load_user(user_id: str):
 
 
 def updateUnfinisheds():
-    finishedStatus_id = 2
     Unfinisheds.query.delete()
     l = []
     for record in Records.query.all():
-        r = (
-            db.session.query(Revisions.status_id)
-            .filter_by(record_id=record.id)
-            .order_by(Revisions.id.desc()).first()
-        )
-        if not (r and r.status_id == finishedStatus_id):
+        r = db.session.query(Revisions.status_id).filter_by(record_id=record.id).order_by(Revisions.id.desc()).limit(1).scalar()
+        if r != finishedStatus_id:
             l.append({"record_id": record.id})
     db.session.bulk_insert_mappings(Unfinisheds, l)
     db.session.commit()
@@ -95,39 +91,47 @@ def updateUnfinisheds():
 
 def updateSequence(tables=None):
     """
-    table: a list of sequence tables
+    tables: a list of sequence tables
     assign rows where sequence=0
     """
     if tables is None:
         tables = sequenceTables
     else:
-        tables = filter(lambda x: x in sequenceTables, tables)
+        tables = [t for t in tables if t in sequenceTables]
 
-    for table in tables:
-        if r := db.session.query(db.func.max(table.sequence)).first():
+    for t in tables:
+        if r := db.session.query(db.func.max(t.sequence)).first():
             max = r[0]
         else:
             max = 0
         l = []
-        for row in table.query.filter_by(sequence=0).order_by(table.id).all():
+        for row in t.query.filter_by(sequence=0).order_by(t.id).all():
             row.sequence = (max := max + 1)
             l.append(row)
         db.session.bulk_save_objects(l)
     db.session.commit()
 
 
-def generateVerificationCode(user_id: int) -> str:
-    return b64encode(urandom(32))
+def random_string(length):
+    s = string.digits + string.ascii_letters
+    return "".join(random.choices(s, k=length))
 
 
 def add_record(user_id, building_id, location, item_id, description):
-    db.session.add(
-        Records(user_id, item_id, building_id, location, description)
+    r = Records.new(
+        user_id=user_id,
+        item_id=item_id,
+        building_id=building_id,
+        location=location,
+        description=description
     )
+    db.session.add(r)
     db.session.commit()
-    # TODO unfinisheds
+    db.session.add(Unfinisheds(record_id=r.id))
+    db.session.commit()
 
-def del_records(ids:list[int]):
+
+def del_records(ids: list[int]):
     for id in ids:
         Revisions.query.filter_by(record_id=id).delete()
         Unfinisheds.query.filter_by(record_id=id).delete()
@@ -136,15 +140,30 @@ def del_records(ids:list[int]):
 
 
 def add_revision(record_id, user_id, status_id, description):
-    rev = Revisions(record_id=record_id, user_id=user_id,status_id=status_id, description=description)
+    rev = Revisions.new(record_id=record_id, user_id=user_id, status_id=status_id, description=description)
+    Records.query.filter_by(id=record_id).update({"update_time": rev.insert_time})
+    if status_id == finishedStatus_id:
+        Unfinisheds.query.filter_by(record_id=record_id).delete()
+    else:
+        if Unfinisheds.query.filter_by(record_id=record_id).count() == 0:
+            db.session.add(Unfinisheds(record_id=record_id))
     db.session.add(rev)
     db.session.commit()
-    # TODO: update_time
 
-def del_revisions(ids:list[int]):
+
+def del_revisions(ids: list[int]):
     for id in ids:
+        record_id = db.session.query(Revisions.record_id).filter_by(id=id).scalar()
         Revisions.query.filter_by(id=id).delete()
+        rev = Revisions.query.filter_by(record_id=record_id).order_by(Revisions.id.desc()).first()
+        Records.query.filter_by(id=record_id).update({"update_time": rev.insert_time})
+        if rev.status_id == finishedStatus_id:
+            Unfinisheds.query.filter_by(record_id=record_id).delete()
+        else:
+            if Unfinisheds.query.filter_by(record_id=record_id).count() == 0:
+                db.session.add(Unfinisheds(record_id=record_id))
     db.session.commit()
+
 
 def get_user(user_id) -> dict:
     user = db.session.query(
@@ -179,13 +198,15 @@ def record_to_dict(record):
         "building": building,
         "location": record.location,
         "insert_time": record.insert_time.strftime(timeformat),
-        "update_time": record.update_time.strftime(timeformat),
+        "insert_date": record.insert_time.strftime(dateformat),
         "description": record.description,
         "revisions": l
     }
 
 
 def render_records(Filter=dict(), page=1, per_page=100) -> dict:
+    if page < 1:
+        page = 1
     q = Records.query
     valid = True
     if "username" in Filter:
@@ -216,12 +237,14 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
 
     return {
         "page": page,
-        "pages": ceil(q.count() / per_page) if valid else 0,
+        "pages": math.ceil(q.count() / per_page) if valid else 0,
         "records": l
     }
 
 
 def render_users(Filter=dict(), page=1, per_page=100) -> dict:
+    if page < 1:
+        page = 1
     q = Users.query
     Filter = {
         key: value
@@ -243,7 +266,7 @@ def render_users(Filter=dict(), page=1, per_page=100) -> dict:
         })
     return {
         "page": page,
-        "pages": ceil(q.count() / per_page),
+        "pages": math.ceil(q.count() / per_page),
         "users": l
     }
 
@@ -255,7 +278,7 @@ def insert(tablename: str, data: dict):
     try:
         if (t := tablenameRev[tablename]) not in sequenceTables:
             return False
-        db.session.add(t(**data))
+        db.session.add(t.new(**data))
         db.session.commit()
         updateSequence([t])
         return True
@@ -270,8 +293,7 @@ def update(tablename: str, data: dict):
     try:
         if (t := tablenameRev[tablename]) not in sequenceTables:
             return False
-        id = data.pop("id")
-        t.query.filter_by(id=id).update(data)
+        t.query.filter_by(id=data.pop("id")).update(data)
         db.session.commit()
         return True
     except:
@@ -320,7 +342,7 @@ def update_users(data: list[dict]):
                 l.append(user)
     db.session.bulk_save_objects(l)
     db.session.commit()
- 
+
 
 def del_users(ids: list[int], force=False):
     """

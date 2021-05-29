@@ -120,13 +120,13 @@ class Users(db.Model):
             db.session.commit()
         return result
 
-    @staticmethod
-    def username_exists(username):
-        return db.session.query(db.exists().where(Users.username == username)).scalar()
+    @classmethod
+    def username_exists(cls, username):
+        return db.session.query(db.exists().where(cls.username == username)).scalar()
 
-    @staticmethod
-    def new(username, password="", name="", classnum=0, email="", is_admin=False, is_valid=True, is_marked_deleted=False):
-        u = Users(
+    @classmethod
+    def new(cls, username, password="", name="", classnum=0, email="", is_admin=False, is_valid=True, is_marked_deleted=False):
+        u = cls(
             id=None,
             username=username,
             password_hash=passwd_context.hash(password) if password else "",

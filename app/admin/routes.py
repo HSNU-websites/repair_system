@@ -92,7 +92,7 @@ def manage_user_page(page=1):
         # Render all users
         current_app.logger.info("GET /manage_user")
         return render_template(
-            "manage_user.html", form=form, form_csv=form_csv, users=render_users()
+            "manage_user.html", form=form, form_csv=form_csv, users=render_users(page=page)
         )
     if request.method == "POST":
         # Add user

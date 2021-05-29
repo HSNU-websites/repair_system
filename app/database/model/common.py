@@ -3,9 +3,10 @@ from passlib.context import CryptContext
 
 db = SQLAlchemy()
 timeformat = r"%Y-%m-%dT%H:%M:%S"
+dateformat = r"%Y-%m-%d"
 filetimeformat = r"%Y-%m-%dT%H-%M-%S"
 timeformat_re_str = r"\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}"
-
+finishedStatus_id = 2
 
 passwd_context = CryptContext(  # First scheme will be default
     schemes=["pbkdf2_sha256", "sha512_crypt"], deprecated="auto"

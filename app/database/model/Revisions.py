@@ -11,7 +11,7 @@ class Revisions(db.Model):
     record_id: `id` in `Records` table.
     user_id: `id` in `Users` table.
     status_id: `id` in `Statuses` table.
-    time: Revision time. The value will be automatically added.
+    insert_time: Revision time. The value will be automatically added.
     description: If the admins fail to find a status for the situation, the field can be used.
     """
 
@@ -20,24 +20,35 @@ class Revisions(db.Model):
     record_id = db.Column(db.ForeignKey("records.id"), nullable=False)
     user_id = db.Column(db.ForeignKey("users.id"), nullable=False)
     status_id = db.Column(db.ForeignKey("statuses.id"), nullable=False)
-    insert_time = db.Column(
-        db.TIMESTAMP, server_default=db.func.now(), nullable=False, index=True
-    )
+    insert_time = db.Column(db.TIMESTAMP, nullable=False, index=True)
     description = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, record_id, user_id, status_id, description, **kwargs):
+    def __init__(self, id, record_id, user_id, status_id, insert_time, description):
+        self.id = id
         self.record_id = record_id
         self.user_id = user_id
         self.status_id = status_id
+        self.insert_time = insert_time
         self.description = description
-        if "id" in kwargs:
-            self.id = kwargs["id"]
-        if "insert_time" in kwargs:
-            self.insert_time = datetime.datetime.strptime(
-                kwargs["insert_time"], timeformat)
 
     def __repr__(self):
         return (
             "Revisions(id={id},record_id={record_id},user_id={user_id},status_id={status_id},insert_time='{mytime}',description='{description}')"
             .format(mytime=self.insert_time.strftime(timeformat), **self.__dict__)
+        )
+
+    @classmethod
+    def new(cls, record_id, user_id, status_id, description, insert_time=None):
+        if insert_time is not None:
+            it = datetime.datetime.strptime(insert_time, timeformat)
+        else:
+            it = datetime.datetime.now().replace(microsecond=0)
+
+        return cls(
+            id=None,
+            record_id=record_id,
+            user_id=user_id,
+            status_id=status_id,
+            insert_time=it,
+            description=description
         )
