@@ -4,6 +4,10 @@ from app import create_app
 
 
 class BasicTest(unittest.TestCase):
+    """
+    In this test, we do some basic tests to determine whether the website behaves properly in normal situation.
+    """
+
     def setUp(self):
         self.app = create_app("testing")
         self.client = self.app.test_client()
@@ -18,12 +22,12 @@ class BasicTest(unittest.TestCase):
         self.assertTrue(self.app.config["TESTING"])
 
     def test_alive(self):
-        r = self.client.get(url_for("main.index_page"))
-        self.assertTrue(r.status_code == 200)
+        response = self.client.get(url_for("main.index_page"))
+        self.assertTrue(response.status_code == 200)
 
     def test_404(self):
-        r = self.client.get("/wrong")
-        self.assertTrue(r.status_code == 404)
+        response = self.client.get("/wrong")
+        self.assertTrue(response.status_code == 404)
 
     def test_blueprint(self):
         self.assertTrue(self.app.blueprints.get("main", None))

@@ -12,7 +12,9 @@ body {
 }
 
 h1 {
+    font-family: 'Noto Sans TC', sans-serif;
     text-align: center;
+    font-weight: normal;
 }
 
 a {
@@ -30,42 +32,58 @@ table {
 }
 
 th, td {
-    font-family: 'Noto Sans TC', sans-serif;
     text-align: center;
     padding: 4px 10px 4px 10px;
     border: 1px solid black;
 }
 
-tr:hover {
+thead tr {
+    height: 50px;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #8ca5f5;
+}
+
+tbody td:last-child {
+    font-family: 'Noto Sans TC', sans-serif;
+    background-color: #a4b8fa;
+}
+
+tbody tr:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-input[type="text"], input[type="password"] {
-    background: #FFFFFF;
-    color: black;
-    border: 1px solid #d1d1d1;
-    border-radius: 5px;
-    height: 20px;
-    outline: none;
-    -webkit-transition: .18s ease-out;
-    -moz-transition: .18s ease-out;
-    -o-transition: .18s ease-out;
-    transition: .18s ease-out;
+td {
+    word-break: break-word;
+    word-wrap: break-word;
 }
 
-input[type="text"]:focus, input[type="password"]:focus {
-    border: 1px solid rgb(13, 142, 194);
-    box-shadow: inset 5px 10px 4px rgba(13, 142, 194, 0.07)
+td:nth-child(3) {
+    width: 100px;
 }
 
-input[type="submit"] {
-    width: 70px;
-    height: 40px;
-    border: 1px solid #d1d1d1;
-    border-radius: 10px;
+td:nth-child(2) {
+    /* building field */
+    width: 80px;
+}
+
+td:nth-child(5) {
+    /* description field */
+    width: 200px;
+}
+
+td:nth-child(7) > div {
+    /* revision records field */
+    text-align: left;
+}
+
+td.button_set {
+    border: none;
 }
 
 .pages {
+    text-align: center;
     color: black;
     margin: 10px 0 10px 30px;
     font-weight: bold;
@@ -122,7 +140,7 @@ input[type="submit"] {
 }
 
 #sidebar {
-    font-size: 12px;
+    font-size: 14px;
     display: block;
     position: fixed;
     margin: 10px auto 10px 30px;
@@ -134,11 +152,10 @@ input[type="submit"] {
 }
 
 #reply_window {
-    font-size: 12px;
+    font-size: 14px;
     position: fixed;
-    display: block;
+    display: none;
     right: 10px;
-    visibility: hidden;
     padding: 20px 10px 20px 10px;
     background-color: rgba(255, 255, 255, 0.2);
     transition: 0.3s;
@@ -198,3 +215,8 @@ input[type="submit"] {
     width: 100%;
 }
 
+@media only screen and (max-height: 500px) {
+    #copyright {
+        visibility: hidden;
+    }
+}

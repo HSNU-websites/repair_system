@@ -2,6 +2,7 @@ h1 {
     text-align: center;
     margin: 10px auto 10px auto;
     font-weight: normal;
+    font-family: 'Noto Sans TC', sans-serif;
 }
 
 body {
@@ -22,6 +23,7 @@ a:hover {
 }
 
 #logo {
+    filter: contrast(500%);
     display: block;
     height: 100px;
     margin-left: auto;
@@ -38,6 +40,7 @@ a:hover {
 }
 
 .container {
+    min-height: 100%;
     margin-top: 20px;
     display: flex;
     justify-content: center;
@@ -63,3 +66,8 @@ a:hover {
     margin: 5px 0 5px 0;
 }
 
+@media only screen and (max-height: 500px) {
+    #copyright {
+        visibility: hidden;
+    }
+}
