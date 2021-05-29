@@ -3,10 +3,12 @@ from flask import url_for
 from app import create_app, db
 from app.database.model import Users
 
-# No authentication
-
 
 class NoAuthTest(unittest.TestCase):
+    """
+    In this test, we test whether the website behaves appropriately when no user login.
+    """
+
     def setUp(self) -> None:
         self.app = create_app("testing")
         self.client = self.app.test_client()
@@ -18,28 +20,31 @@ class NoAuthTest(unittest.TestCase):
             self.app_context.pop()
 
     def test_report_page(self):
-        r = self.client.get(url_for("user.report_page"))
-        self.assertTrue(r.status_code == 401)
+        response = self.client.get(url_for("user.report_page"))
+        self.assertTrue(response.status_code == 401)
 
     def test_dashboard_page(self):
-        r = self.client.get(url_for("user.dashboard_page"))
-        self.assertTrue(r.status_code == 401)
+        response = self.client.get(url_for("user.dashboard_page"))
+        self.assertTrue(response.status_code == 401)
 
     def test_admin_dashboard_page(self):
-        r = self.client.get(url_for("admin.dashboard_page"))
-        self.assertTrue(r.status_code == 401)
+        response = self.client.get(url_for("admin.dashboard_page"))
+        self.assertTrue(response.status_code == 401)
 
     def test_system_page(self):
-        r = self.client.get(url_for("admin.system_page"))
-        self.assertTrue(r.status_code == 401)
+        response = self.client.get(url_for("admin.system_page"))
+        self.assertTrue(response.status_code == 401)
 
     def test_system_modification_page(self):
-        r = self.client.post(url_for("admin.system_modification_page"))
-        self.assertTrue(r.status_code == 401)
+        response = self.client.post(url_for("admin.system_modification_page"))
+        self.assertTrue(response.status_code == 401)
 
 
-# Only normal student privileges
 class NormalUserAuthTest(unittest.TestCase):
+    """
+    In this test, we test whether the website behaves appropriately when a normal student login.
+    """
+
     def setUp(self) -> None:
         self.app = create_app("testing")
         self.client = self.app.test_client()
@@ -66,44 +71,47 @@ class NormalUserAuthTest(unittest.TestCase):
         return self.client.post(url_for("main.index_page"), data=self.login_data)
 
     def test_login(self):
-        r = self.login()
+        response = self.login()
         self.assertTrue(
-            r.status_code == 302
+            response.status_code == 302
         )  # After a user successfully login, he or she will be redirected.
 
     def test_report_page(self):
         with self.client:
             self.login()
-            r = self.client.get(url_for("user.report_page"))
-            self.assertTrue(r.status_code == 200)
+            response = self.client.get(url_for("user.report_page"))
+            self.assertTrue(response.status_code == 200)
 
     def test_dashboard_page(self):
         with self.client:
             self.login()
-            r = self.client.get(url_for("user.dashboard_page"))
-            self.assertTrue(r.status_code == 200)
+            response = self.client.get(url_for("user.dashboard_page"))
+            self.assertTrue(response.status_code == 200)
 
     def test_admin_dashboard_page(self):
         with self.client:
             self.login()
-            r = self.client.get(url_for("admin.dashboard_page"))
-            self.assertTrue(r.status_code == 403)
+            response = self.client.get(url_for("admin.dashboard_page"))
+            self.assertTrue(response.status_code == 403)
 
     def test_system_page(self):
         with self.client:
             self.login()
-            r = self.client.get(url_for("admin.system_page"))
-            self.assertTrue(r.status_code == 403)
+            response = self.client.get(url_for("admin.system_page"))
+            self.assertTrue(response.status_code == 403)
 
     def test_system_modification_page(self):
         with self.client:
             self.login()
-            r = self.client.post(url_for("admin.system_modification_page"))
-            self.assertTrue(r.status_code == 403)
+            response = self.client.post(url_for("admin.system_modification_page"))
+            self.assertTrue(response.status_code == 403)
 
 
-# Admin privileges
 class AdminAuthTest(NormalUserAuthTest):
+    """
+    In this test, we test whether the website behaves appropriately when an admin login.
+    """
+
     def setUp(self) -> None:
         self.app = create_app("testing")
         self.client = self.app.test_client()
@@ -130,14 +138,14 @@ class AdminAuthTest(NormalUserAuthTest):
     def test_system_page(self):
         with self.client:
             self.login()
-            r = self.client.get(url_for("admin.system_page"))
-            self.assertTrue(r.status_code == 200)
+            response = self.client.get(url_for("admin.system_page"))
+            self.assertTrue(response.status_code == 200)
 
     def test_system_modification_page(self):
         with self.client:
             self.login()
-            r = self.client.post(
+            response = self.client.post(
                 url_for("admin.system_modification_page"),
                 json={"category": "offices", "value": "test"},  # Test case
             )
-            self.assertTrue(r.status_code == 200)
+            self.assertTrue(response.status_code == 200)
