@@ -1,4 +1,4 @@
-function send_remove(category, id) {
+function send_remove(element, category, id) {
     $.ajax({
         url: "/admin_dashboard_backend",
         type: "delete",
@@ -8,7 +8,12 @@ function send_remove(category, id) {
         .always(function (r) {
             if (r.status == 200) {
                 alert("OK");
-                location.reload();
+                if (category == "revision") {
+                    element.parentElement.remove();
+                }
+                if (category == "record") {
+                    element.parentElement.parentElement.remove();
+                }
             }
             else {
                 alert("Error");
@@ -17,14 +22,25 @@ function send_remove(category, id) {
 }
 
 function show_reply_window(element, record_id) {
-    var parent = element.parentElement.parentElement.parentElement;
-    for (i=0;i<parent.children.length;i++){
-        parent.children[i].style.backgroundColor = "rgba(255, 255, 255, 0)";
+    var tbody = document.querySelector("body > div > table > tbody")
+    for (i = 0; i < tbody.children.length; i++) {
+        // return to original status
+        tbody.children[i].removeAttribute("style");
     }
+    // change color because the one is chosen to reply
     element.parentElement.parentElement.style.backgroundColor = "rgba(255, 255, 255, 0.5)";
     var reply_window = document.getElementById("reply_window");
     reply_window.children[2].children[0].id = record_id;
-    reply_window.style.visibility = "visible";
+    reply_window.style.display = "block";
+}
+
+function hide_reply_window() {
+    var reply_window = document.getElementById("reply_window");
+    reply_window.style.display = "none";
+    var tbody = document.querySelector("body > div > table > tbody")
+    for (i = 0; i < tbody.children.length; i++) {
+        tbody.children[i].removeAttribute("style");
+    }
 }
 
 function send_reply_record(element) {
@@ -45,7 +61,7 @@ function send_reply_record(element) {
         .always(function (r) {
             if (r.status == 200) {
                 alert("OK");
-                location.reload();
+                window.location.reload()
             }
             else {
                 alert("Error");

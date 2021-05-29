@@ -17,7 +17,6 @@
             }
         }
     </style>
-    <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <script src="{{ url_for('static', filename='admin_dashboard.js') }}"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <script>
@@ -67,7 +66,7 @@
             </form>
         </div>
         <div id="reply_window">
-            <div class="closebtn" onclick="hide(this.parentElement);">&#10006;</div>
+            <div class="closebtn" onclick="hide_reply_window();">&#10006;</div>
             <div class="field">
                 <label for="status">狀態: </label>
                 <select name="status" id="status">
@@ -120,22 +119,25 @@
                     <td>{{ record["item"] }}</td>
                     <td>{{ record["description"] }}</td>
                     <td>{{ record["insert_time"] }}</td>
-                    <td style="width: 200px;">
-                        <div style="text-align: left;">
+                    <td>
+                        <div>
                             {% for revision in record["revisions"] %}
-                            <div><b>維護人: </b>{{ revision["user"]["name"] }}</div>
-                            <div><b>狀態: </b>{{ revision["status"] }}</div>
-                            <div><b>時間: </b>{{ revision["insert_time"] }}</div>
-                            <div><b>描述: </b>{{ revision["description"] }}</div>
-                            <button class="remove" onclick="send_remove('revision', {{ revision['id'] }});" style="margin: 3px 0 3px 1px;">刪除</button>
-                            {% if loop.index < record["revisions"] | length %}<hr>{% endif %}
-                                {% endfor %}
+                            <div>
+                                <div><b>維護人: </b>{{ revision["user"]["name"] }}</div>
+                                <div><b>狀態: </b>{{ revision["status"] }}</div>
+                                <div><b>時間: </b>{{ revision["insert_time"] }}</div>
+                                <div><b>額外描述: </b>{{ revision["description"] }}</div>
+                                <button class="remove" onclick="send_remove(this, 'revision', {{ revision['id'] }});"
+                                    style="margin: 3px 0 3px 1px;">刪除</button>
+                                {% if loop.index < record["revisions"] | length %}<hr>{% endif %}
+                            </div>
+                            {% endfor %}
                         </div>
                     </td>
-                    <td style="border: none;">
+                    <td class="button_set">
                         <button class="update" onclick="show_reply_window(this, {{ record['id'] }});">回覆</button>
                         <div style="height: 5px;"></div>
-                        <button class="remove" onclick="send_remove('record', {{ record['id'] }});">刪除</button>
+                        <button class="remove" onclick="send_remove(this, 'record', {{ record['id'] }});">刪除</button>
                     </td>
                 </tr>
                 {% endfor %}

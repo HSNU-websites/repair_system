@@ -57,15 +57,14 @@
                 <input type="text" value="{{ item['description'] }}">
                 <select>
                     {% for office in offices %}
-                    <option value="{{ office['id'] }}" {% if office["id"]==item["office_id"] %} selected {% endif %}>{{
-                        office['description'] }}</option>
+                    <option value="{{ office['id'] }}" {% if office["id"] == item["office_id"] %} selected {% endif %}>{{ office['description'] }}</option>
                     {% endfor %}
                 </select>
                 <button class="remove" onclick="send_remove(this);">移除</button>
             </div>
             {% endfor %}
             <input type="text" name="add">
-            <select name="offices" id="offices">
+            <select name="offices">
                 {% for office in offices %}
                 <option value="{{ office['id'] }}">{{ office['description'] }}</option>
                 {% endfor %}
