@@ -68,33 +68,31 @@ def reset(yes=False):
     ]
     db.session.add_all(users)
 
+    # Buildings default
+    db.session.add(Buildings(id=1, description="其他", sequence=len(db_default.buildings) + 1))
+    for i, building in enumerate(db_default.buildings, start=1):
+        db.session.add(Buildings.new(building, sequence=i))
+
     # Statuses default
-    db.session.add(Statuses("其他", sequence=len(db_default.statuses) + 1))
+    db.session.add(Statuses(id=1, description="其他", sequence=len(db_default.statuses) + 1))
     for i, status in enumerate(db_default.statuses, start=1):
-        db.session.add(Statuses(status, sequence=i))
+        db.session.add(Statuses.new(status, sequence=i))
 
     # Offices default
-    for office in db_default.offices:
-        db.session.add(Offices(office))
+    for i, office in enumerate(db_default.offices, start=1):
+        db.session.add(Offices.new(office, sequence=i))
 
     db.session.commit()
 
     # Items default
-    db.session.add(Items("其他", 1, sequence=len(db_default.items) + 1))
+    db.session.add(Items(id=1, description="其他", office_id=1, sequence=len(db_default.items) + 1))
     for i, item in enumerate(db_default.items, start=1):
-        db.session.add(Items(item[0], item[1], sequence=i))
-
-    # Buildings default
-    db.session.add(Buildings("其他", sequence=len(db_default.buildings) + 1))
-    for i, building in enumerate(db_default.buildings, start=1):
-        db.session.add(Buildings(building, sequence=i))
-
+        db.session.add(Items.new(item[0], item[1], sequence=i))
     db.session.commit()
 
-    # "%Y-%m-%dT%H-%M-%S"
     current_timestamp = int(datetime.now().timestamp())
     random_records = [
-        Records(
+        Records.new(
             user_id=randint(1, len(users) + 1),
             item_id=randint(1, len(db_default.items) + 1),
             building_id=randint(1, len(db_default.buildings) + 1),
@@ -105,22 +103,20 @@ def reset(yes=False):
         )
         for _ in range(1000)
     ]
-    records = [
-        Records(1, 1, 1, "某個地方", "今天的紀錄"),
-        Records(1, 1, 1, "某個地方", "昨天的紀錄", insert_time=(
+    random_records += [
+        Records.new(1, 1, 1, "某個地方", "今天的紀錄"),
+        Records.new(1, 1, 1, "某個地方", "昨天的紀錄", insert_time=(
             datetime.now() - timedelta(days=1)).strftime(timeformat)),
-        Records(1, 1, 1, "某個地方", "三天前的紀錄", insert_time=(
+        Records.new(1, 1, 1, "某個地方", "三天前的紀錄", insert_time=(
             datetime.now() - timedelta(days=3)).strftime(timeformat)),
-        Records(1, 1, 1, "某個地方", "十天前的紀錄", insert_time=(
+        Records.new(1, 1, 1, "某個地方", "十天前的紀錄", insert_time=(
             datetime.now() - timedelta(days=10)).strftime(timeformat))
     ]
     db.session.bulk_save_objects(random_records)
-    db.session.add_all(records)
-
     db.session.commit()
 
     random_revisions = [
-        Revisions(
+        Revisions.new(
             record_id=i,
             user_id=randint(1, len(users) + 1),
             status_id=1,
@@ -129,7 +125,7 @@ def reset(yes=False):
         for i in range(1, 20)
     ]
     random_revisions += [
-        Revisions(
+        Revisions.new(
             record_id=i,
             user_id=randint(1, len(users) + 1),
             status_id=2,
@@ -138,10 +134,7 @@ def reset(yes=False):
         for i in range(1, 6)
     ]
     db.session.bulk_save_objects(random_revisions)
-    db.session.add(Revisions(1, 1, 1, "測試修訂紀錄"))
     db.session.commit()
-
-    # db.session.add(Unfinisheds(1))
 
     h.updateUnfinisheds()
     h.updateSequence()
