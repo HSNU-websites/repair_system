@@ -101,8 +101,7 @@ def reset(yes=False):
 
     current_timestamp = int((datetime.now() - timedelta(days=10)).timestamp())
     count = 1000
-    rt = random.sample(range(current_timestamp), k=count)
-    rt.sort()
+    random_timestamps = sorted(random.sample(range(current_timestamp), k=count))
     random_records = [
         Records.new(
             user_id=random.randint(1, len(users) + len(random_users) + 1),
@@ -112,7 +111,7 @@ def reset(yes=False):
             description="{}的紀錄".format(random.randint(1, 100000)),
             insert_time=datetime.fromtimestamp(random_timestamp).strftime(timeformat)
         )
-        for random_timestamp in rt
+        for random_timestamp in random_timestamps
     ]
     random_records += [
         Records.new(1, 1, 1, "某個地方", "十天前的紀錄", insert_time=(

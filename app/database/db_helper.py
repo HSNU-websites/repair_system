@@ -54,6 +54,7 @@ def render_system_setting():
     statuses = [get_dict(row) for row in Statuses.query.order_by(Statuses.sequence).all()]
     return (buildings, items, offices, statuses)
 
+
 @cache.memoize()
 def get_admin_emails():
     admins = db.session.query(Users.email).filter(Users.is_admin).all()
@@ -171,6 +172,7 @@ def del_revisions(ids: list[int]):
         cache.delete_memoized(record_to_dict, record_id)
     db.session.commit()
 
+
 @cache.memoize()
 def get_user(user_id) -> dict:
     """
@@ -285,7 +287,8 @@ def render_users(Filter=dict(), page=1, per_page=100) -> dict:
         "users": l
     }
 
-def del_cache_for_sequence_table(tablename:str):
+
+def del_cache_for_sequence_table(tablename: str):
     cache.delete_memoized(render_system_setting)
     if tablename == "statuses":
         cache.delete_memoized(render_statuses)
@@ -293,6 +296,7 @@ def del_cache_for_sequence_table(tablename:str):
         cache.delete_memoized(render_items)
     elif tablename == "buildings":
         cache.delete_memoized(render_buildings)
+
 
 def insert(tablename: str, data: dict):
     """
