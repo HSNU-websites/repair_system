@@ -176,10 +176,8 @@ def get_user(user_id) -> dict:
 
 
 def record_to_dict(record):
-    item = db.session.query(Items.description).filter_by(id=record.item_id).scalar()
-    building = db.session.query(Buildings.description).filter_by(id=record.building_id).scalar()
     l = []
-    for rev in Revisions.query.filter_by(record_id=record.id).all():
+    for rev in Revisions.query.filter_by(record_id=record.id).order_by(Revisions.id.asc()).all():
         status = db.session.query(Statuses.description).filter_by(id=rev.status_id).scalar()
         l.append({
             "id": rev.id,
@@ -192,13 +190,14 @@ def record_to_dict(record):
     return {
         "id": record.id,
         "user": get_user(record.user_id),
-        "item": item,
-        "building": building,
+        "item": db.session.query(Items.description).filter_by(id=record.item_id).scalar(),
+        "building": db.session.query(Buildings.description).filter_by(id=record.building_id).scalar(),
         "location": record.location,
         "insert_time": record.insert_time.strftime(timeformat),
         "insert_date": record.insert_time.strftime(dateformat),
         "description": record.description,
-        "revisions": l
+        "revisions": l,
+        "unfinished": Unfinisheds.query.filter_by(record_id=record.id).count() > 0
     }
 
 
@@ -220,7 +219,6 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
     if valid and "unfinished_only" in Filter and Filter.pop("unfinished_only"):
         unfin_query = db.session.query(Unfinisheds.record_id)
         q = q.filter(Records.id.in_(unfin_query))
-
 
     if valid:
         Filter = {
@@ -256,7 +254,7 @@ def render_users(Filter=dict(), page=1, per_page=100) -> dict:
     }
     q = q.filter_by(**Filter)
     l = []
-    for user in q.offset((page - 1) * per_page).limit(per_page).all():
+    for user in q.order_by(Users.id.asc()).offset((page - 1) * per_page).limit(per_page).all():
         l.append({
             "id": user.id,
             "username": user.username,
