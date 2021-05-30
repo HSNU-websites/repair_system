@@ -15,6 +15,10 @@ class Config:
     MAIL_DEFAULT_SENDER = "HSNU"
     # APScheduler
     SCHEDULER_API_ENABLED = True
+    # Cache
+    CACHE_TYPE = "SimpleCache"
+    CACHE_DEFAULT_TIMEOUT = 0  # Never timeout
+    CACHE_THRESHOLD = 5000
 
 
 class Development(Config):

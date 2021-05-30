@@ -21,27 +21,32 @@ from .model import (
     get_dict,
     finishedStatus_id
 )
+from .common import cache
 
 
 class User(UserMixin):
     pass
 
 
+@cache.memoize()
 def render_statuses():
     statuses = Statuses.query.order_by(Statuses.sequence).all()
     return [status.description for status in statuses]
 
 
+@cache.memoize()
 def render_items():
     items = Items.query.order_by(Items.sequence).all()
     return [(item.id, item.description) for item in items]
 
 
+@cache.memoize()
 def render_buildings():
     buildings = Buildings.query.order_by(Buildings.sequence).all()
     return [(building.id, building.description) for building in buildings]
 
 
+@cache.memoize()
 def render_system_setting():
     buildings = [get_dict(row) for row in Buildings.query.order_by(Buildings.sequence).all()]
     items = [get_dict(row) for row in Items.query.order_by(Items.sequence).all()]
@@ -49,10 +54,10 @@ def render_system_setting():
     statuses = [get_dict(row) for row in Statuses.query.order_by(Statuses.sequence).all()]
     return (buildings, items, offices, statuses)
 
-
+@cache.memoize()
 def get_admin_emails():
     admins = db.session.query(Users.email).filter(Users.is_admin).all()
-    return [admin.email for admin in admins]
+    return [admin.email for admin in admins if admin.email != ""]
 
 
 def login_auth(username, password):
@@ -66,6 +71,7 @@ def login_auth(username, password):
         return None
 
 
+@cache.memoize()
 def load_user(user_id: str):
     # whether user_id is str or int doesn't matter
     user = Users.query.filter_by(id=user_id).first()
@@ -135,7 +141,9 @@ def del_records(ids: list[int]):
     for id in ids:
         Revisions.query.filter_by(record_id=id).delete()
         Unfinisheds.query.filter_by(record_id=id).delete()
-        Records.query.filter_by(id=id).delete()
+        r = Records.query.filter_by(id=id).first()
+        cache.delete_memoized(record_to_dict, r)
+        db.session.delete(r)
     db.session.commit()
 
 
@@ -146,6 +154,8 @@ def add_revision(record_id, user_id, status_id, description):
     else:
         if Unfinisheds.query.filter_by(record_id=record_id).count() == 0:
             db.session.add(Unfinisheds(record_id=record_id))
+    r = Records.query.filter_by(id=record_id).first()
+    cache.delete_memoized(record_to_dict, r)
     db.session.add(rev)
     db.session.commit()
 
@@ -160,10 +170,16 @@ def del_revisions(ids: list[int]):
         else:
             if Unfinisheds.query.filter_by(record_id=record_id).count() == 0:
                 db.session.add(Unfinisheds(record_id=record_id))
+        r = Records.query.filter_by(id=record_id).first()
+        cache.delete_memoized(record_to_dict, r)
     db.session.commit()
 
-
+@cache.memoize()
 def get_user(user_id) -> dict:
+    """
+    Used only in record_to_dict and user_setting.
+    """
+    print(f"get_user({user_id})")
     user = db.session.query(
         Users.username, Users.name, Users.classnum, Users.email
     ).filter_by(id=user_id).first()
@@ -175,6 +191,7 @@ def get_user(user_id) -> dict:
     }
 
 
+@cache.memoize()
 def record_to_dict(record):
     l = []
     for rev in Revisions.query.filter_by(record_id=record.id).order_by(Revisions.id.asc()).all():
@@ -271,6 +288,14 @@ def render_users(Filter=dict(), page=1, per_page=100) -> dict:
         "users": l
     }
 
+def del_cache_for_sequence_table(tablename:str):
+    cache.delete_memoized(render_system_setting)
+    if tablename == "statuses":
+        cache.delete_memoized(render_statuses)
+    elif tablename == "items":
+        cache.delete_memoized(render_items)
+    elif tablename == "buildings":
+        cache.delete_memoized(render_buildings)
 
 def insert(tablename: str, data: dict):
     """
@@ -282,6 +307,7 @@ def insert(tablename: str, data: dict):
         db.session.add(t.new(**data))
         db.session.commit()
         updateSequence([t])
+        del_cache_for_sequence_table(tablename)
         return True
     except:
         return False
@@ -296,6 +322,7 @@ def update(tablename: str, data: dict):
             return False
         t.query.filter_by(id=data.pop("id")).update(data)
         db.session.commit()
+        del_cache_for_sequence_table(tablename)
         return True
     except:
         return False
@@ -310,6 +337,7 @@ def delete(tablename: str, id: int):
             return False
         t.query.filter_by(id=id).delete()
         db.session.commit()
+        del_cache_for_sequence_table(tablename)
         return True
     except:
         return False
@@ -327,7 +355,10 @@ def add_users(data: list[dict]):
             if Users.username_exists(d["username"]):
                 already_exist.append(d["username"])
             else:
-                l.append(Users.new(**d))
+                u = Users.new(**d)
+                l.append(u)
+                if u.is_admin:
+                    cache.delete_memoized(get_admin_emails)
     db.session.bulk_save_objects(l)
     db.session.commit()
     return already_exist
@@ -336,11 +367,16 @@ def add_users(data: list[dict]):
 def update_users(data: list[dict]):
     l = []
     for d in data:
-        if "id" in d:
-            user = Users.query.filter_by(id=d.pop("id")).first()
-            if user:
-                user.update(**d)
-                l.append(user)
+        if "id" not in d:
+            continue
+        user = Users.query.filter_by(id=d.pop("id")).first()
+        if user:
+            old_properties = user.properties
+            user.update(**d)
+            l.append(user)
+            if user.properties != old_properties:
+                cache.delete_memoized(get_admin_emails)
+                cache.delete_memoized(load_user, user.id)
     db.session.bulk_save_objects(l)
     db.session.commit()
 
@@ -370,5 +406,7 @@ def del_users(ids: list[int], force=False):
             else:
                 s.add(user_id)
     if s:
+        for user_id in s:
+            cache.delete_memoized(load_user, user_id)
         Users.query.filter(Users.id.in_(s)).delete()
         db.session.commit()
