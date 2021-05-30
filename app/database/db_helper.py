@@ -368,16 +368,15 @@ def add_users(data: list[dict]):
 def update_users(data: list[dict]):
     l = []
     for d in data:
-        if "id" not in d:
-            continue
-        user = Users.query.filter_by(id=d.pop("id")).first()
-        if user:
-            old_properties = user.properties
-            user.update(**d)
-            l.append(user)
-            if user.properties != old_properties:
-                cache.delete_memoized(get_admin_emails)
-                cache.delete_memoized(load_user, user.id)
+        if "id" in d:
+            user = Users.query.filter_by(id=d.pop("id")).first()
+            if user:
+                old_properties = user.properties
+                user.update(**d)
+                l.append(user)
+                if user.properties != old_properties:
+                    cache.delete_memoized(get_admin_emails)
+                    cache.delete_memoized(load_user, user.id)
     db.session.bulk_save_objects(l)
     db.session.commit()
 
