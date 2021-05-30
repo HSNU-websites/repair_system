@@ -141,7 +141,6 @@ def del_records(ids: list[int]):
 
 def add_revision(record_id, user_id, status_id, description):
     rev = Revisions.new(record_id=record_id, user_id=user_id, status_id=status_id, description=description)
-    Records.query.filter_by(id=record_id).update({"update_time": rev.insert_time})
     if status_id == finishedStatus_id:
         Unfinisheds.query.filter_by(record_id=record_id).delete()
     else:
@@ -156,7 +155,6 @@ def del_revisions(ids: list[int]):
         record_id = db.session.query(Revisions.record_id).filter_by(id=id).scalar()
         Revisions.query.filter_by(id=id).delete()
         rev = Revisions.query.filter_by(record_id=record_id).order_by(Revisions.id.desc()).first()
-        Records.query.filter_by(id=record_id).update({"update_time": rev.insert_time})
         if rev.status_id == finishedStatus_id:
             Unfinisheds.query.filter_by(record_id=record_id).delete()
         else:
@@ -235,7 +233,7 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
     if valid:
         l = [
             record_to_dict(record)
-            for record in q.order_by(Records.update_time.desc()).offset((page - 1) * per_page).limit(per_page).all()
+            for record in q.order_by(Records.id.desc()).offset((page - 1) * per_page).limit(per_page).all()
         ]
     else:
         l = []
