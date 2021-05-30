@@ -1,6 +1,6 @@
 import unittest
 from datetime import datetime, timedelta
-from random import randint
+import random
 
 from flask_script import Manager
 
@@ -40,6 +40,7 @@ def reset(yes=False):
     db.drop_all()
     db.create_all()
 
+
     db.session.add(
         Users.new(
             username="deleted",
@@ -49,7 +50,8 @@ def reset(yes=False):
             is_marked_deleted=True
         )
     )
-    # test users will be removed in production
+
+    
     users = [
         Users.new(
             username="admin",
@@ -67,6 +69,18 @@ def reset(yes=False):
         ),
     ]
     db.session.add_all(users)
+
+    # test users will be removed in production
+    if app.config["ENV"] == "development":
+        random_users = [
+            Users.new(
+                username=str(410001 + i),
+                name="Student" + str(i),
+                classnum=1300 + (i // 26)
+            )
+            for i in range(1000)
+        ]
+        db.session.add_all(random_users)
 
     # Buildings default
     db.session.add(Buildings(id=1, description="其他", sequence=len(db_default.buildings) + 1))
@@ -90,51 +104,53 @@ def reset(yes=False):
         db.session.add(Items.new(item[0], item[1], sequence=i))
     db.session.commit()
 
-    current_timestamp = int(datetime.now().timestamp())
-    random_records = [
-        Records.new(
-            user_id=randint(1, len(users) + 1),
-            item_id=randint(1, len(db_default.items) + 1),
-            building_id=randint(1, len(db_default.buildings) + 1),
-            location="某{}個地方".format(randint(1, 100000)),
-            description="{}的紀錄".format(randint(1, 100000)),
-            insert_time=datetime.fromtimestamp(
-                randint(0, current_timestamp)).strftime(timeformat)
-        )
-        for _ in range(1000)
-    ]
-    random_records += [
-        Records.new(1, 1, 1, "某個地方", "今天的紀錄"),
-        Records.new(1, 1, 1, "某個地方", "昨天的紀錄", insert_time=(
-            datetime.now() - timedelta(days=1)).strftime(timeformat)),
-        Records.new(1, 1, 1, "某個地方", "三天前的紀錄", insert_time=(
-            datetime.now() - timedelta(days=3)).strftime(timeformat)),
-        Records.new(1, 1, 1, "某個地方", "十天前的紀錄", insert_time=(
-            datetime.now() - timedelta(days=10)).strftime(timeformat))
-    ]
-    db.session.bulk_save_objects(random_records)
-    db.session.commit()
+    if app.config["ENV"] == "development":
+        current_timestamp = int((datetime.now() - timedelta(days=10)).timestamp())
+        count = 1000
+        random_timestamps = sorted(random.sample(range(current_timestamp), k=count))
+        random_records = [
+            Records.new(
+                user_id=random.randint(1, len(users) + len(random_users) + 1),
+                item_id=random.randint(1, len(db_default.items) + 1),
+                building_id=random.randint(1, len(db_default.buildings) + 1),
+                location="某{}個地方".format(random.randint(1, 100000)),
+                description="{}的紀錄".format(random.randint(1, 100000)),
+                insert_time=datetime.fromtimestamp(random_timestamp).strftime(timeformat)
+            )
+            for random_timestamp in random_timestamps
+        ]
+        random_records += [
+            Records.new(1, 1, 1, "某個地方", "十天前的紀錄", insert_time=(
+                datetime.now() - timedelta(days=10)).strftime(timeformat)),
+            Records.new(1, 1, 1, "某個地方", "三天前的紀錄", insert_time=(
+                datetime.now() - timedelta(days=3)).strftime(timeformat)),
+            Records.new(1, 1, 1, "某個地方", "昨天的紀錄", insert_time=(
+                datetime.now() - timedelta(days=1)).strftime(timeformat)),
+            Records.new(1, 1, 1, "某個地方", "今天的紀錄")
+        ]
+        db.session.bulk_save_objects(random_records)
+        db.session.commit()
 
-    random_revisions = [
-        Revisions.new(
-            record_id=i,
-            user_id=randint(1, len(users) + 1),
-            status_id=1,
-            description="測試修訂{}紀錄".format(randint(1, 100000)),
-        )
-        for i in range(1, 20)
-    ]
-    random_revisions += [
-        Revisions.new(
-            record_id=i,
-            user_id=randint(1, len(users) + 1),
-            status_id=2,
-            description="測試修訂{}紀錄".format(randint(1, 100000)),
-        )
-        for i in range(1, 6)
-    ]
-    db.session.bulk_save_objects(random_revisions)
-    db.session.commit()
+        random_revisions = [
+            Revisions.new(
+                record_id=random.randint(1, len(random_records)),
+                user_id=random.randint(1, len(users) + 1),
+                status_id=1,
+                description="測試修訂{}紀錄".format(random.randint(1, 100000)),
+            )
+            for _ in range(500)
+        ]
+        random_revisions += [
+            Revisions.new(
+                record_id=random.randint(1, len(random_records)),
+                user_id=random.randint(1, len(users) + 1),
+                status_id=2,
+                description="測試修訂{}紀錄".format(random.randint(1, 100000)),
+            )
+            for _ in range(200)
+        ]
+        db.session.bulk_save_objects(random_revisions)
+        db.session.commit()
 
     h.updateUnfinisheds()
     h.updateSequence()

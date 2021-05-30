@@ -5,8 +5,9 @@ from pathlib import Path
 
 from . import backup, db_helper
 from .model import db, timeformat
+from .common import cache
 
-__all__ = [db, backup, db_helper]
+__all__ = [db, backup, db_helper, cache]
 
 
 # def my_namer(default_name):

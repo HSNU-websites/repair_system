@@ -22,7 +22,7 @@ from flask_login.signals import user_unauthorized
 from flask_mail import Mail
 from flask_apscheduler import APScheduler
 from .config import config
-from .database import db
+from .database import db, cache
 
 
 class LoginManager_(LoginManager):
@@ -88,6 +88,7 @@ def create_app(env):
     login_manager.init_app(app)
     db.init_app(app)
     mail.init_app(app)
+    cache.init_app(app)
     if app.config["ENV"] != "testing":
         scheduler.init_app(app)
         scheduler.start()

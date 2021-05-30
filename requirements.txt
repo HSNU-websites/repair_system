@@ -8,3 +8,4 @@ MySQL
 ujson
 passlib
 Flask-APScheduler
+Flask-Caching
