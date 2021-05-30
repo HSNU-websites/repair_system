@@ -141,8 +141,8 @@ def del_records(ids: list[int]):
     for id in ids:
         Revisions.query.filter_by(record_id=id).delete()
         Unfinisheds.query.filter_by(record_id=id).delete()
-        r = Records.query.filter_by(id=id).first()
-        cache.delete_memoized(record_to_dict, r)
+        Records.query.filter_by(id=id).delete()
+        cache.delete_memoized(record_to_dict, id)
         db.session.delete(r)
     db.session.commit()
 
@@ -154,8 +154,7 @@ def add_revision(record_id, user_id, status_id, description):
     else:
         if Unfinisheds.query.filter_by(record_id=record_id).count() == 0:
             db.session.add(Unfinisheds(record_id=record_id))
-    r = Records.query.filter_by(id=record_id).first()
-    cache.delete_memoized(record_to_dict, r)
+    cache.delete_memoized(record_to_dict, record_id)
     db.session.add(rev)
     db.session.commit()
 
@@ -170,8 +169,7 @@ def del_revisions(ids: list[int]):
         else:
             if Unfinisheds.query.filter_by(record_id=record_id).count() == 0:
                 db.session.add(Unfinisheds(record_id=record_id))
-        r = Records.query.filter_by(id=record_id).first()
-        cache.delete_memoized(record_to_dict, r)
+        cache.delete_memoized(record_to_dict, record_id)
     db.session.commit()
 
 @cache.memoize()
@@ -179,7 +177,6 @@ def get_user(user_id) -> dict:
     """
     Used only in record_to_dict and user_setting.
     """
-    print(f"get_user({user_id})")
     user = db.session.query(
         Users.username, Users.name, Users.classnum, Users.email
     ).filter_by(id=user_id).first()
@@ -192,7 +189,8 @@ def get_user(user_id) -> dict:
 
 
 @cache.memoize()
-def record_to_dict(record):
+def record_to_dict(record_id):
+    record = Records.query.filter_by(id=record_id).first()
     l = []
     for rev in Revisions.query.filter_by(record_id=record.id).order_by(Revisions.id.asc()).all():
         status = db.session.query(Statuses.description).filter_by(id=rev.status_id).scalar()
@@ -221,7 +219,7 @@ def record_to_dict(record):
 def render_records(Filter=dict(), page=1, per_page=100) -> dict:
     if page < 1:
         page = 1
-    q = Records.query
+    q = db.session.query(Records.id)
     valid = True
     if "username" in Filter:
         user_id = db.session.query(Users.id).filter_by(username=Filter.pop("username")).scalar()
@@ -247,7 +245,7 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
 
     if valid:
         l = [
-            record_to_dict(record)
+            record_to_dict(record.id)
             for record in q.order_by(Records.id.desc()).offset((page - 1) * per_page).limit(per_page).all()
         ]
     else:
