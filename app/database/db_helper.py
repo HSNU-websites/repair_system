@@ -143,7 +143,6 @@ def del_records(ids: list[int]):
         Unfinisheds.query.filter_by(record_id=id).delete()
         Records.query.filter_by(id=id).delete()
         cache.delete_memoized(record_to_dict, id)
-        db.session.delete(r)
     db.session.commit()
 
 
