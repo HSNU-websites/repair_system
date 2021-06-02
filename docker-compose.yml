@@ -1,0 +1,56 @@
+version: '3.1'
+
+services:
+
+  repair_system:
+    image: repair_system
+    container_name: repair_system
+    depends_on:
+      - db
+    restart: always
+    ports:
+      - 127.0.0.1:5000:5000
+    environment:
+      - MODE : "production"
+      - DB_USER: "repair_system"
+      - DB_PASSWORD: "pas$w0rd"
+      - DB_HOST: "db:3306"
+      - DB_DATABASE: "repair_system"
+      - MAIL_USERNAME: "mail@localhost"
+      - MAIL_PASSWORD: "pas$w0rd"
+    volumes:
+      - ./data/Backup:/repair_system/Backup
+      - ./data/log:/repair_system/log
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - repair_system
+
+  db:
+    image: mysql
+    container_name: db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "pas$w0rd"
+      MYSQL_DATABASE: "repair_system"
+      MYSQL_USER: "repair_system"
+      MYSQL_PASSWORD: "pas$w0rd"
+    volumes:
+      - ./data/db:/var/lib/mysql
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - repair_system
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - repair_system
+
+networks:
+  repair_system:
