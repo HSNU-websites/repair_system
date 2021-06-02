@@ -1,5 +1,6 @@
 import unittest
 from datetime import datetime, timedelta
+from os import getenv
 import random
 
 from flask_script import Manager
@@ -11,7 +12,7 @@ import db_default
 from app import create_app, db
 from app.database.model import Users, Buildings, Items, Offices, Records, Revisions, Statuses, timeformat
 
-app = create_app("development")
+app = create_app(getenv("MODE", "production"))
 manager = Manager(app)
 
 
@@ -40,7 +41,6 @@ def reset(yes=False):
     db.drop_all()
     db.create_all()
 
-
     db.session.add(
         Users.new(
             username="deleted",
@@ -51,7 +51,6 @@ def reset(yes=False):
         )
     )
 
-    
     users = [
         Users.new(
             username="admin",
