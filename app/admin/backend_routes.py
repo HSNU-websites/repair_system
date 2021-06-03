@@ -1,4 +1,4 @@
-from flask import request, current_app
+from flask import request, current_app, send_from_directory
 from flask_login import login_required, current_user
 from . import admin_bp
 from ..users import admin_required
@@ -99,3 +99,19 @@ def manage_user_backend_page():
         data = request.get_json(force=True)
         update_users([data])
         return "OK"
+
+
+@admin_bp.route("/backup_backend", methods=["POST", "DELETE", "UPDATE"])
+@admin_required
+@login_required
+def backup_backend_page():
+    if request.method == "POST":
+        # download backup file
+        backup_id = request.get_json(force=True)
+        return send_from_directory()
+    if request.method == "DELETE":
+        # delete backup
+        backup_id = request.get_json(force=True)["id"]
+    if request.method == "UPDATE":
+        # restore to specific version
+        backup_id = request.get_json(force=True)["id"]

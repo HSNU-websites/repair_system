@@ -9,7 +9,16 @@ import app.database.db_helper as h
 import app.mail_helper as m
 import db_default
 from app import create_app, db
-from app.database.model import Users, Buildings, Items, Offices, Records, Revisions, Statuses, timeformat
+from app.database.model import (
+    Users,
+    Buildings,
+    Items,
+    Offices,
+    Records,
+    Revisions,
+    Statuses,
+    timeformat,
+)
 
 app = create_app("development")
 manager = Manager(app)
@@ -40,18 +49,16 @@ def reset(yes=False):
     db.drop_all()
     db.create_all()
 
-
     db.session.add(
         Users.new(
             username="deleted",
             name="此帳號已刪除",
             classnum=0,
             is_valid=False,
-            is_marked_deleted=True
+            is_marked_deleted=True,
         )
     )
 
-    
     users = [
         Users.new(
             username="admin",
@@ -76,19 +83,23 @@ def reset(yes=False):
             Users.new(
                 username=str(410001 + i),
                 name="Student" + str(i),
-                classnum=1300 + (i // 26)
+                classnum=1300 + (i // 26),
             )
             for i in range(1000)
         ]
         db.session.add_all(random_users)
 
     # Buildings default
-    db.session.add(Buildings(id=1, description="其他", sequence=len(db_default.buildings) + 1))
+    db.session.add(
+        Buildings(id=1, description="其他", sequence=len(db_default.buildings) + 1)
+    )
     for i, building in enumerate(db_default.buildings, start=1):
         db.session.add(Buildings.new(building, sequence=i))
 
     # Statuses default
-    db.session.add(Statuses(id=1, description="其他", sequence=len(db_default.statuses) + 1))
+    db.session.add(
+        Statuses(id=1, description="其他", sequence=len(db_default.statuses) + 1)
+    )
     for i, status in enumerate(db_default.statuses, start=1):
         db.session.add(Statuses.new(status, sequence=i))
 
@@ -99,7 +110,9 @@ def reset(yes=False):
     db.session.commit()
 
     # Items default
-    db.session.add(Items(id=1, description="其他", office_id=1, sequence=len(db_default.items) + 1))
+    db.session.add(
+        Items(id=1, description="其他", office_id=1, sequence=len(db_default.items) + 1)
+    )
     for i, item in enumerate(db_default.items, start=1):
         db.session.add(Items.new(item[0], item[1], sequence=i))
     db.session.commit()
@@ -115,18 +128,38 @@ def reset(yes=False):
                 building_id=random.randint(1, len(db_default.buildings) + 1),
                 location="某{}個地方".format(random.randint(1, 100000)),
                 description="{}的紀錄".format(random.randint(1, 100000)),
-                insert_time=datetime.fromtimestamp(random_timestamp).strftime(timeformat)
+                insert_time=datetime.fromtimestamp(random_timestamp).strftime(
+                    timeformat
+                ),
             )
             for random_timestamp in random_timestamps
         ]
         random_records += [
-            Records.new(1, 1, 1, "某個地方", "十天前的紀錄", insert_time=(
-                datetime.now() - timedelta(days=10)).strftime(timeformat)),
-            Records.new(1, 1, 1, "某個地方", "三天前的紀錄", insert_time=(
-                datetime.now() - timedelta(days=3)).strftime(timeformat)),
-            Records.new(1, 1, 1, "某個地方", "昨天的紀錄", insert_time=(
-                datetime.now() - timedelta(days=1)).strftime(timeformat)),
-            Records.new(1, 1, 1, "某個地方", "今天的紀錄")
+            Records.new(
+                1,
+                1,
+                1,
+                "某個地方",
+                "十天前的紀錄",
+                insert_time=(datetime.now() - timedelta(days=10)).strftime(timeformat),
+            ),
+            Records.new(
+                1,
+                1,
+                1,
+                "某個地方",
+                "三天前的紀錄",
+                insert_time=(datetime.now() - timedelta(days=3)).strftime(timeformat),
+            ),
+            Records.new(
+                1,
+                1,
+                1,
+                "某個地方",
+                "昨天的紀錄",
+                insert_time=(datetime.now() - timedelta(days=1)).strftime(timeformat),
+            ),
+            Records.new(1, 1, 1, "某個地方", "今天的紀錄"),
         ]
         db.session.bulk_save_objects(random_records)
         db.session.commit()

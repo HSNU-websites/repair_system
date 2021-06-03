@@ -3,7 +3,7 @@ from flask.helpers import flash
 from flask_login import login_required
 from . import admin_bp
 from .helper import csv_handler
-from ..forms import ReportsFilterForm, AddOneUserForm, AddUsersByFileForm
+from ..forms import ReportsFilterForm, AddOneUserForm, AddUsersByFileForm, RestoreForm
 from ..database.db_helper import (
     render_system_setting,
     render_records,
@@ -131,3 +131,18 @@ def manage_user_page(page=1):
         return render_template(
             "manage_user.html", form=form, form_csv=form_csv, users=render_users()
         )
+
+
+@admin_bp.route("/backup", methods=["GET", "POST"])
+@admin_required
+@login_required
+def backup_page():
+    form = RestoreForm()
+    backups = ["1", "2", "30"]
+    if request.method == "GET":
+        return render_template("backup.html", form=form, backups=backups)
+    if request.method == "POST":
+        if form.validate_on_submit():
+            pass
+        else:
+            return render_template("backup.html", form=form, backups=backups)

@@ -73,7 +73,7 @@ td:nth-child(5) {
     width: 200px;
 }
 
-td:nth-child(7) > div {
+td:nth-child(7)>div {
     /* revision records field */
     text-align: left;
 }
@@ -108,7 +108,8 @@ td.button_set {
 }
 
 .pages a.end {
-    pointer-events: none; background-color: rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
 .column span {
@@ -204,6 +205,26 @@ td.button_set {
 #user_setting form div {
     margin: 10px 5px 10px 5px;
     height: 40px;
+}
+
+#backup_options {
+    display: flex;
+    justify-content: space-around;
+}
+
+#backup_options .field {
+    display: inline-block;
+}
+
+#backups h2 {
+    text-align: center;
+}
+
+.backup {
+    display: flex;
+    justify-content: space-around;
+    width: 80%;
+    margin: 10px 0 10px 0;
 }
 
 #copyright {
