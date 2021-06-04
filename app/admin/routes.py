@@ -1,3 +1,4 @@
+import re
 from flask import request, render_template, current_app, make_response
 from flask.helpers import flash
 from flask_login import login_required
@@ -10,6 +11,7 @@ from ..database.db_helper import (
     render_users,
     add_users,
 )
+from ..database.backup import getBackups
 from ..users import admin_required
 
 
@@ -92,7 +94,10 @@ def manage_user_page(page=1):
         # Render all users
         current_app.logger.info("GET /manage_user")
         return render_template(
-            "manage_user.html", form=form, form_csv=form_csv, users=render_users(page=page)
+            "manage_user.html",
+            form=form,
+            form_csv=form_csv,
+            users=render_users(page=page),
         )
     if request.method == "POST":
         # Add user
@@ -138,11 +143,15 @@ def manage_user_page(page=1):
 @login_required
 def backup_page():
     form = RestoreForm()
-    backups = ["1", "2", "30"]
+    backups = getBackups()
+    print([backup.__str__() for backup in backups])
+    backups = [re.search("Backup(.)*", backup.__str__()).group() for backup in backups]
     if request.method == "GET":
         return render_template("backup.html", form=form, backups=backups)
     if request.method == "POST":
+        # restore by uploading file
         if form.validate_on_submit():
+            # TODO
             pass
         else:
             return render_template("backup.html", form=form, backups=backups)

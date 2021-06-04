@@ -9,7 +9,7 @@ from .db_helper import updateUnfinisheds
 defaultTables = idTables
 partition = 10000
 
-backup_dir = Path("Backup")
+backup_dir = Path("backup")
 
 # mail [].sort(key = lambda s: s[2])
 # archiveName -> *.tar.gz / * (a folder)

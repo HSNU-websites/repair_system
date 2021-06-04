@@ -216,15 +216,13 @@ td.button_set {
     display: inline-block;
 }
 
-#backups h2 {
-    text-align: center;
+#backups {
+    min-width: 70vw;
 }
 
-.backup {
-    display: flex;
-    justify-content: space-around;
-    width: 80%;
+.backup td {
     margin: 10px 0 10px 0;
+    min-width: 35vw;
 }
 
 #copyright {

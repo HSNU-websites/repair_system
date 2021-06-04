@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&display=swap" rel="stylesheet">
     <script src="/static/backup.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <title>備份與還原</title>
 </head>
 
@@ -28,7 +29,7 @@
         </nav>
         <h1>備份與還原</h1>
         <div id="backup_options">
-            <button class="add">備份</button>
+            <button class="add" onclick="doBackup();">備份</button>
             <form action="/backup" method="POST">
                 {{ form.csrf_token }}
                 <div class="field" style="margin-top: 0;">
@@ -39,20 +40,20 @@
                 </div>
             </form>
         </div>
-        <div id="backups">
-            <h2>備份記錄檔</h2>
-            <div>
+        <div>
+            <h2 style="text-align: center;">備份記錄檔</h2>
+            <table id="backups">
                 {% for backup in backups %}
-                <div class="backup">
-                    <span>{{ backup }}</span>
-                    <span>
-                        <button class="add">下載</button>
-                        <button class="update">復原至此版本</button>
-                        <button class="remove">刪除</button>
-                    </span>
-                </div>
+                <tr class="backup">
+                    <td>{{ backup }}</td>
+                    <td>
+                        <button class="add"><a href="backup/{{ backup }}">下載</a></button>
+                        <button class="update" onclick="restoreTo('{{ backup }}');">復原至此版本</button>
+                        <button class="remove" onclick="deleteBackup('{{ backup }}');">刪除</button>
+                    </td>
+                </tr>
                 {% endfor %}
-            </div>
+            </table>
         </div>
     </div>
     <footer>
