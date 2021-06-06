@@ -11,7 +11,7 @@ from ..database.db_helper import (
     render_users,
     add_users,
 )
-from ..database.backup import getBackups
+from ..database.backup import get_backups
 from ..users import admin_required
 
 
@@ -143,15 +143,15 @@ def manage_user_page(page=1):
 @login_required
 def backup_page():
     form = RestoreForm()
-    backups = getBackups()
-    print([backup.__str__() for backup in backups])
+    backups = get_backups()
     backups = [re.search("Backup(.)*", backup.__str__()).group() for backup in backups]
     if request.method == "GET":
         return render_template("backup.html", form=form, backups=backups)
     if request.method == "POST":
-        # restore by uploading file
+        # save uploaded file
         if form.validate_on_submit():
-            # TODO
-            pass
+            file = form.file.data
+            file.save("backup/" + file.filename)
+            return render_template("backup.html", form=form, backups=backups)
         else:
             return render_template("backup.html", form=form, backups=backups)

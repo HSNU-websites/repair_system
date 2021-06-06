@@ -83,4 +83,4 @@ class UserSettingForm(FlaskForm):
 
 class RestoreForm(FlaskForm):
     file = FileField("", validators=[FileRequired()])
-    submit = SubmitField("還原")
+    submit = SubmitField("上傳")

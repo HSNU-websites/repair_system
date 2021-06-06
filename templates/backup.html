@@ -30,7 +30,7 @@
         <h1>備份與還原</h1>
         <div id="backup_options">
             <button class="add" onclick="doBackup();">備份</button>
-            <form action="/backup" method="POST">
+            <form action="/backup" method="POST" enctype="multipart/form-data">
                 {{ form.csrf_token }}
                 <div class="field" style="margin-top: 0;">
                     {{ form.file }}
