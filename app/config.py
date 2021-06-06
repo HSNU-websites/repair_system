@@ -1,11 +1,10 @@
-from os import getenv
+from os import getenv, urandom
 
 
 class Config:
-    SECRET_KEY = getenv("SECRET_KEY")
+    SECRET_KEY = urandom(16)
     # SQLAlchemy
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
     # Mail
     MAIL_SERVER = "smtp.gmail.com"
     MAIL_PORT = 465
@@ -22,11 +21,13 @@ class Config:
 
 
 class Development(Config):
+    SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
     DEBUG = True
     ENV = "development"
 
 
 class Testing(Config):
+    SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
     TESTING = True
     DEBUG = True
     ENV = "testing"
@@ -36,7 +37,13 @@ class Testing(Config):
 
 
 class Production(Config):
-    ENV = "development"
+    SQLALCHEMY_DATABASE_URI = "mysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_DATABASE}".format(
+        DB_USER=getenv("DB_USER"),
+        DB_PASSWORD=getenv("DB_PASSWORD"),
+        DB_HOST=getenv("DB_HOST"),
+        DB_DATABASE=getenv("DB_DATABASE"),
+    )
+    ENV = "production"
 
 
 config = {
