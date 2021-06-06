@@ -1,4 +1,4 @@
-from flask import request, current_app
+from flask import request, current_app, send_file
 from flask_login import login_required, current_user
 from . import admin_bp
 from ..users import admin_required
@@ -12,6 +12,7 @@ from ..database.db_helper import (
     del_revisions,
     del_records,
 )
+from ..database.backup import backup, restore, del_backup
 
 
 # The page receives the response to the report and the command to delete a report or a revision.
@@ -99,3 +100,39 @@ def manage_user_backend_page():
         data = request.get_json(force=True)
         update_users([data])
         return "OK"
+
+
+@admin_bp.route("/backup_backend", methods=["POST", "DELETE", "UPDATE"])
+@admin_required
+@login_required
+def backup_backend_page():
+    if request.method == "POST":
+        # do backup
+        try:
+            backup()
+            return "OK"
+        except:
+            return "Error", 400
+    if request.method == "DELETE":
+        # delete backup
+        backup_name = request.get_json(force=True)["name"]
+        try:
+            del_backup(backup_name)
+            return "OK"
+        except:
+            return "Error", 400
+    if request.method == "UPDATE":
+        # restore to specific version
+        backup_name = request.get_json(force=True)["name"]
+        try:
+            restore(backup_name)
+            return "OK"
+        except:
+            return "Error", 400
+
+
+@admin_bp.route("/backup/<string:filename>", methods=["GET"])
+@admin_required
+@login_required
+def get_backup_file(filename):
+    return send_file("../backup/" + filename, as_attachment=True)
