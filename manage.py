@@ -1,5 +1,6 @@
 import unittest
 from datetime import datetime, timedelta
+from os import getenv
 import random
 
 from flask_script import Manager
@@ -20,7 +21,7 @@ from app.database.model import (
     timeformat,
 )
 
-app = create_app("development")
+app = create_app(getenv("ENV", "production"))
 manager = Manager(app)
 
 

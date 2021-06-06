@@ -114,7 +114,7 @@
             <tbody>
                 {% for record in records["records"] %}
                 <tr>
-                    <td>{{ record["user"]["classnum"] | string + " " + record["user"]["username"] }}</td>
+                    <td>{{ record["user"]["classnum"] | string + " " + record["user"]["name"] }}</td>
                     <td>{{ record["building"] }}</td>
                     <td>{{ record["location"] }}</td>
                     <td>{{ record["item"] }}</td>

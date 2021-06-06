@@ -23,6 +23,7 @@ from flask_mail import Mail
 from flask_apscheduler import APScheduler
 from .config import config
 from .database import db, cache
+from .myhandler import MyTimedRotatingFileHandler
 
 
 class LoginManager_(LoginManager):
@@ -103,24 +104,24 @@ def create_app(env):
         )
 
     # log
-    if not path.exists("log"):
-        mkdir("log")
     formatter = RequestFormatter(
         "[%(asctime)s] %(remote_addr)s requested %(url)s %(levelname)s: %(message)s"
     )
-    access_log_handler = TimedRotatingFileHandler(
-        "log/access_" + datetime.now().strftime("%Y-%m-%d") + ".log",
-        when="D",
-        interval=1,
-        backupCount=15,
+
+    access_log_handler = MyTimedRotatingFileHandler(
+        "log/access.log",
+        "log/access_%Y-%m-%d.log",
+        when="MIDNIGHT",
+        backupCount=14,
         encoding="UTF-8",
         delay=False,
         utc=False,
     )
-    access_log_handler.setLevel("INFO")
+    access_log_handler.setLevel(logging.INFO)
     access_log_handler.setFormatter(formatter)
-    access_log_handler.suffix = "access_%Y-%m-%d.log"
+    app.logger.handlers = []  # remove stream handler
     app.logger.addHandler(access_log_handler)
+    app.logger.setLevel(logging.INFO)
 
     # Blueprint
     from .main import main_bp
