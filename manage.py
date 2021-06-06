@@ -12,7 +12,7 @@ import db_default
 from app import create_app, db
 from app.database.model import Users, Buildings, Items, Offices, Records, Revisions, Statuses, timeformat
 
-app = create_app(getenv("MODE", "production"))
+app = create_app(getenv("ENV", "production"))
 manager = Manager(app)
 
 
