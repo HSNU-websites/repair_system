@@ -25,5 +25,5 @@ sql_log_handler.setLevel(logging.INFO)
 
 sql_logger = logging.getLogger('sqlalchemy.engine')
 sql_logger.addHandler(sql_log_handler)
-sql_logger.setLevel(logging.DEBUG)
-# sql_logger pass log to handlers if log.level > DEBUG
+sql_logger.setLevel(logging.INFO)
+# sql_logger pass log to handlers if log.level > INFO

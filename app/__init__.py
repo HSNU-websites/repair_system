@@ -121,7 +121,7 @@ def create_app(env):
     access_log_handler.setFormatter(formatter)
     app.logger.handlers = []  # remove stream handler
     app.logger.addHandler(access_log_handler)
-    app.logger.setLevel(logging.DEBUG)
+    app.logger.setLevel(logging.INFO)
 
     # Blueprint
     from .main import main_bp

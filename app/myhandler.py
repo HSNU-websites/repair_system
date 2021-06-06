@@ -9,7 +9,7 @@ _MIDNIGHT = 24 * 60 * 60  # number of seconds in a day
 
 def timeformat_to_regex(timeformat: str):
     """
-    Only support %Y %m %d %H %M %S.
+    Only support %Y %m %d %H %M %S %%.
     """
     timeformat = timeformat.replace(r"%Y", r"\d{4}")
     timeformat = timeformat.replace(r"%m", r"\d{2}")
@@ -17,21 +17,30 @@ def timeformat_to_regex(timeformat: str):
     timeformat = timeformat.replace(r"%H", r"\d{2}")
     timeformat = timeformat.replace(r"%M", r"\d{2}")
     timeformat = timeformat.replace(r"%S", r"\d{2}")
+    timeformat = timeformat.replace(r"%%", r"%")
     return re.compile("^" + timeformat + "$")
 
 
 class MyTimedRotatingFileHandler(BaseRotatingHandler):
     """
-    Handler for logging to a file, rotating the log file at certain timed
-    intervals.
-
-    If backupCount is > 0, when rollover is done, no more than backupCount
-    files are kept - the oldest ones are deleted.
+    Edit from logging.handlers.TimedRotatingFileHandler.
+    filename: str - path to log file.
+        e.g. "log/access.log"
+    rotatefilename: str - path to rotate, support strftime format (%Y %m %d %H %M %S %%).
+        e.g. "log/access_%Y-%m-%d.log"
+    other parameter act the same as logging.handlers.TimedRotatingFileHandler
     """
 
     def __init__(self, filename, rotatefilename, when='h', interval=1,
                  backupCount=0, encoding=None, delay=False, utc=False,
                  atTime=None, errors=None):
+
+        # create directory
+        rotatedirName, rotatebaseName = os.path.split(rotatefilename)
+        os.makedirs(rotatedirName, exist_ok=True)
+        dirName, baseName = os.path.split(filename)
+        os.makedirs(dirName, exist_ok=True)
+
         BaseRotatingHandler.__init__(self, filename, 'a', encoding=encoding,
                                      delay=delay, errors=errors)
         self.rotatefilename = rotatefilename
@@ -69,15 +78,11 @@ class MyTimedRotatingFileHandler(BaseRotatingHandler):
         else:
             raise ValueError("Invalid rollover interval specified: %s" % self.when)
 
-        rotatedirName, rotatebaseName = os.path.split(self.rotatefilename)
-        os.makedirs(rotatedirName, exist_ok=True)
         self.rotatedmatch = timeformat_to_regex(rotatebaseName)
         self.interval = self.interval * interval  # multiply by units requested
         # The following line added because the filename passed in could be a
         # path object (see Issue #27493), but self.baseFilename will be a string
-        filename = self.baseFilename
-        dirName, baseName = os.path.split(filename)
-        os.makedirs(dirName, exist_ok=True)
+        # filename = self.baseFilename
         if os.path.exists(filename):
             t = os.stat(filename)[ST_MTIME]
         else:
