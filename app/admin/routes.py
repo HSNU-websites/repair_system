@@ -1,4 +1,3 @@
-import re
 from flask import request, render_template, current_app, make_response
 from flask.helpers import flash
 from flask_login import login_required
@@ -143,15 +142,11 @@ def manage_user_page(page=1):
 @login_required
 def backup_page():
     form = RestoreForm()
-    backups = get_backups()
-    backups = [re.search("Backup(.)*", backup.__str__()).group() for backup in backups]
     if request.method == "GET":
-        return render_template("backup.html", form=form, backups=backups)
+        return render_template("backup.html", form=form, backups=get_backups())
     if request.method == "POST":
         # save uploaded file
         if form.validate_on_submit():
             file = form.file.data
             file.save("backup/" + file.filename)
-            return render_template("backup.html", form=form, backups=backups)
-        else:
-            return render_template("backup.html", form=form, backups=backups)
+        return render_template("backup.html", form=form, backups=get_backups())
