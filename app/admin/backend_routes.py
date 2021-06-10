@@ -1,4 +1,4 @@
-from flask import request, current_app, send_file
+from flask import request, current_app, send_file, abort
 from flask_login import login_required, current_user
 from . import admin_bp
 from ..users import admin_required
@@ -41,13 +41,13 @@ def admin_dashboard_backend_page():
 
 
 # The page handles the system modification signals which are sent from `/system`.
-@admin_bp.route("/system_modification", methods=["POST", "DELETE", "UPDATE"])
+@admin_bp.route("/system_backend", methods=["POST", "DELETE", "UPDATE"])
 @admin_required
 @login_required
-def system_modification_page():
+def system_backend_page():
     if request.method == "POST":
         # Add
-        current_app.logger.info("POST /system_modification")
+        current_app.logger.info("POST /system_backend")
         data = request.get_json(force=True)
         if data.get("office") != None:
             args = {"description": data["value"], "office_id": data["office"]}
@@ -56,18 +56,18 @@ def system_modification_page():
         if insert(data["category"], args):
             return "OK"
         else:
-            return "Error", 400
+            abort(400)
     if request.method == "DELETE":
         # Delete
-        current_app.logger.info("DELETE /system_modification")
+        current_app.logger.info("DELETE /system_backend")
         data = request.get_json(force=True)
         if delete(data["category"], data["id"]):
             return "OK"
         else:
-            return "Error", 400
+            abort(400)
     if request.method == "UPDATE":
         # Update
-        current_app.logger.info("UPDATE /system_modification")
+        current_app.logger.info("UPDATE /system_backend")
         data = request.get_json(force=True)
         category = data[0]["category"]
         for r in data[1:]:
@@ -79,7 +79,7 @@ def system_modification_page():
             if r.get("office_id", None):
                 new["office_id"] = r["office_id"]
             if not update(category, new):
-                return "Error", 400
+                abort(400)
         return "OK"
 
 
@@ -92,14 +92,20 @@ def manage_user_backend_page():
         # Delete user
         current_app.logger.info("DELETE /manage_user_backend")
         data = request.get_json(force=True)
-        del_users([data["user_id"]])
-        return "OK"
+        try:
+            del_users([data["user_id"]])
+            return "OK"
+        except:
+            abort(400)
     if request.method == "UPDATE":
         # Update user
         current_app.logger.info("UPDATE /manage_user_backend")
         data = request.get_json(force=True)
-        update_users([data])
-        return "OK"
+        try:
+            update_users([data])
+            return "OK"
+        except:
+            abort(400)
 
 
 @admin_bp.route("/backup_backend", methods=["POST", "DELETE", "UPDATE"])
@@ -112,7 +118,7 @@ def backup_backend_page():
             backup()
             return "OK"
         except:
-            return "Error", 400
+            abort(400)
     if request.method == "DELETE":
         # delete backup
         backup_name = request.get_json(force=True)["name"]
@@ -120,7 +126,7 @@ def backup_backend_page():
             del_backup(backup_name)
             return "OK"
         except:
-            return "Error", 400
+            abort(400)
     if request.method == "UPDATE":
         # restore to specific version
         backup_name = request.get_json(force=True)["name"]
@@ -128,7 +134,7 @@ def backup_backend_page():
             restore(backup_name)
             return "OK"
         except:
-            return "Error", 400
+            abort(400)
 
 
 @admin_bp.route("/backup/<string:filename>", methods=["GET"])

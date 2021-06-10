@@ -4,9 +4,9 @@ from app import create_app, db
 from app.database.model import Users
 
 
-class FormTest(unittest.TestCase):
+class BackendTest(unittest.TestCase):
     """
-    A test model to help other tests related to forms.
+    A test model to help other tests related to forms and backend.
     """
 
     def setUp(self) -> None:
@@ -36,12 +36,12 @@ class FormTest(unittest.TestCase):
         return self.client.post(url_for("main.index_page"), data=self.login_data)
 
 
-class ReportFormTest(FormTest):
+class ReportFormTest(BackendTest):
     """
     In this test, we test whether report form behaves properly.
     """
 
-    def test_report_page(self):
+    def test_ok(self):
         with self.client:
             self.login()
             response = self.client.post(
@@ -56,25 +56,63 @@ class ReportFormTest(FormTest):
             self.assertTrue(response.status_code == 200)
 
 
-class SystemModificationTest(FormTest):
+class SystemBackendTest(BackendTest):
     """
     In this test, we test whether operations to system settings is available.
     """
 
-    def test_system_modification_page_ok(self):
+    def test_ok(self):
         with self.client:
             self.login()
             response = self.client.delete(
-                url_for("admin.system_modification_page"),
+                url_for("admin.system_backend_page"),
                 json={"category": "offices", "id": "1"},
             )
             self.assertTrue(response.status_code == 200)
 
-    def test_system_modification_page_bad_request(self):
+    def test_method_not_allowed(self):
+        with self.client:
+            self.login()
+            response = self.client.get(url_for("admin.system_backend_page"))
+            self.assertTrue(response.status_code == 405)
+
+    def test_bad_request(self):
         with self.client:
             self.login()
             response = self.client.post(
-                url_for("admin.system_modification_page"),
+                url_for("admin.system_backend_page"),
                 json={"category": "items", "value": "test_item"},
+            )
+            self.assertTrue(
+                response.status_code == 400
+            )  # because no office is provided
+
+
+class ManageUserBackendTest(BackendTest):
+    """
+    In this test, we test whether user management is available.
+    """
+
+    def test_ok(self):
+        with self.client:
+            self.login()
+            response = self.client.delete(
+                url_for("admin.manage_user_backend_page"),
+                json={"user_id": 1},
+            )
+            self.assertTrue(response.status_code == 200)
+
+    def test_method_not_allowed(self):
+        with self.client:
+            self.login()
+            response = self.client.get(url_for("admin.manage_user_backend_page"))
+            self.assertTrue(response.status_code == 405)
+
+    def test_bad_request(self):
+        with self.client:
+            self.login()
+            response = self.client.delete(
+                url_for("admin.manage_user_backend_page"),
+                json={},
             )
             self.assertTrue(response.status_code == 400)
