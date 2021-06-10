@@ -57,7 +57,7 @@ class AddOneUserForm(FlaskForm):
         "密碼: ", validators=[DataRequired()], render_kw={"placeholder": "Password"}
     )
     email = EmailField("電子郵件 (僅管理員需要): ", render_kw={"placeholder": "Email"})
-    submit = SubmitField("新增")
+    submit_one_user = SubmitField("新增")
 
     def validate_email(self, field):
         if self.classnum.data == "0" and self.email.data == "":
@@ -66,7 +66,7 @@ class AddOneUserForm(FlaskForm):
 
 class AddUsersByFileForm(FlaskForm):
     csv_file = FileField("CSV file", validators=[FileRequired()])
-    submit = SubmitField("新增")
+    submit_csv = SubmitField("新增")
 
 
 class UserSettingForm(FlaskForm):

@@ -1,5 +1,12 @@
-from flask import request, render_template, current_app, make_response, flash, redirect
-from flask.helpers import url_for
+from flask import (
+    request,
+    render_template,
+    current_app,
+    make_response,
+    flash,
+    redirect,
+    url_for,
+)
 from flask_login import login_required
 from . import admin_bp
 from .helper import csv_handler
@@ -96,79 +103,56 @@ def manage_user_page(page=1):
     """
     form = AddOneUserForm()
     form_csv = AddUsersByFileForm()
+    response = render_template(
+        "manage_user.html",
+        form=form,
+        form_csv=form_csv,
+        users=render_users(page=page),
+    )
     if request.method == "GET":
         # Render all users
         current_app.logger.info("GET /manage_user")
-        return render_template(
-            "manage_user.html",
-            form=form,
-            form_csv=form_csv,
-            users=render_users(page=page),
-        )
+        return response
     if request.method == "POST":
         # Add user
-        # Add one user
-        if form.validate_on_submit():
-            current_app.logger.info("POST /manage_user")
-            data = {
-                "username": form.username.data,
-                "name": form.name.data,
-                "classnum": form.classnum.data,
-                "password": form.password.data,
-                "email": form.email.data,
-                "is_admin": int(form.classnum.data) == 0,
-            }
-            if len(data["password"]) < 6:
-                flash(
-                    "Password is too short (at least 6 characters).", category="alert"
-                )
-            elif already_exists := add_users(data):
-                flash(", ".join(already_exists) + " 已經存在", category="alert")
-            return render_template(
-                "manage_user.html",
-                form=form,
-                form_csv=form_csv,
-                users=render_users(),
-            )
-        else:
-            current_app.logger.info("POST /manage_user: Invalid submit")
-            return (
-                render_template(
-                    "manage_user.html",
-                    form=form,
-                    form_csv=form_csv,
-                    users=render_users(),
-                ),
-                400,
-            )
-
-        # Add users by csv
-        if form_csv.validate_on_submit():
-            current_app.logger.info("POST /manage_user")
-            csv_file = form_csv.csv_file.data
-            # data format: [{"username": "zxc", "name": "zxc", "password": "123", "classnum": "1400"}]
-            if not (data := csv_handler(csv_file.read())):
-                flash("Bad encoding.", category="alert")
-            else:
-                if already_exists := add_users(data):
+        if "submit_one_user" in request.form:
+            # Add one user
+            if form.validate_on_submit():
+                current_app.logger.info("POST /manage_user")
+                data = {
+                    "username": form.username.data,
+                    "name": form.name.data,
+                    "classnum": form.classnum.data,
+                    "password": form.password.data,
+                    "email": form.email.data,
+                    "is_admin": int(form.classnum.data) == 0,
+                }
+                if len(data["password"]) < 6:
+                    flash(
+                        "Password is too short (at least 6 characters).",
+                        category="alert",
+                    )
+                elif already_exists := add_users(data):
                     flash(", ".join(already_exists) + " 已經存在", category="alert")
-            return render_template(
-                "manage_user.html",
-                form=form,
-                form_csv=form_csv,
-                users=render_users(),
-            )
-        else:
-            current_app.logger.info("POST /manage_user: Invalid submit")
-            return (
-                render_template(
-                    "manage_user.html",
-                    form=form,
-                    form_csv=form_csv,
-                    users=render_users(),
-                ),
-                400,
-            )
+                return response
+            else:
+                current_app.logger.info("POST /manage_user: Invalid submit")
+                return response, 400
+        if "submit_csv" in request.form:
+            # Add users by csv
+            if form_csv.validate_on_submit():
+                current_app.logger.info("POST /manage_user")
+                csv_file = form_csv.csv_file.data
+                # data format: [{"username": "zxc", "name": "zxc", "password": "123", "classnum": "1400"}]
+                if not (data := csv_handler(csv_file.read())):
+                    flash("Bad encoding.", category="alert")
+                else:
+                    if already_exists := add_users(data):
+                        flash(", ".join(already_exists) + " 已經存在", category="alert")
+                return response
+            else:
+                current_app.logger.info("POST /manage_user: Invalid submit")
+                return response, 400
 
 
 @admin_bp.route("/backup", methods=["GET", "POST"])
