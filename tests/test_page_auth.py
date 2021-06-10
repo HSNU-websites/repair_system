@@ -30,6 +30,10 @@ class NoAuthTest(unittest.TestCase):
         response = self.client.get(url_for("user.dashboard_page"))
         self.assertTrue(response.status_code == self.normal)
 
+    def test_user_setting_page(self):
+        response = self.client.get(url_for("user.user_setting_page"))
+        self.assertTrue(response.status_code == self.normal)
+
     def test_admin_dashboard_page(self):
         response = self.client.get(url_for("admin.dashboard_page"))
         self.assertTrue(response.status_code == self.admin)
@@ -96,6 +100,12 @@ class NormalUserAuthTest(unittest.TestCase):
         with self.client:
             self.login()
             response = self.client.get(url_for("user.dashboard_page"))
+            self.assertTrue(response.status_code == self.normal)
+
+    def test_user_setting_page(self):
+        with self.client:
+            self.login()
+            response = self.client.get(url_for("user.user_setting_page"))
             self.assertTrue(response.status_code == self.normal)
 
     def test_admin_dashboard_page(self):

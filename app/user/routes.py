@@ -40,7 +40,7 @@ def report_page():
             return render_template("report.html", form=form)
         else:
             current_app.logger.warning("POST /report: Invalid submit.")
-            # Flask-wtf will return valid choice when the value is changed.
+            # Flask-wtf will return invalid choice when the value is changed.
             for _, error in form.errors.items():
                 for msg in error:
                     flash(msg, category="alert")

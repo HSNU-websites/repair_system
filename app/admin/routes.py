@@ -1,4 +1,5 @@
-from flask import request, render_template, current_app, make_response, flash
+from flask import request, render_template, current_app, make_response, flash, redirect
+from flask.helpers import url_for
 from flask_login import login_required
 from . import admin_bp
 from .helper import csv_handler
@@ -63,6 +64,7 @@ def dashboard_page(page=1):
             return response
         else:
             current_app.logger.info("POST /admin_dashboard: Invalid submit")
+            return redirect(url_for("admin.dashboard_page"))
 
 
 @admin_bp.route("/system", methods=["GET"])
