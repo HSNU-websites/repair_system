@@ -55,6 +55,19 @@ class ReportFormTest(BackendTest):
             )
             self.assertTrue(response.status_code == 200)
 
+    def test_bad(self):
+        with self.client:
+            self.login()
+            response = self.client.post(
+                url_for("user.report_page"),
+                data={
+                    "building": "None",
+                    "location": "None",
+                    "item": "None",
+                },
+            )
+            self.assertTrue(response.status_code == 400)
+
 
 class SystemBackendTest(BackendTest):
     """
@@ -93,6 +106,37 @@ class ManageUserBackendTest(BackendTest):
     In this test, we test whether user management is available.
     """
 
+    def test_add_one_user_ok(self):
+        with self.client:
+            self.login()
+            response = self.client.post(
+                url_for("admin.manage_user_page"),
+                data={
+                    "username": "710000",
+                    "name": "test",
+                    "classnum": "1498",
+                    "password": "password",
+                },
+            )
+            print(response.status_code)
+            self.assertTrue(response.status_code == 200)
+
+    def test_add_one_user_bad(self):
+        # Add admin but password is not provided.
+        with self.client:
+            self.login()
+            response = self.client.post(
+                url_for("admin.manage_user_page"),
+                data={
+                    "username": "710000",
+                    "name": "test",
+                    "classnum": "0",
+                    "password": "password",
+                },
+            )
+            print(response.status_code)
+            self.assertTrue(response.status_code == 400)
+
     def test_ok(self):
         with self.client:
             self.login()
@@ -116,3 +160,35 @@ class ManageUserBackendTest(BackendTest):
                 json={},
             )
             self.assertTrue(response.status_code == 400)
+
+
+class BackupBackendTest(BackendTest):
+    """
+    In this test, we test whether backup functions work.
+    """
+
+    def test_ok(self):
+        with self.client:
+            self.login()
+            response = self.client.post(url_for("admin.backup_backend_page"))
+            self.assertTrue(response.status_code == 200)
+
+    def test_method_not_allowed(self):
+        with self.client:
+            self.login()
+            response = self.client.get(url_for("admin.backup_backend_page"))
+            self.assertTrue(response.status_code == 405)
+
+    def test_bad_request(self):
+        with self.client:
+            self.login()
+            response = self.client.delete(url_for("admin.backup_backend_page"), json={})
+            self.assertTrue(response.status_code == 400)
+
+    def test_not_exists_backup_file(self):
+        with self.client:
+            self.login()
+            response = self.client.get(
+                url_for("admin.get_backup_file", filename="notexists")
+            )
+            self.assertTrue(response.status_code == 404)

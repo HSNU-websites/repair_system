@@ -126,6 +126,7 @@ class NormalUserAuthTest(unittest.TestCase):
 class AdminAuthTest(NormalUserAuthTest):
     """
     In this test, we test whether the website behaves appropriately when an admin login.
+    The test derives from `NormalUserAuthTest`
     """
 
     def setUp(self) -> None:

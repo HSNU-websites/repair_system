@@ -13,10 +13,12 @@ from ..mail_helper import send_report_mail
 from . import user_bp
 
 
-# The page allows students to report broken items.
 @user_bp.route("/report", methods=["GET", "POST"])
 @login_required
 def report_page():
+    """
+    The page allows students to report broken items.
+    """
     form = ReportForm()
     form.building.choices = render_buildings()
     form.item.choices = render_items()
@@ -39,10 +41,10 @@ def report_page():
         else:
             current_app.logger.warning("POST /report: Invalid submit.")
             # Flask-wtf will return valid choice when the value is changed.
-            for field, error in form.errors.items():
+            for _, error in form.errors.items():
                 for msg in error:
                     flash(msg, category="alert")
-            return render_template("report.html", form=form)
+            return render_template("report.html", form=form), 400
 
 
 # The page is student's dashboard, and he or she can browse all his or her reports here.
@@ -50,19 +52,22 @@ def report_page():
 @user_bp.route("/dashboard/<int:page>", methods=["GET"])
 @login_required
 def dashboard_page(page=1):
+    """
+    The page is student's dashboard, and he or she can browse all his or her reports here.
+    """
     current_app.logger.info("GET /dashboard")
     return render_template(
         "user_dashboard.html",
-        records=render_records(
-            {"user_id": current_user.id}, page
-        ),
+        records=render_records({"user_id": current_user.id}, page),
     )
 
 
-# The page allows users, whether they are students or admins, to set their emails and passwords.
 @user_bp.route("/user_setting", methods=["GET", "POST"])
 @login_required
 def user_setting_page():
+    """
+    The page allows users, whether they are students or admins, to set their emails and passwords.
+    """
     user = get_user(current_user.id)
     form = UserSettingForm(email=user["email"])
     if request.method == "GET":
@@ -78,9 +83,10 @@ def user_setting_page():
                 data["password"] = password
             update_users([data])
             flash("OK", category="success")
+            return render_template("user_setting.html", user=user, form=form)
         else:
             current_app.logger.info("POST /user_setting: Invalid submit.")
             for _, errorMessages in form.errors.items():
                 for err in errorMessages:
                     flash(err, category="alert")
-        return render_template("user_setting.html", user=user, form=form)
+            return render_template("user_setting.html", user=user, form=form), 400

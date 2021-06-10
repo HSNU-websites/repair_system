@@ -15,11 +15,13 @@ from ..database.db_helper import (
 from ..database.backup import backup, restore, del_backup
 
 
-# The page receives the response to the report and the command to delete a report or a revision.
 @admin_bp.route("/admin_dashboard_backend", methods=["POST", "DELETE"])
 @admin_required
 @login_required
 def admin_dashboard_backend_page():
+    """
+    The page receives the response to the report and the command to delete a report or a revision.
+    """
     if request.method == "POST":
         data = request.get_json(force=True)
         add_revision(
@@ -40,11 +42,13 @@ def admin_dashboard_backend_page():
         return "OK"
 
 
-# The page handles the system modification signals which are sent from `/system`.
 @admin_bp.route("/system_backend", methods=["POST", "DELETE", "UPDATE"])
 @admin_required
 @login_required
 def system_backend_page():
+    """
+    The page handles the system modification signals which are sent from `/system`.
+    """
     if request.method == "POST":
         # Add
         current_app.logger.info("POST /system_backend")
@@ -83,11 +87,13 @@ def system_backend_page():
         return "OK"
 
 
-# The page handles the request to delete and update user's information.
 @admin_bp.route("/manage_user_backend", methods=["DELETE", "UPDATE"])
 @admin_required
 @login_required
 def manage_user_backend_page():
+    """
+    The page handles the request to delete and update user's information.
+    """
     if request.method == "DELETE":
         # Delete user
         current_app.logger.info("DELETE /manage_user_backend")
@@ -112,6 +118,9 @@ def manage_user_backend_page():
 @admin_required
 @login_required
 def backup_backend_page():
+    """
+    The page handles the request to do some operations to backup system.
+    """
     if request.method == "POST":
         # do backup
         try:
@@ -121,16 +130,17 @@ def backup_backend_page():
             abort(400)
     if request.method == "DELETE":
         # delete backup
-        backup_name = request.get_json(force=True)["name"]
         try:
+            backup_name = request.get_json(force=True)["name"]
             del_backup(backup_name)
             return "OK"
         except:
             abort(400)
     if request.method == "UPDATE":
         # restore to specific version
-        backup_name = request.get_json(force=True)["name"]
+        # NOT available to use now
         try:
+            backup_name = request.get_json(force=True)["name"]
             restore(backup_name)
             return "OK"
         except:
@@ -141,4 +151,10 @@ def backup_backend_page():
 @admin_required
 @login_required
 def get_backup_file(filename):
-    return send_file("../backup/" + filename, as_attachment=True)
+    """
+    The page is used to get backup file and allow user to download it.
+    """
+    try:
+        return send_file("../backup/" + filename, as_attachment=True)
+    except FileNotFoundError:
+        abort(404)
