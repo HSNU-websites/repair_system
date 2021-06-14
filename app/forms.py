@@ -70,15 +70,16 @@ class AddUsersByFileForm(FlaskForm):
 
 
 class UserSettingForm(FlaskForm):
-    email = EmailField(
-        "Email: ", render_kw={"placeholder": "Email"}
-    )
+    email = EmailField("Email: ", render_kw={"placeholder": "Email"})
     password = PasswordField("密碼: ", render_kw={"placeholder": "未更改"})
     submit = SubmitField("更改")
 
     def validate_password(self, field):
-        if field.data != "" and len(field.data) < 6:
-            raise ValidationError("Password is too short (at least 6 characters).")
+        if type(field.data) is str:
+            if field.data != "" and len(field.data) < 6:
+                raise ValidationError("Password is too short (at least 6 characters).")
+        else:
+            raise ValidationError("Invalid.")
 
 
 class RestoreForm(FlaskForm):

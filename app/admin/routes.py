@@ -1,5 +1,12 @@
-from flask import request, render_template, current_app, make_response
-from flask.helpers import flash
+from flask import (
+    request,
+    render_template,
+    current_app,
+    make_response,
+    flash,
+    redirect,
+    url_for,
+)
 from flask_login import login_required
 from . import admin_bp
 from .helper import csv_handler
@@ -14,12 +21,14 @@ from ..database.backup import get_backups
 from ..users import admin_required
 
 
-# The page allows admins to browse all reports and make response to the reports.
 @admin_bp.route("/admin_dashboard/", methods=["GET", "POST"])
 @admin_bp.route("/admin_dashboard/<int:page>", methods=["GET", "POST"])
 @admin_required
 @login_required
 def dashboard_page(page=1):
+    """
+    The page allows admins to browse all reports and make response to the reports.
+    """
     # cookies are used to save filter when user turns page
     form = ReportsFilterForm()
     if request.method == "GET":
@@ -62,13 +71,16 @@ def dashboard_page(page=1):
             return response
         else:
             current_app.logger.info("POST /admin_dashboard: Invalid submit")
+            return redirect(url_for("admin.dashboard_page"))
 
 
-# The page allows admins to modify system setting. For example, they can add more buildings, offices and so on to the system.
 @admin_bp.route("/system", methods=["GET"])
 @admin_required
 @login_required
 def system_page():
+    """
+    The page allows admins to modify system setting. For example, they can add more buildings, offices and so on to the system.
+    """
     if request.method == "GET":
         current_app.logger.info("GET /system")
         buildings, items, offices, statuses = render_system_setting()
@@ -81,66 +93,75 @@ def system_page():
         )
 
 
-# The page allows admins to add, edit and delete users.
 @admin_bp.route("/manage_user/", methods=["GET", "POST"])
 @admin_bp.route("/manage_user/<int:page>", methods=["GET", "POST"])
 @admin_required
 @login_required
 def manage_user_page(page=1):
+    """
+    The page allows admins to add, edit and delete users.
+    """
     form = AddOneUserForm()
     form_csv = AddUsersByFileForm()
+    response = render_template(
+        "manage_user.html",
+        form=form,
+        form_csv=form_csv,
+        users=render_users(page=page),
+    )
     if request.method == "GET":
         # Render all users
         current_app.logger.info("GET /manage_user")
-        return render_template(
-            "manage_user.html",
-            form=form,
-            form_csv=form_csv,
-            users=render_users(page=page),
-        )
+        return response
     if request.method == "POST":
         # Add user
-        # Add one user
-        if form.validate_on_submit():
-            current_app.logger.info("POST /manage_user")
-            data = {
-                "username": form.username.data,
-                "name": form.name.data,
-                "classnum": form.classnum.data,
-                "password": form.password.data,
-                "email": form.email.data,
-                "is_admin": int(form.classnum.data) == 0,
-            }
-            if len(data["password"]) < 6:
-                flash(
-                    "Password is too short (at least 6 characters).", category="alert"
-                )
-            elif already_exists := add_users(data):
-                flash(", ".join(already_exists) + " 已經存在", category="alert")
-        else:
-            current_app.logger.info("POST /manage_user: Invalid submit")
-
-        # Add users by csv
-        if form_csv.validate_on_submit():
-            current_app.logger.info("POST /manage_user")
-            csv_file = form_csv.csv_file.data
-            # data format: [{"username": "zxc", "name": "zxc", "password": "123", "classnum": "1400"}]
-            if not (data := csv_handler(csv_file.read())):
-                flash("Bad encoding.", category="alert")
-            else:
-                if already_exists := add_users(data):
+        if form.username.data:
+            # Add one user
+            if form.validate_on_submit():
+                current_app.logger.info("POST /manage_user")
+                data = {
+                    "username": form.username.data,
+                    "name": form.name.data,
+                    "classnum": form.classnum.data,
+                    "password": form.password.data,
+                    "email": form.email.data,
+                    "is_admin": int(form.classnum.data) == 0,
+                }
+                if len(data["password"]) < 6:
+                    flash(
+                        "Password is too short (at least 6 characters).",
+                        category="alert",
+                    )
+                elif already_exists := add_users(data):
                     flash(", ".join(already_exists) + " 已經存在", category="alert")
-        else:
-            current_app.logger.info("POST /manage_user: Invalid submit")
-        return render_template(
-            "manage_user.html", form=form, form_csv=form_csv, users=render_users()
-        )
+                return response
+            else:
+                current_app.logger.info("POST /manage_user: Invalid submit")
+                return response, 400
+        if form_csv.csv_file.data:
+            # Add users by csv
+            if form_csv.validate_on_submit():
+                current_app.logger.info("POST /manage_user")
+                csv_file = form_csv.csv_file.data
+                # data format: [{"username": "zxc", "name": "zxc", "password": "123", "classnum": "1400"}]
+                if not (data := csv_handler(csv_file.read())):
+                    flash("Bad encoding.", category="alert")
+                else:
+                    if already_exists := add_users(data):
+                        flash(", ".join(already_exists) + " 已經存在", category="alert")
+                return response
+            else:
+                current_app.logger.info("POST /manage_user: Invalid submit")
+                return response, 400
 
 
 @admin_bp.route("/backup", methods=["GET", "POST"])
 @admin_required
 @login_required
 def backup_page():
+    """
+    The page allows admins to backup current database or restore from previous version.
+    """
     form = RestoreForm()
     if request.method == "GET":
         return render_template("backup.html", form=form, backups=get_backups())
