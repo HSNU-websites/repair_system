@@ -55,10 +55,12 @@ def internal_server_error_handler(e):
     current_app.logger.error("Internal Server Error.")
     return redirect(url_for("main.index_page"))
 
+
 @main_bp.app_errorhandler(401)
 def unauthorized_handler(e):
     current_app.logger.error("Unauthorized.")
     return redirect(url_for("main.index_page"))
+
 
 @main_bp.app_errorhandler(403)
 def forbidden_handler(e):

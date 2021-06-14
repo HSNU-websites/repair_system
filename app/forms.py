@@ -57,7 +57,7 @@ class AddOneUserForm(FlaskForm):
         "密碼: ", validators=[DataRequired()], render_kw={"placeholder": "Password"}
     )
     email = EmailField("電子郵件 (僅管理員需要): ", render_kw={"placeholder": "Email"})
-    submit_one_user = SubmitField("新增")
+    submit = SubmitField("新增")
 
     def validate_email(self, field):
         if self.classnum.data == "0" and self.email.data == "":
@@ -66,7 +66,7 @@ class AddOneUserForm(FlaskForm):
 
 class AddUsersByFileForm(FlaskForm):
     csv_file = FileField("CSV file", validators=[FileRequired()])
-    submit_csv = SubmitField("新增")
+    submit = SubmitField("新增")
 
 
 class UserSettingForm(FlaskForm):
@@ -75,11 +75,11 @@ class UserSettingForm(FlaskForm):
     submit = SubmitField("更改")
 
     def validate_password(self, field):
-        if type(field.data) is str and field.data != "":
-            if len(field.data) < 6:
+        if type(field.data) is str:
+            if field.data != "" and len(field.data) < 6:
                 raise ValidationError("Password is too short (at least 6 characters).")
         else:
-            raise ValidationError("Password is too short (at least 6 characters).")
+            raise ValidationError("Invalid.")
 
 
 class RestoreForm(FlaskForm):

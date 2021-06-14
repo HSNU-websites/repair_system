@@ -1,4 +1,3 @@
-from app.database.backup import restore
 import unittest
 from flask import url_for
 from app import create_app, db
@@ -112,7 +111,7 @@ class ManageUserBackendTest(BackendTest):
     """
 
     def test_add_one_user_bad(self):
-        # Add admin but password is not provided.
+        # Add admin but email is not provided.
         with self.client:
             self.login()
             response = self.client.post(
@@ -185,6 +184,10 @@ class BackupBackendTest(BackendTest):
 
 
 class UserSettingTest(BackendTest):
+    """
+    In this test, we test whether the user setting page is ok.
+    """
+
     def test_ok(self):
         with self.client:
             self.login()

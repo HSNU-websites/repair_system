@@ -115,7 +115,7 @@ def manage_user_page(page=1):
         return response
     if request.method == "POST":
         # Add user
-        if "submit_one_user" in request.form:
+        if form.username.data:
             # Add one user
             if form.validate_on_submit():
                 current_app.logger.info("POST /manage_user")
@@ -138,7 +138,7 @@ def manage_user_page(page=1):
             else:
                 current_app.logger.info("POST /manage_user: Invalid submit")
                 return response, 400
-        if "submit_csv" in request.form:
+        if form_csv.csv_file.data:
             # Add users by csv
             if form_csv.validate_on_submit():
                 current_app.logger.info("POST /manage_user")

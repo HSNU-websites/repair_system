@@ -15,8 +15,8 @@ class NoAuthTest(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         # status code
-        self.normal = 401
-        self.admin = 401
+        self.normal = 302
+        self.admin = 302
 
     def tearDown(self) -> None:
         if self.app_context is not None:
@@ -73,7 +73,7 @@ class NormalUserAuthTest(unittest.TestCase):
         db.session.add(self.user)
         # status code
         self.normal = 200
-        self.admin = 403
+        self.admin = 302
 
     def tearDown(self) -> None:
         db.session.remove()
