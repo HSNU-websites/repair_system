@@ -8,8 +8,6 @@ services:
     depends_on:
       - db
     restart: always
-    ports:
-      - 8080:5000
     environment:
       - MODE="production"
       - DB_USER="repair_system"
@@ -43,7 +41,7 @@ services:
       - repair_system
 
   nginx:
-    image: nginx:latest
+    build: ./nginx/
     container_name: nginx
     depends_on:
       - web
