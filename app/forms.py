@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, SelectField, StringField, SubmitField
 from wtforms.fields.html5 import EmailField
 from flask_wtf.file import FileField, FileRequired
-from wtforms.validators import DataRequired, ValidationError, Length
+from wtforms.validators import DataRequired, ValidationError
 
 
 class LoginForm(FlaskForm):
@@ -70,12 +70,18 @@ class AddUsersByFileForm(FlaskForm):
 
 
 class UserSettingForm(FlaskForm):
-    email = EmailField(
-        "Email: ", render_kw={"placeholder": "Email"}
-    )
+    email = EmailField("Email: ", render_kw={"placeholder": "Email"})
     password = PasswordField("密碼: ", render_kw={"placeholder": "未更改"})
     submit = SubmitField("更改")
 
     def validate_password(self, field):
-        if field.data != "" and len(field.data) < 6:
-            raise ValidationError("Password is too short (at least 6 characters).")
+        if type(field.data) is str:
+            if field.data != "" and len(field.data) < 6:
+                raise ValidationError("Password is too short (at least 6 characters).")
+        else:
+            raise ValidationError("Invalid.")
+
+
+class RestoreForm(FlaskForm):
+    file = FileField("", validators=[FileRequired()])
+    submit = SubmitField("上傳")

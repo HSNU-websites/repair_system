@@ -1,11 +1,12 @@
-Flask == 1.1.2
-Flask-script
-Flask-login
-Flask-sqlalchemy
-Flask-wtf
-Flask-mail
-MySQL
-ujson
-passlib
+Flask==1.1.2
 Flask-APScheduler
 Flask-Caching
+Flask-Login
+Flask-Mail
+Flask-Script
+Flask-SQLAlchemy
+Flask-WTF
+gunicorn
+mysql
+passlib
+ujson

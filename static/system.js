@@ -3,7 +3,7 @@ function send_remove(element) {
     var category = info[0];
     var id = parseInt(info[1]);
     $.ajax({
-        url: "/system_modification",
+        url: "/system_backend",
         type: "delete",
         data: JSON.stringify({ "category": category, "id": id }),
         dataType: "json",
@@ -39,7 +39,7 @@ function send_add(element) {
     }
     console.log(data)
     $.ajax({
-        url: "/system_modification",
+        url: "/system_backend",
         type: "post",
         data: data,
         dataType: "json",
@@ -82,7 +82,7 @@ function send_update(element) {
         }
     }
     $.ajax({
-        url: "/system_modification",
+        url: "/system_backend",
         type: "update",
         data: JSON.stringify(result),
         dataType: "json",

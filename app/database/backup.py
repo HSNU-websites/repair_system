@@ -9,7 +9,7 @@ from .db_helper import updateUnfinisheds
 defaultTables = idTables
 partition = 10000
 
-backup_dir = Path("Backup")
+backup_dir = Path("backup")
 
 # mail [].sort(key = lambda s: s[2])
 # archiveName -> *.tar.gz / * (a folder)
@@ -49,8 +49,8 @@ def db_reprTest():
     return b
 
 
-def getBackups() -> list:
-    return list(backup_dir.iterdir())
+def get_backups() -> list:
+    return [a.name for a in backup_dir.glob("*.tar.xz")]
 
 
 def set_diff(a: set, b: set, modify=False) -> list[set]:
@@ -135,3 +135,9 @@ def restore(archiveName: str, tables: list = None, insert=True, update=True, del
                 t.query.filter(t.id.in_(result[2])).delete()
     db.session.commit()
     updateUnfinisheds()
+
+
+def del_backup(archiveName):
+    a = backup_dir / archiveName
+    if a.is_file():
+        a.unlink()

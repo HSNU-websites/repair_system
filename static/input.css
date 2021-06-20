@@ -5,6 +5,7 @@ input[type="text"], input[type="email"], input[type="password"] {
     color: black;
     border: 1px solid #d1d1d1;
     border-radius: 5px;
+    min-width: 0;
     height: 20px;
     outline: none;
     -webkit-transition: .18s ease-out;
@@ -24,8 +25,8 @@ input[type="text"]:disabled, input[type="email"]:disabled, input[type="password"
 
 input[type="submit"] {
     font-family: 'Noto Sans TC', sans-serif;
-    width: 70px;
-    height: 40px;
+    min-width: 70px;
+    height: 30px;
     border: 1px solid #d1d1d1;
     border-radius: 10px;
 }
@@ -47,7 +48,7 @@ button {
     border-color: rgba(255, 255, 255, 0);
     border-radius: 5px;
     height: 30px;
-    width: 50px;
+    min-width: 50px;
     background-color: white;
     cursor: pointer;
 }

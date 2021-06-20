@@ -6,9 +6,11 @@ from ..database.db_helper import login_auth
 from ..users import *
 
 
-# Login page.
 @main_bp.route("/", methods=["GET", "POST"])
-def index_page():  # index page is login page
+def index_page():
+    """
+    The index page serves as login page.
+    """
     if current_user.is_active:
         if current_user.is_admin:
             return redirect(url_for("admin.dashboard_page"))
@@ -39,7 +41,6 @@ def index_page():  # index page is login page
                 return redirect(url_for("main.index_page"))
 
 
-# Logout page.
 @main_bp.route("/logout", methods=["GET"])
 def logout_page():
     current_app.logger.info("GET /logout")
@@ -52,3 +53,16 @@ def logout_page():
 @main_bp.app_errorhandler(500)
 def internal_server_error_handler(e):
     current_app.logger.error("Internal Server Error.")
+    return redirect(url_for("main.index_page"))
+
+
+@main_bp.app_errorhandler(401)
+def unauthorized_handler(e):
+    current_app.logger.error("Unauthorized.")
+    return redirect(url_for("main.index_page"))
+
+
+@main_bp.app_errorhandler(403)
+def forbidden_handler(e):
+    current_app.logger.error("Forbidden.")
+    return redirect(url_for("main.index_page"))
