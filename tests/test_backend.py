@@ -11,6 +11,7 @@ class BackendTest(unittest.TestCase):
     """
 
     def setUp(self) -> None:
+        db.drop_all()
         self.app = create_app("testing")
         self.client = self.app.test_client()
         self.app_context = self.app.app_context()
@@ -26,6 +27,7 @@ class BackendTest(unittest.TestCase):
             is_admin=True,
         )
         db.session.add(self.test_admin)
+        db.session.commit()
 
     def tearDown(self) -> None:
         db.session.remove()

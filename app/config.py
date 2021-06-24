@@ -27,7 +27,7 @@ class Development(Config):
 
 
 class Testing(Config):
-    SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///data_testing.db"
     TESTING = True
     DEBUG = True
     ENV = "testing"

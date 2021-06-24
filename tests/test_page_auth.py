@@ -57,6 +57,7 @@ class NormalUserAuthTest(unittest.TestCase):
     """
 
     def setUp(self) -> None:
+        db.drop_all()
         self.app = create_app("testing")
         self.client = self.app.test_client()
         self.app_context = self.app.test_request_context()
@@ -71,6 +72,7 @@ class NormalUserAuthTest(unittest.TestCase):
             is_admin=False,
         )
         db.session.add(self.user)
+        db.session.commit()
         # status code
         self.normal = 200
         self.admin = 302
@@ -140,6 +142,7 @@ class AdminAuthTest(NormalUserAuthTest):
     """
 
     def setUp(self) -> None:
+        db.drop_all()
         self.app = create_app("testing")
         self.client = self.app.test_client()
         self.app_context = self.app.test_request_context()
@@ -155,6 +158,7 @@ class AdminAuthTest(NormalUserAuthTest):
             is_admin=True,
         )
         db.session.add(self.test_admin)
+        db.session.commit()
         # status code
         self.normal = 200
         self.admin = 200
