@@ -1,1 +1,13 @@
 /data
+/.circleci/
+/.vscode/
+__pycache__/
+/.dockerignore
+/Dockerfile
+/docker-compose.yml
+/.git/
+/.gitignore
+/nginx/
+/data/
+/backup/
+/log/
