@@ -103,7 +103,6 @@ def manage_user_page(page=1):
     """
     form = AddOneUserForm()
     form_csv = AddUsersByFileForm()
-    response = redirect(url_for("admin.manage_user_page"))
     if request.method == "GET":
         # Render all users
         current_app.logger.info("GET /manage_user")
@@ -132,12 +131,28 @@ def manage_user_page(page=1):
                         "Password is too short (at least 6 characters).",
                         category="alert",
                     )
-                elif already_exists := add_users(data):
+                elif already_exists := add_users([data]):
                     flash(", ".join(already_exists) + " 已經存在", category="alert")
-                return response
+                return render_template(
+                    "manage_user.html",
+                    form=form,
+                    form_csv=form_csv,
+                    users=render_users(page=page),
+                )
             else:
+                for _, errorMessages in form.errors.items():
+                    for err in errorMessages:
+                        flash(err, category="alert")
                 current_app.logger.info("POST /manage_user: Invalid submit")
-                return response
+                return (
+                    render_template(
+                        "manage_user.html",
+                        form=form,
+                        form_csv=form_csv,
+                        users=render_users(page=page),
+                    ),
+                    400,
+                )
         if form_csv.csv_file.data:
             # Add users by csv
             if form_csv.validate_on_submit():
@@ -149,13 +164,26 @@ def manage_user_page(page=1):
                 else:
                     if already_exists := add_users(data):
                         flash(", ".join(already_exists) + " 已經存在", category="alert")
-                return response
+                return render_template(
+                    "manage_user.html",
+                    form=form,
+                    form_csv=form_csv,
+                    users=render_users(page=page),
+                )
             else:
                 for _, errorMessages in form_csv.errors.items():
                     for err in errorMessages:
                         flash(err, category="alert")
                 current_app.logger.info("POST /manage_user: Invalid submit")
-                return response
+                return (
+                    render_template(
+                        "manage_user.html",
+                        form=form,
+                        form_csv=form_csv,
+                        users=render_users(page=page),
+                    ),
+                    400,
+                )
 
 
 @admin_bp.route("/backup", methods=["GET", "POST"])
