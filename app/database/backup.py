@@ -2,14 +2,17 @@ import datetime
 import re  # regex
 from pathlib import Path
 
-from .model import *
+import ujson
+
 from .Archive import Archive
 from .db_helper import updateUnfinisheds
+from .model import *
+from .common import cache
 
 defaultTables = idTables
 partition = 10000
 
-backup_dir = Path("backup")
+backup_dir = Path("backup").resolve()  # absolute path to backup directory
 
 # mail [].sort(key = lambda s: s[2])
 # archiveName -> *.tar.gz / * (a folder)
@@ -17,13 +20,12 @@ backup_dir = Path("backup")
 # tables      -> [Users]
 # tablenames  -> ["users"]
 
-pattern = re.compile(r"^(?P<tableName>[a-z]+)(_\d+)?.json$")
+pattern = re.compile(r"^(?P<tableName>[a-z]+)_\d+.json$")
 
 
 def convertTablename(filename: str):
     """
-    'buildings.json'    -> 'buildings'
-    'users_1-1000.json' -> 'users'
+    'users_1.json' -> 'users'
     """
     if m := pattern.match(filename):
         return m.group("tableName")
@@ -49,91 +51,88 @@ def db_reprTest():
     return b
 
 
-def get_backups() -> list:
-    return [a.name for a in backup_dir.glob("*.tar.xz")]
-
-
-def set_diff(a: set, b: set, modify=False) -> list[set]:
-    """
-    if modify=True, set 'a' and 'b' will be modified,
-    but it's faster since it doesn't need copy.
-    returns list[set(only in a), set(in a and b), set(only in b)]
-    """
-    if not modify:
-        a = a.copy()
-        b = b.copy()
-    result = [set(), set(), set()]
-    for value in a:
-        if value in b:
-            result[1].add(value)
-            b.remove(value)
-        else:
-            result[0].add(value)
-    result[2] = b
+def get_backups(reverse: bool = True) -> list:
+    result = [a.name for a in backup_dir.glob("*.tar.xz")]
+    result.sort(reverse=reverse)
     return result
 
 
-def backup(tables: list[db.Model] = None):  # path not fix
+def backup(tablenames: list[str] = None):
     archiveName = "Backup_{time}.tar.xz".format(
         time=datetime.datetime.now().strftime(filetimeformat))
-    if tables is None:
-        tables = defaultTables
+
+    if tablenames is None:
+        tablenames = topological_order
     else:
-        tables = filter(lambda x: x in idTables, tables)
+        tablenames = to_topological(tablenames, topological_order)
+        if not validate_topological(tablenames, dependencyGraph):
+            print("tablenames does not fulfill dependencies.")
+            return False
+    tables = [t for tn in tablenames if (t := tablenameRev[tn]) in idTables]
 
     archive = Archive(backup_dir / archiveName, "w")
     for t in tables:
-        max = t.query.count()
-        if max <= partition:
-            filename = "{tablename}.json".format(tablename=t.__tablename__)
-            final = dict()
-            final["tablename"] = t.__tablename__
-            final["data"] = [get_dict(row) for row in t.query.all()]
+        p = t.query.paginate(per_page=partition)
+        while p.items:
+            filename = "{tablename}_{count}.json".format(
+                tablename=t.__tablename__, count=p.page)
+            final = {
+                "tablename": t.__tablename__,
+                "data": [get_dict(row) for row in p.items]
+            }
             archive.write(filename, final)
-        else:
-            p = t.query.paginate(per_page=partition)
-            while p.items:
-                filename = "{tablename}_{count}.json".format(
-                    tablename=t.__tablename__, count=p.page)
-                final = dict()
-                final["tablename"] = t.__tablename__
-                final["data"] = [get_dict(row) for row in p.items]
-                archive.write(filename, final)
-                p = p.next()
+            p = p.next()
     print("Backup finished, file: {}".format(archiveName))
 
-
-def restore(archiveName: str, tables: list = None, insert=True, update=True, delete=True):
-    Unfinisheds.query.delete()
-    if tables is None:
-        tables = defaultTables
-    tablenames = [t.__tablename__ for t in tables]
-    print("Restoring tables {}".format(tablenames))
+def restore(archiveName: str, tablenames: list[str] = None):
+    # prepare tablelist
     archive = Archive(backup_dir / archiveName, "r")
-    print("Archive {} has {}".format(archiveName, archive.getFileNames()))
-    for filename in archive.getFileNames():
-        tablename = convertTablename(filename)
-        if tablename in tablenames:
-            print("Restoring {}".format(tablename))
-            t = tablenameRev[tablename]
-            l = archive.read(filename)[tablename]
-            temp = [get_dict(eval(obj)) for obj in l]
-            rows = {d["id"]: d for d in temp}
-            a = set(rows.keys())
-            b = {row.id for row in db.session.query(t.id).all()}
-            result = set_diff(a, b, modify=True)
-            if insert:
-                print("Inserting {}".format(sorted(result[0])))
-                ld = [rows[id] for id in result[0]]
-                db.session.bulk_insert_mappings(t, ld)
-            if update:
-                print("Updating {}".format(sorted(result[1])))
-                ld = [rows[id] for id in result[1]]
-                db.session.bulk_update_mappings(t, ld)
-            if delete:
-                print("Deleting {}".format(sorted(result[2])))
-                t.query.filter(t.id.in_(result[2])).delete()
+    tablelist = dict()
+    for fn in archive.getFileNames():
+        tn = convertTablename(fn)
+        if tn:
+            l = tablelist.setdefault(tn, [])
+            l.append(fn)
+    for l in tablelist.values():  # sort filenames
+        l.sort()
+    tl = ujson.dumps(tablelist, ensure_ascii=False, escape_forward_slashes=False, sort_keys=True, indent=4)
+    print("Archive {} has {}".format(archiveName, tl))
+
+    # check if tablenames valid
+    if tablenames is None:
+        tablenames = list(tablelist.keys())
+    else:
+        temp = []
+        for tn in tablenames:
+            if tn in tablelist:
+                temp.append(tn)
+            else:
+                print("table '{}' not in backup '{}'".format(tn, archiveName))
+                return False
+        tablenames = temp
+    tablenames = to_topological(tablenames, topological_order)
+    if not validate_topological(tablenames, dependencyGraph):
+        print("tablenames does not fulfill dependencies.")
+        return False
+
+    # delete tables
+    if "records" in tablenames or "revisions" in tablenames:
+        Unfinisheds.query.delete()
+
+    for tablename in reversed(tablenames):
+        t = tablenameRev[tablename]
+        t.query.delete()
+
+    # restore tables
+    for tablename in tablenames:
+        t = tablenameRev[tablename]
+        for filename in tablelist[tablename]:
+            l = archive.read(filename)["data"]
+            rows = [t(**d) for d in l]
+            db.session.bulk_save_objects(rows)
+
     db.session.commit()
+    cache.clear()
     updateUnfinisheds()
 
 

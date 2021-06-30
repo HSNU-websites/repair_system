@@ -1,9 +1,7 @@
 .vscode/
 __pycache__/
-.venv
+/.venv/
 .env
 data.db
-test.py
-*.tar.xz
-/Backup/
+/backup/
 /log/
