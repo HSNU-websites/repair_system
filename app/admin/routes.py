@@ -132,7 +132,7 @@ def manage_user_page(page=1):
                         "Password is too short (at least 6 characters).",
                         category="alert",
                     )
-                elif already_exists := add_users(data):
+                elif already_exists := add_users([data]):
                     flash(", ".join(already_exists) + " 已經存在", category="alert")
                 return response
             else:
