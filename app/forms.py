@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import PasswordField, SelectField, StringField, SubmitField
 from wtforms.fields.html5 import EmailField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
+from flask_wtf.recaptcha import RecaptchaField
 from wtforms.validators import DataRequired, ValidationError
 
 
@@ -12,6 +13,7 @@ class LoginForm(FlaskForm):
     password = PasswordField(
         "密碼: ", validators=[DataRequired()], render_kw={"placeholder": "Password"}
     )
+    recaptcha = RecaptchaField()
     submit = SubmitField("登入")
 
 

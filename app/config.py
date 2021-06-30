@@ -18,6 +18,9 @@ class Config:
     CACHE_TYPE = "SimpleCache"
     CACHE_DEFAULT_TIMEOUT = 0  # Never timeout
     CACHE_THRESHOLD = 5000
+    # reCAPTCHA
+    RECAPTCHA_PUBLIC_KEY = getenv("RECAPTCHA_PUBLIC_KEY")
+    RECAPTCHA_PRIVATE_KEY = getenv("RECAPTCHA_PRIVATE_KEY")
 
 
 class Development(Config):

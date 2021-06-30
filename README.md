@@ -17,6 +17,8 @@ $ sudo apt install docker docker-compose git python-certbot-nginx
 $ sudo certbot --nginx
 $ sudo cp /etc/letsencrypt/live/[domain]/{fullchain.pem,privkey.pem} ./nginx/ssl/
 ```
+再來把基本的資訊加入 `docker-compose.yml`。第一個需要加入的項目是一組 gmail 的帳號密碼，且他必須打開「低安全性應用程式」的授權，用來寄發系統郵件；第二個是 reCAPTCHA 的 public key 和 private key，他在登入時會驗證。  
+
 最後就可以啟動：
 ```
 $ sudo docker-compose up -d
@@ -40,4 +42,3 @@ Password: 123
 在 `./data/log/` 裡面有 SQL 和 flask 的 log，有記錄每一筆 request。
 ## 常見問題
 1. flask 的版本需指定 `flask == 1.1`，因為需要和 flask-script 配合。
-2. 系統自動寄發的 email 需要一個 gmail 信箱，寫在 `docker-compose.yml` 裡面，且他必須打開「低安全性應用程式」的授權。
