@@ -88,7 +88,7 @@ def load_user(user_id: str):
 def updateUnfinisheds():
     Unfinisheds.query.delete()
     l = []
-    for record in Records.query.all():
+    for record in db.session.query(Records.id).all():
         r = db.session.query(Revisions.status_id).filter_by(record_id=record.id).order_by(Revisions.id.desc()).limit(1).scalar()
         if r != finishedStatus_id:
             l.append({"record_id": record.id})
