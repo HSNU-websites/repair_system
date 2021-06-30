@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, SelectField, StringField, SubmitField
 from wtforms.fields.html5 import EmailField
-from flask_wtf.file import FileField, FileRequired
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms.validators import DataRequired, ValidationError
 
 
@@ -65,7 +65,10 @@ class AddOneUserForm(FlaskForm):
 
 
 class AddUsersByFileForm(FlaskForm):
-    csv_file = FileField("CSV file", validators=[FileRequired()])
+    csv_file = FileField(
+        "CSV file",
+        validators=[FileRequired(), FileAllowed(["csv"], "Only csv is allowed.")],
+    )
     submit = SubmitField("新增")
 
 
