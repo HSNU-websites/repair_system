@@ -133,7 +133,8 @@ def restore(archiveName: str, tablenames: list[str] = None):
 
     db.session.commit()
     cache.clear()
-    updateUnfinisheds()
+    if "records" in tablenames or "revisions" in tablenames:
+        updateUnfinisheds()
 
 
 def del_backup(archiveName):
