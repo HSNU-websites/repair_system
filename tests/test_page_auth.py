@@ -24,31 +24,31 @@ class NoAuthTest(unittest.TestCase):
 
     def test_report_page(self):
         response = self.client.get(url_for("user.report_page"))
-        self.assertTrue(response.status_code == self.normal)
+        self.assertEqual(response.status_code, self.normal)
 
     def test_dashboard_page(self):
         response = self.client.get(url_for("user.dashboard_page"))
-        self.assertTrue(response.status_code == self.normal)
+        self.assertEqual(response.status_code, self.normal)
 
     def test_user_setting_page(self):
         response = self.client.get(url_for("user.user_setting_page"))
-        self.assertTrue(response.status_code == self.normal)
+        self.assertEqual(response.status_code, self.normal)
 
     def test_admin_dashboard_page(self):
         response = self.client.get(url_for("admin.dashboard_page"))
-        self.assertTrue(response.status_code == self.admin)
+        self.assertEqual(response.status_code, self.admin)
 
     def test_system_page(self):
         response = self.client.get(url_for("admin.system_page"))
-        self.assertTrue(response.status_code == self.admin)
+        self.assertEqual(response.status_code, self.admin)
 
     def test_manage_user_page(self):
         response = self.client.post(url_for("admin.manage_user_page"))
-        self.assertTrue(response.status_code == self.admin)
+        self.assertEqual(response.status_code, self.admin)
 
     def test_backup_page(self):
         response = self.client.post(url_for("admin.backup_page"))
-        self.assertTrue(response.status_code == self.admin)
+        self.assertEqual(response.status_code, self.admin)
 
 
 class NormalUserAuthTest(unittest.TestCase):
@@ -57,6 +57,7 @@ class NormalUserAuthTest(unittest.TestCase):
     """
 
     def setUp(self) -> None:
+        db.drop_all()
         self.app = create_app("testing")
         self.client = self.app.test_client()
         self.app_context = self.app.test_request_context()
@@ -71,6 +72,7 @@ class NormalUserAuthTest(unittest.TestCase):
             is_admin=False,
         )
         db.session.add(self.user)
+        db.session.commit()
         # status code
         self.normal = 200
         self.admin = 302
@@ -86,51 +88,51 @@ class NormalUserAuthTest(unittest.TestCase):
 
     def test_login(self):
         response = self.login()
-        self.assertTrue(
-            response.status_code == 302
+        self.assertEqual(
+            response.status_code, 302
         )  # After a user successfully login, he or she will be redirected.
 
     def test_report_page(self):
         with self.client:
             self.login()
             response = self.client.get(url_for("user.report_page"))
-            self.assertTrue(response.status_code == self.normal)
+            self.assertEqual(response.status_code, self.normal)
 
     def test_dashboard_page(self):
         with self.client:
             self.login()
             response = self.client.get(url_for("user.dashboard_page"))
-            self.assertTrue(response.status_code == self.normal)
+            self.assertEqual(response.status_code, self.normal)
 
     def test_user_setting_page(self):
         with self.client:
             self.login()
             response = self.client.get(url_for("user.user_setting_page"))
-            self.assertTrue(response.status_code == self.normal)
+            self.assertEqual(response.status_code, self.normal)
 
     def test_admin_dashboard_page(self):
         with self.client:
             self.login()
             response = self.client.get(url_for("admin.dashboard_page"))
-            self.assertTrue(response.status_code == self.admin)
+            self.assertEqual(response.status_code, self.admin)
 
     def test_system_page(self):
         with self.client:
             self.login()
             response = self.client.get(url_for("admin.system_page"))
-            self.assertTrue(response.status_code == self.admin)
+            self.assertEqual(response.status_code, self.admin)
 
     def test_manage_user_page(self):
         with self.client:
             self.login()
             response = self.client.get(url_for("admin.manage_user_page"))
-            self.assertTrue(response.status_code == self.admin)
+            self.assertEqual(response.status_code, self.admin)
 
     def test_backup_page(self):
         with self.client:
             self.login()
             response = self.client.get(url_for("admin.backup_page"))
-            self.assertTrue(response.status_code == self.admin)
+            self.assertEqual(response.status_code, self.admin)
 
 
 class AdminAuthTest(NormalUserAuthTest):
@@ -140,6 +142,7 @@ class AdminAuthTest(NormalUserAuthTest):
     """
 
     def setUp(self) -> None:
+        db.drop_all()
         self.app = create_app("testing")
         self.client = self.app.test_client()
         self.app_context = self.app.test_request_context()
@@ -155,6 +158,7 @@ class AdminAuthTest(NormalUserAuthTest):
             is_admin=True,
         )
         db.session.add(self.test_admin)
+        db.session.commit()
         # status code
         self.normal = 200
         self.admin = 200
