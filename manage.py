@@ -205,5 +205,12 @@ def test():
     unittest.TextTestRunner(verbosity=2).run(tests)
 
 
+@app.before_first_request
+def init_database():
+    db.create_all()
+    if Users.query.count() == 0:
+        reset(True)
+
+
 if __name__ == "__main__":
     manager.run()
