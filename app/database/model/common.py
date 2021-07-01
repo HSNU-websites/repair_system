@@ -75,7 +75,14 @@ def topological_sort(graph) -> list:
 
 def to_topological(target, sample):
     s = set(target)
-    return [n for n in sample if n in s]
+    result = []
+    for node in sample:
+        if node in s:
+            result.append(node)
+            s.remove(node)
+    for node in s: # if node is not in sample, assume it does not depand on anyone.
+        result.append(node)
+    return result
 
 
 def validate_topological(target, graph):

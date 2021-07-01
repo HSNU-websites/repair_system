@@ -17,7 +17,7 @@ from ..database.db_helper import (
     render_users,
     add_users,
 )
-from ..database.backup import get_backups
+from ..database.backup import get_backups, backup_dir
 from ..users import admin_required
 
 
@@ -200,5 +200,5 @@ def backup_page():
         # save uploaded file
         if form.validate_on_submit():
             file = form.file.data
-            file.save("backup/" + file.filename)
+            file.save(backup_dir / file.filename)
         return render_template("backup.html", form=form, backups=get_backups())

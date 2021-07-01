@@ -1,13 +1,15 @@
 import datetime
+import logging
 import re  # regex
 from pathlib import Path
 
 import ujson
+from app.myhandler import MyTimedRotatingFileHandler
 
 from .Archive import Archive
+from .common import cache
 from .db_helper import updateUnfinisheds
 from .model import *
-from .common import cache
 
 defaultTables = idTables
 partition = 10000
@@ -19,6 +21,27 @@ backup_dir = Path("backup").resolve()  # absolute path to backup directory
 # filename    -> *.json
 # tables      -> [Users]
 # tablenames  -> ["users"]
+
+backup_log_handler = MyTimedRotatingFileHandler(
+    "log/backup.log",
+    "log/backup_%Y-%m-%d.log",
+    when="MIDNIGHT",
+    backupCount=14,
+    encoding="UTF-8",
+    delay=False,
+    utc=False,
+)
+format = logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+backup_log_handler.setFormatter(format)
+backup_log_handler.setLevel(logging.INFO)
+#  backup_log_handler handles log if log.level > INFO
+
+backup_logger = logging.getLogger('backup')
+backup_logger.addHandler(backup_log_handler)
+backup_logger.setLevel(logging.INFO)
+# backup_logger pass log to handlers if log.level > INFO
 
 pattern = re.compile(r"^(?P<tableName>[a-z]+)_\d+.json$")
 
@@ -61,14 +84,25 @@ def backup(tablenames: list[str] = None):
     archiveName = "Backup_{time}.tar.xz".format(
         time=datetime.datetime.now().strftime(filetimeformat))
 
+    backup_logger.info("Starting backup...")
+    backup_logger.info("tables: {}".format(tablenames))
+
     if tablenames is None:
         tablenames = topological_order
+        backup_logger.info("use default tables: {}".format(tablenames))
     else:
+        for tn in tablenames:
+            if tn not in idTables:
+                err = "table '{}' not available".format(tn)
+                backup_logger.error(err)
+                raise RuntimeError(err)
         tablenames = to_topological(tablenames, topological_order)
         if not validate_topological(tablenames, dependencyGraph):
-            print("tablenames does not fulfill dependencies.")
-            return False
-    tables = [t for tn in tablenames if (t := tablenameRev[tn]) in idTables]
+            err = "tablenames does not fulfill dependencies"
+            backup_logger.error(err)
+            raise RuntimeError(err)
+
+    tables = [tablenameRev[tn] for tn in tablenames]
 
     archive = Archive(backup_dir / archiveName, "w")
     for t in tables:
@@ -82,11 +116,16 @@ def backup(tablenames: list[str] = None):
             }
             archive.write(filename, final)
             p = p.next()
-    print("Backup finished, file: {}".format(archiveName))
+    backup_logger.info("Backup finished, file: {}".format(archiveName))
+
 
 def restore(archiveName: str, tablenames: list[str] = None):
     # prepare tablelist
     archive = Archive(backup_dir / archiveName, "r")
+
+    backup_logger.info("Starting restore...")
+    backup_logger.info("tables: {}".format(tablenames))
+
     tablelist = dict()
     for fn in archive.getFileNames():
         tn = convertTablename(fn)
@@ -96,24 +135,23 @@ def restore(archiveName: str, tablenames: list[str] = None):
     for l in tablelist.values():  # sort filenames
         l.sort()
     tl = ujson.dumps(tablelist, ensure_ascii=False, escape_forward_slashes=False, sort_keys=True, indent=4)
-    print("Archive {} has {}".format(archiveName, tl))
+    backup_logger.info("Archive '{}' has {}".format(archiveName, tl))
 
     # check if tablenames valid
     if tablenames is None:
         tablenames = list(tablelist.keys())
     else:
-        temp = []
         for tn in tablenames:
-            if tn in tablelist:
-                temp.append(tn)
-            else:
-                print("table '{}' not in backup '{}'".format(tn, archiveName))
-                return False
-        tablenames = temp
+            if tn not in tablelist:
+                err = "table '{}' not in backup file".format(tn)
+                backup_logger.error(err)
+                raise RuntimeError(err)
+
     tablenames = to_topological(tablenames, topological_order)
     if not validate_topological(tablenames, dependencyGraph):
-        print("tablenames does not fulfill dependencies.")
-        return False
+        err = "tablenames does not fulfill dependencies"
+        backup_logger.error(err)
+        raise RuntimeError(err)
 
     # delete tables
     if "records" in tablenames or "revisions" in tablenames:
@@ -135,6 +173,8 @@ def restore(archiveName: str, tablenames: list[str] = None):
     cache.clear()
     if "records" in tablenames or "revisions" in tablenames:
         updateUnfinisheds()
+
+    backup_logger.info("Restore finished")
 
 
 def del_backup(archiveName):
