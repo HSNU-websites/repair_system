@@ -4,7 +4,7 @@ WORKDIR /code
 
 COPY . /code
 
-RUN chmod +x /code/docker-entrypoint.sh
+RUN chmod +x /code/docker-entrypoint.sh \
     && apt update \
     && apt upgrade -y \
     && apt install -y --no-install-recommends gcc default-mysql-client vim \
