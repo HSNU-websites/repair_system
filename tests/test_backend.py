@@ -95,8 +95,6 @@ class ManageUserBackendTest(BackendTest):
     In this test, we test whether user management is available.
     """
 
-    """
-    # The function has some problems and should not be tested now.
     def test_add_one_user_ok(self):
         with self.client:
             self.login()
@@ -110,7 +108,6 @@ class ManageUserBackendTest(BackendTest):
                 },
             )
             self.assertTrue(response.status_code == 200)
-    """
 
     def test_add_one_user_bad(self):
         # Add admin but email is not provided.
@@ -126,6 +123,7 @@ class ManageUserBackendTest(BackendTest):
                 },
             )
             self.assertTrue(response.status_code == 400)
+            self.assertTrue(b"Email is required for admin." in response.data)
 
     def test_backend_ok(self):
         with self.client:
