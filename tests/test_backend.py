@@ -11,6 +11,7 @@ class BackendTest(unittest.TestCase):
     """
 
     def setUp(self) -> None:
+        db.drop_all()
         self.app = create_app("testing")
         self.client = self.app.test_client()
         self.app_context = self.app.app_context()
@@ -26,6 +27,7 @@ class BackendTest(unittest.TestCase):
             is_admin=True,
         )
         db.session.add(self.test_admin)
+        db.session.commit()
 
     def tearDown(self) -> None:
         db.session.remove()
@@ -53,7 +55,7 @@ class ReportFormTest(BackendTest):
                     "item": "None",
                 },
             )
-            self.assertTrue(response.status_code == 400)
+            self.assertEqual(response.status_code, 400)
 
 
 class SystemBackendTest(BackendTest):
@@ -68,13 +70,13 @@ class SystemBackendTest(BackendTest):
                 url_for("admin.system_backend_page"),
                 json={"category": "offices", "id": "1"},
             )
-            self.assertTrue(response.status_code == 200)
+            self.assertEqual(response.status_code, 200)
 
     def test_method_not_allowed(self):
         with self.client:
             self.login()
             response = self.client.get(url_for("admin.system_backend_page"))
-            self.assertTrue(response.status_code == 405)
+            self.assertEqual(response.status_code, 405)
 
     def test_bad_request(self):
         with self.client:
@@ -83,9 +85,7 @@ class SystemBackendTest(BackendTest):
                 url_for("admin.system_backend_page"),
                 json={"category": "items", "value": "test_item"},
             )
-            self.assertTrue(
-                response.status_code == 400
-            )  # because no office is provided
+            self.assertEqual(response.status_code, 400)  # because no office is provided
 
 
 class ManageUserBackendTest(BackendTest):
@@ -105,7 +105,7 @@ class ManageUserBackendTest(BackendTest):
                     "password": "password",
                 },
             )
-            self.assertTrue(response.status_code == 200)
+            self.assertEqual(response.status_code, 200)
 
     def test_add_one_user_bad(self):
         # Add admin but email is not provided.
@@ -120,8 +120,8 @@ class ManageUserBackendTest(BackendTest):
                     "password": "password",
                 },
             )
-            self.assertTrue(response.status_code == 400)
-            self.assertTrue(b"Email is required for admin." in response.data)
+            self.assertEqual(response.status_code, 400)
+            self.assertIn(b"Email is required for admin.", response.data)
 
     def test_backend_ok(self):
         with self.client:
@@ -130,13 +130,13 @@ class ManageUserBackendTest(BackendTest):
                 url_for("admin.manage_user_backend_page"),
                 json={"user_id": 1},
             )
-            self.assertTrue(response.status_code == 200)
+            self.assertEqual(response.status_code, 200)
 
     def test_backend_method_not_allowed(self):
         with self.client:
             self.login()
             response = self.client.get(url_for("admin.manage_user_backend_page"))
-            self.assertTrue(response.status_code == 405)
+            self.assertEqual(response.status_code, 405)
 
     def test_backend_bad_request(self):
         with self.client:
@@ -145,7 +145,7 @@ class ManageUserBackendTest(BackendTest):
                 url_for("admin.manage_user_backend_page"),
                 json={},
             )
-            self.assertTrue(response.status_code == 400)
+            self.assertEqual(response.status_code, 400)
 
 
 class BackupBackendTest(BackendTest):
@@ -158,19 +158,19 @@ class BackupBackendTest(BackendTest):
         with self.client:
             self.login()
             response = self.client.post(url_for("admin.backup_backend_page"))
-            self.assertTrue(response.status_code == 200)
+            self.assertEqual(response.status_code, 200)
 
     def test_method_not_allowed(self):
         with self.client:
             self.login()
             response = self.client.get(url_for("admin.backup_backend_page"))
-            self.assertTrue(response.status_code == 405)
+            self.assertEqual(response.status_code, 405)
 
     def test_bad_request(self):
         with self.client:
             self.login()
             response = self.client.delete(url_for("admin.backup_backend_page"), json={})
-            self.assertTrue(response.status_code == 400)
+            self.assertEqual(response.status_code, 400)
 
     def test_not_exists_backup_file(self):
         with self.client:
@@ -178,7 +178,7 @@ class BackupBackendTest(BackendTest):
             response = self.client.get(
                 url_for("admin.get_backup_file", filename="notexists")
             )
-            self.assertTrue(response.status_code == 404)
+            self.assertEqual(response.status_code, 404)
 
 
 class UserSettingTest(BackendTest):
@@ -193,7 +193,7 @@ class UserSettingTest(BackendTest):
                 url_for("user.user_setting_page"),
                 data={"email": "test@test.com", "password": "password"},
             )
-            self.assertTrue(response.status_code == 200)
+            self.assertEqual(response.status_code, 200)
 
     def test_bad(self):
         with self.client:
@@ -202,7 +202,7 @@ class UserSettingTest(BackendTest):
                 url_for("user.user_setting_page"),
                 data={},
             )
-            self.assertTrue(response.status_code == 400)
+            self.assertEqual(response.status_code, 400)
 
     def test_too_short_password(self):
         with self.client:
@@ -211,4 +211,4 @@ class UserSettingTest(BackendTest):
                 url_for("user.user_setting_page"),
                 data={"email": "test@test.com", "password": "short"},
             )
-            self.assertTrue(response.status_code == 400)
+            self.assertEqual(response.status_code, 400)

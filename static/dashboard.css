@@ -9,6 +9,7 @@ body {
     background-size: cover;
     margin: auto 0px auto 0px;
     height: 100%;
+    font-family: 'Noto Sans TC', sans-serif;
 }
 
 h1 {
