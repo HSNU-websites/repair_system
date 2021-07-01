@@ -36,23 +36,21 @@ class Records(db.Model):
 
     def __repr__(self):
         return (
-            "Records(id={id},user_id={user_id},item_id={item_id},building_id={building_id},location='{location}',insert_time='{myinserttime}',description='{description}')"
-            .format(myinserttime=self.insert_time.strftime(timeformat), **self.__dict__)
+            "Records(id={id},user_id={user_id},item_id={item_id},building_id={building_id},location='{location}',insert_time='{mytime}',description='{description}')"
+            .format(mytime=self.insert_time.strftime(timeformat), **self.__dict__)
         )
 
     @classmethod
     def new(cls, user_id, item_id, building_id, location="", description="", insert_time=None):
-        if insert_time is not None:
-            it = datetime.datetime.strptime(insert_time, timeformat)
-        else:
-            it = datetime.datetime.now().replace(microsecond=0)
+        if insert_time is None:
+            insert_time = datetime.datetime.now().strftime(timeformat)
 
         return cls(
             id=None,
             user_id=user_id,
             item_id=item_id,
             building_id=building_id,
-            insert_time=it,
+            insert_time=insert_time,
             location=location,
             description=description
         )

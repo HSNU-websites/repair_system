@@ -39,16 +39,14 @@ class Revisions(db.Model):
 
     @classmethod
     def new(cls, record_id, user_id, status_id, description, insert_time=None):
-        if insert_time is not None:
-            it = datetime.datetime.strptime(insert_time, timeformat)
-        else:
-            it = datetime.datetime.now().replace(microsecond=0)
+        if insert_time is None:
+            insert_time = datetime.datetime.now().strftime(timeformat)
 
         return cls(
             id=None,
             record_id=record_id,
             user_id=user_id,
             status_id=status_id,
-            insert_time=it,
+            insert_time=insert_time,
             description=description
         )
