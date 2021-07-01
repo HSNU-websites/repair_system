@@ -415,21 +415,18 @@ def del_users(ids: list[int], force=False):
 
 
 def reset(is_development=False):
-    db.session.commit() # must commit before drop_all
+    db.session.commit()  # must commit before drop_all
     db.drop_all()
     db.create_all()
 
-    db.session.add(
+    users = [
         Users.new(
             username="deleted",
             name="此帳號已刪除",
             classnum=0,
             is_valid=False,
             is_marked_deleted=True,
-        )
-    )
-
-    users = [
+        ),
         Users.new(
             username="admin",
             password="123",
@@ -438,17 +435,19 @@ def reset(is_development=False):
             email="admin@127.0.0.1",
             is_admin=True,
         ),
-        Users.new(
-            username="user",
-            password="123",
-            name="User",
-            classnum=0,
-        ),
     ]
     db.session.add_all(users)
 
     # test users will be removed in production
     if is_development:
+        db.session.add(
+            Users.new(
+                username="user",
+                password="123",
+                name="User",
+                classnum=0,
+            )
+        )
         random_users = [
             Users.new(
                 username=str(410001 + i),

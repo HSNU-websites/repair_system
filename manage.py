@@ -65,7 +65,7 @@ def test():
 @manager.command
 def init_database():
     """
-    Reset all Tables to Default if not Initialized
+    Reset all Tables to Default if not initialized
     """
     db.create_all()
     if Users.query.count() == 0:
