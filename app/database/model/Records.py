@@ -36,8 +36,8 @@ class Records(db.Model):
 
     def __repr__(self):
         return (
-            "Records(id={id},user_id={user_id},item_id={item_id},building_id={building_id},location='{location}',insert_time='{myinserttime}',description='{description}')"
-            .format(myinserttime=self.insert_time.strftime(timeformat), **self.__dict__)
+            "Records(id={id},user_id={user_id},item_id={item_id},building_id={building_id},location='{location}',insert_time='{mytime}',description='{description}')"
+            .format(mytime=self.insert_time.strftime(timeformat), **self.__dict__)
         )
 
     @classmethod
