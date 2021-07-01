@@ -7,3 +7,5 @@ data.db
 /backup/
 /log/
 /data/
+fullchain.pem
+privkey.pem
