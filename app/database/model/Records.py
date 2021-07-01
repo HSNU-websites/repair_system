@@ -42,17 +42,15 @@ class Records(db.Model):
 
     @classmethod
     def new(cls, user_id, item_id, building_id, location="", description="", insert_time=None):
-        if insert_time is not None:
-            it = datetime.datetime.strptime(insert_time, timeformat)
-        else:
-            it = datetime.datetime.now().replace(microsecond=0)
+        if insert_time is None:
+            insert_time = datetime.datetime.now().strftime(timeformat)
 
         return cls(
             id=None,
             user_id=user_id,
             item_id=item_id,
             building_id=building_id,
-            insert_time=it,
+            insert_time=insert_time,
             location=location,
             description=description
         )
