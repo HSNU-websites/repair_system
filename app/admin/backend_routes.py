@@ -12,7 +12,7 @@ from ..database.db_helper import (
     del_revisions,
     del_records,
 )
-from ..database.backup import backup, restore, del_backup
+from ..database.backup import backup, restore, del_backup, backup_dir
 
 
 @admin_bp.route("/admin_dashboard_backend", methods=["POST", "DELETE"])
@@ -155,6 +155,6 @@ def get_backup_file(filename):
     The page is used to get backup file and allow user to download it.
     """
     try:
-        return send_file("../backup/" + filename, as_attachment=True)
+        return send_file(str(backup_dir / filename), as_attachment=True)
     except FileNotFoundError:
         abort(404)
