@@ -4,6 +4,7 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     margin: auto 0px auto 0px;
+    font-family: 'Noto Sans TC', sans-serif;
 }
 
 a {
