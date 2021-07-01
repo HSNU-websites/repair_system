@@ -19,13 +19,9 @@ $ sudo cp /etc/letsencrypt/live/[domain]/{fullchain.pem,privkey.pem} ./nginx/ssl
 ```
 再來把基本的資訊加入 `docker-compose.yml`。第一個需要加入的項目是一組 gmail 的帳號密碼，且他必須打開「低安全性應用程式」的授權，用來寄發系統郵件；第二個是 reCAPTCHA 的 public key 和 private key，他在登入時會驗證。  
 
-最後就可以啟動：
+最後就可以啟動，第一次會耗時數分鐘：
 ```
 $ sudo docker-compose up -d
-```
-這時候資料庫還未準備完成，要手動進入 container 初始化：
-```
-$ sudo docker exec -it web python manage.py reset -y
 ```
 接著打開網頁，應該就可以順利使用，初始帳號密碼為：
 ```
@@ -42,3 +38,17 @@ Password: 123
 在 `./data/log/` 裡面有 SQL 和 flask 的 log，有記錄每一筆 request。
 ## 常見問題
 1. flask 的版本需指定 `flask == 1.1`，因為需要和 flask-script 配合。
+2. 如果打不開的話，可以試試：
+    ```
+    $ sudo docker exec -it web python3 manage.py reset -y
+    ```
+    或
+    ```
+    $ sudo docker exec -it web python3 manage.py init_database
+    ```
+    但請注意，此操作會重置全部資料庫。
+3. 程式碼修改過後，需要重新 build image，要使用：
+    ```
+    $ sudo docker-compose up -d --build
+    ```
+4. 預設帳號的 deleted 請勿刪除，否則可能導致使用者刪除功能出現問題。

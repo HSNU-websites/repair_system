@@ -6,18 +6,8 @@ from flask_script import Manager
 
 import app.database.backup as b
 import app.database.db_helper as h
-import app.mail_helper as m
 from app import create_app, db
-from app.database.model import (
-    Users,
-    Buildings,
-    Items,
-    Offices,
-    Records,
-    Revisions,
-    Statuses,
-    timeformat,
-)
+from app.database.model import Users
 
 app = create_app(getenv("ENV", "production"))
 manager = Manager(app)
