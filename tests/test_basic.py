@@ -23,13 +23,13 @@ class BasicTest(unittest.TestCase):
 
     def test_alive(self):
         response = self.client.get(url_for("main.index_page"))
-        self.assertTrue(response.status_code == 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_404(self):
         response = self.client.get("/wrong")
-        self.assertTrue(response.status_code == 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_blueprint(self):
-        self.assertTrue(self.app.blueprints.get("main", None))
-        self.assertTrue(self.app.blueprints.get("user", None))
-        self.assertTrue(self.app.blueprints.get("admin", None))
+        self.assertNotEqual(self.app.blueprints.get("main", None), None)
+        self.assertNotEqual(self.app.blueprints.get("user", None), None)
+        self.assertNotEqual(self.app.blueprints.get("admin", None), None)
