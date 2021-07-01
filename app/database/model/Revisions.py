@@ -28,7 +28,7 @@ class Revisions(db.Model):
         self.record_id = record_id
         self.user_id = user_id
         self.status_id = status_id
-        self.insert_time = insert_time
+        self.insert_time = datetime.datetime.strptime(insert_time, timeformat)
         self.description = description
 
     def __repr__(self):

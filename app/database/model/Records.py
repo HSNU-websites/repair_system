@@ -30,7 +30,7 @@ class Records(db.Model):
         self.user_id = user_id
         self.item_id = item_id
         self.building_id = building_id
-        self.insert_time = insert_time
+        self.insert_time = datetime.datetime.strptime(insert_time, timeformat)
         self.location = location
         self.description = description
 

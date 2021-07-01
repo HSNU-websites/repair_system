@@ -16,6 +16,7 @@ class Statuses(db.Model):
     description = db.Column(db.String(255), nullable=False)
 
     def __init__(self, id, description, sequence):
+        self.id = id
         self.sequence = sequence
         self.description = description
 
