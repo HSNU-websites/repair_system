@@ -4,11 +4,12 @@ WORKDIR /code
 
 COPY . /code
 
-RUN apt update \
+RUN chmod +x /code/docker-entrypoint.sh
+    && apt update \
     && apt upgrade -y \
     && apt install -y --no-install-recommends gcc default-mysql-client vim \
     && python3 -m pip install -r requirements.txt
 
-CMD ["/usr/local/bin/python3", "-m","gunicorn","-b","0.0.0.0:5000", "manage:app"]
+CMD ["/code/docker-entrypoint.sh"]
 
 EXPOSE 5000

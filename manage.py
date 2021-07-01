@@ -62,11 +62,14 @@ def test():
     unittest.TextTestRunner(verbosity=2).run(tests)
 
 
-@app.before_first_request
+@manager.command
 def init_database():
+    """
+    Reset all Tables to Default if not Initialized
+    """
     db.create_all()
     if Users.query.count() == 0:
-        reset(True)
+        reset(yes=True)
 
 
 if __name__ == "__main__":
