@@ -2,6 +2,7 @@ import unittest
 from flask import url_for
 from app import create_app, db
 from app.database.model import Users
+from app.database.db_helper import reset
 
 
 class BackendTest(unittest.TestCase):
@@ -11,25 +12,17 @@ class BackendTest(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        db.drop_all()
         self.app = create_app("testing")
         self.client = self.app.test_client()
         self.app_context = self.app.app_context()
         self.app_context.push()
+        db.drop_all()
         db.create_all()
         self.login_data = {"username": "admin", "password": "123"}
-        self.test_admin = Users.new(
-            username="admin",
-            password="123",
-            name="Admin",
-            classnum=0,
-            email="admin@127.0.0.1",
-            is_admin=True,
-        )
-        db.session.add(self.test_admin)
-        db.session.commit()
+        reset(is_test=True)
 
     def tearDown(self) -> None:
+        db.session.commit()
         db.session.remove()
         db.drop_all()
         if self.app_context is not None:
@@ -104,6 +97,7 @@ class ManageUserBackendTest(BackendTest):
                     "classnum": "1498",
                     "password": "password",
                 },
+                follow_redirects=True,
             )
             self.assertEqual(response.status_code, 200)
 
@@ -119,8 +113,9 @@ class ManageUserBackendTest(BackendTest):
                     "classnum": "0",
                     "password": "password",
                 },
+                follow_redirects=True,
             )
-            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.status_code, 200)
             self.assertIn(b"Email is required for admin.", response.data)
 
     def test_backend_ok(self):

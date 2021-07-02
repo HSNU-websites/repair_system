@@ -414,7 +414,7 @@ def del_users(ids: list[int], force=False):
         db.session.commit()
 
 
-def reset(is_development=False):
+def reset(is_test=False, is_development=False):
     db.session.commit()  # must commit before drop_all
     db.drop_all()
     db.create_all()
@@ -439,6 +439,15 @@ def reset(is_development=False):
     db.session.add_all(users)
 
     # test users will be removed in production
+    if is_test:
+        db.session.add(
+            Users.new(
+                username="user",
+                password="123",
+                name="User",
+                classnum=0,
+            )
+        )
     if is_development:
         db.session.add(
             Users.new(
