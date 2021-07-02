@@ -35,5 +35,5 @@ class Items(db.Model):
             id=None,
             sequence=sequence,
             office_id=office_id,
-            description=description
+            description=description[:255]
         )

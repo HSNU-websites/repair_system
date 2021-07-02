@@ -51,6 +51,6 @@ class Records(db.Model):
             item_id=item_id,
             building_id=building_id,
             insert_time=insert_time,
-            location=location,
-            description=description
+            location=location[:255],
+            description=description[:255]
         )

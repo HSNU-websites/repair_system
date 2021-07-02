@@ -31,6 +31,6 @@ class Buildings(db.Model):
     def new(cls, description, sequence=0):
         return cls(
             id=None,
-            description=description,
+            description=description[:255],
             sequence=sequence
         )

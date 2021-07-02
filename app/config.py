@@ -40,7 +40,7 @@ class Testing(Config):
 
 
 class Production(Config):
-    SQLALCHEMY_DATABASE_URI = "mysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_DATABASE}".format(
+    SQLALCHEMY_DATABASE_URI = "mysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_DATABASE}?charset=utf8mb4".format(
         DB_USER=getenv("DB_USER"),
         DB_PASSWORD=getenv("DB_PASSWORD"),
         DB_HOST=getenv("DB_HOST"),
