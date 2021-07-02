@@ -48,8 +48,10 @@ class ReportFormTest(BackendTest):
                     "item": "8",
                     "description": "None",
                 },
+                follow_redirects=True,
             )
             self.assertEqual(response.status_code, 200)
+            self.assertIn(b"Successfully report.", response.data)
 
     def test_bad(self):
         with self.client:
@@ -61,8 +63,10 @@ class ReportFormTest(BackendTest):
                     "location": "None",
                     "item": "None",
                 },
+                follow_redirects=True,
             )
-            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b"This field is required.", response.data)
 
 
 class SystemBackendTest(BackendTest):
@@ -114,6 +118,22 @@ class ManageUserBackendTest(BackendTest):
                 follow_redirects=True,
             )
             self.assertEqual(response.status_code, 200)
+
+    def test_add_duplicate_user(self):
+        with self.client:
+            self.login()
+            response = self.client.post(
+                url_for("admin.manage_user_page"),
+                data={
+                    "username": "user",
+                    "name": "user",
+                    "classnum": "1498",
+                    "password": "password",
+                },
+                follow_redirects=True,
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b"user", response.data)
 
     def test_add_one_user_bad(self):
         # Add admin but email is not provided.
@@ -201,8 +221,10 @@ class UserSettingTest(BackendTest):
             response = self.client.post(
                 url_for("user.user_setting_page"),
                 data={"email": "test@test.com", "password": "password"},
+                follow_redirects=True,
             )
             self.assertEqual(response.status_code, 200)
+            self.assertIn(b"OK.", response.data)
 
     def test_bad(self):
         with self.client:
@@ -210,8 +232,10 @@ class UserSettingTest(BackendTest):
             response = self.client.post(
                 url_for("user.user_setting_page"),
                 data={},
+                follow_redirects=True,
             )
-            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b"Invalid.", response.data)
 
     def test_too_short_password(self):
         with self.client:
@@ -219,5 +243,9 @@ class UserSettingTest(BackendTest):
             response = self.client.post(
                 url_for("user.user_setting_page"),
                 data={"email": "test@test.com", "password": "short"},
+                follow_redirects=True,
             )
-            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(
+                b"Password is too short (at least 6 characters).", response.data
+            )

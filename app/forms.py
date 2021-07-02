@@ -56,7 +56,7 @@ class AddOneUserForm(FlaskForm):
         render_kw={"placeholder": "Class Number"},
     )
     password = PasswordField(
-        "密碼: ", validators=[DataRequired()], render_kw={"placeholder": "Password"}
+        "密碼: ", validators=[DataRequired(), Length(min=6)], render_kw={"placeholder": "Password"}
     )
     email = EmailField("電子郵件 (僅管理員需要): ", render_kw={"placeholder": "Email"})
     submit = SubmitField("新增")
@@ -88,5 +88,5 @@ class UserSettingForm(FlaskForm):
 
 
 class RestoreForm(FlaskForm):
-    file = FileField("", validators=[FileRequired()])
+    file = FileField("", validators=[FileRequired(), FileAllowed(["xz"])])
     submit = SubmitField("上傳")

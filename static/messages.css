@@ -19,6 +19,10 @@
     background-color: #2196F3;
 }
 
+.warning {
+    background-color: #ff9800;
+}
+
 .success {
     background-color: #4CAF50;
 }

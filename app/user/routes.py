@@ -1,4 +1,5 @@
-from flask import current_app, flash, render_template, request
+from flask import current_app, flash, render_template, request, redirect
+from flask.helpers import url_for
 from flask_login import current_user, login_required
 from ..database.db_helper import (
     add_record,
@@ -37,14 +38,13 @@ def report_page():
                 current_user.id, building_id, location, item_id, description
             )
             flash("Successfully report.", "success")
-            return render_template("report.html", form=form)
         else:
             current_app.logger.warning("POST /report: Invalid submit.")
             # Flask-wtf will return invalid choice when the value is changed.
             for _, error in form.errors.items():
                 for msg in error:
                     flash(msg, category="alert")
-            return render_template("report.html", form=form), 400
+        return redirect(url_for("user.report_page"))
 
 
 # The page is student's dashboard, and he or she can browse all his or her reports here.
@@ -82,11 +82,10 @@ def user_setting_page():
             if password != "":
                 data["password"] = password
             update_users([data])
-            flash("OK", category="success")
-            return render_template("user_setting.html", user=user, form=form)
+            flash("OK.", category="success")
         else:
-            current_app.logger.info("POST /user_setting: Invalid submit.")
+            current_app.logger.warning("POST /user_setting: Invalid submit.")
             for _, errorMessages in form.errors.items():
                 for err in errorMessages:
                     flash(err, category="alert")
-            return render_template("user_setting.html", user=user, form=form), 400
+        return redirect(url_for("user.user_setting_page"))
