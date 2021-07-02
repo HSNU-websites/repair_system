@@ -37,6 +37,20 @@ class ReportFormTest(BackendTest):
     In this test, we test whether report form behaves properly.
     """
 
+    def test_ok(self):
+        with self.client:
+            self.login()
+            response = self.client.post(
+                url_for("user.report_page"),
+                data={
+                    "building": "3",
+                    "location": "None",
+                    "item": "8",
+                    "description": "None",
+                },
+            )
+            self.assertEqual(response.status_code, 200)
+
     def test_bad(self):
         with self.client:
             self.login()
