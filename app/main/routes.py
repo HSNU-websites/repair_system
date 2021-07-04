@@ -37,7 +37,9 @@ def index_page():
                     return redirect(url_for("main.index_page"))
             else:
                 current_app.logger.warning("POST /: Invalid submit.")
-                flash("Invalid submit.", category="alert")
+                for _, errorMessages in form.errors.items():
+                    for err in errorMessages:
+                        flash(err, category="alert")
                 return redirect(url_for("main.index_page"))
 
 
@@ -58,11 +60,11 @@ def internal_server_error_handler(e):
 
 @main_bp.app_errorhandler(401)
 def unauthorized_handler(e):
-    current_app.logger.error("Unauthorized.")
+    current_app.logger.warning("Unauthorized.")
     return redirect(url_for("main.index_page"))
 
 
 @main_bp.app_errorhandler(403)
 def forbidden_handler(e):
-    current_app.logger.error("Forbidden.")
+    current_app.logger.warning("Forbidden.")
     return redirect(url_for("main.index_page"))

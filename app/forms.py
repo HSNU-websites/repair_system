@@ -3,7 +3,7 @@ from wtforms import PasswordField, SelectField, StringField, SubmitField
 from wtforms.fields.html5 import EmailField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from flask_wtf.recaptcha import RecaptchaField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import DataRequired, ValidationError, Length
 
 
 class LoginForm(FlaskForm):
@@ -21,9 +21,9 @@ class ReportForm(FlaskForm):
     building = SelectField(
         "大樓: ", validators=[DataRequired()]
     )  # choices will be added when rendered
-    location = StringField("地點: ", validators=[DataRequired()])
+    location = StringField("地點 (限 200 字內): ", validators=[DataRequired(), Length(max=200)])
     item = SelectField("損壞物件: ", validators=[DataRequired()])
-    description = StringField("狀況描述: ", validators=[DataRequired()])
+    description = StringField("狀況描述 (限 200 字內): ", validators=[DataRequired(), Length(max=200)])
     submit = SubmitField("報修")
 
 
@@ -42,7 +42,7 @@ class ReportsFilterForm(FlaskForm):
 class AddOneUserForm(FlaskForm):
     username = StringField(
         "學號 (登入帳號): ",
-        validators=[DataRequired()],
+        validators=[DataRequired(), Length(max=16)],
         render_kw={"placeholder": "Username"},
     )
     name = StringField(
@@ -56,7 +56,7 @@ class AddOneUserForm(FlaskForm):
         render_kw={"placeholder": "Class Number"},
     )
     password = PasswordField(
-        "密碼: ", validators=[DataRequired()], render_kw={"placeholder": "Password"}
+        "密碼: ", validators=[DataRequired(), Length(min=6)], render_kw={"placeholder": "Password"}
     )
     email = EmailField("電子郵件 (僅管理員需要): ", render_kw={"placeholder": "Email"})
     submit = SubmitField("新增")
@@ -88,5 +88,5 @@ class UserSettingForm(FlaskForm):
 
 
 class RestoreForm(FlaskForm):
-    file = FileField("", validators=[FileRequired()])
+    file = FileField("", validators=[FileRequired(), FileAllowed(["xz"])])
     submit = SubmitField("上傳")

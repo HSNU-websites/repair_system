@@ -31,9 +31,9 @@ def dashboard_page(page=1):
     """
     # cookies are used to save filter when user turns page
     form = ReportsFilterForm()
+    Filter = dict()
     if request.method == "GET":
         current_app.logger.info("GET /admin_dashboard")
-        Filter = {}
         if username := request.cookies.get("username"):
             Filter["username"] = username
         if classnum := request.cookies.get("classnum"):
@@ -44,10 +44,9 @@ def dashboard_page(page=1):
             form=form,
             statuses=render_system_setting()[3],
         )
-    if request.method == "POST":
+    if request.method == "POST":  
         if form.validate_on_submit():
             current_app.logger.info("POST /admin_dashboard")
-            Filter = dict()
             cookies = []
             if username := form.username.data:
                 Filter["username"] = username
@@ -59,7 +58,7 @@ def dashboard_page(page=1):
             response = make_response(
                 render_template(
                     "admin_dashboard.html",
-                    records=render_records(Filter),
+                    records=render_records(Filter=Filter, page=page),
                     form=form,
                     statuses=render_system_setting()[3],
                 )
@@ -70,7 +69,7 @@ def dashboard_page(page=1):
                 response.set_cookie(*cookie, max_age=120)
             return response
         else:
-            current_app.logger.info("POST /admin_dashboard: Invalid submit")
+            current_app.logger.warning("POST /admin_dashboard: Invalid submit")
             return redirect(url_for("admin.dashboard_page"))
 
 
@@ -81,16 +80,15 @@ def system_page():
     """
     The page allows admins to modify system setting. For example, they can add more buildings, offices and so on to the system.
     """
-    if request.method == "GET":
-        current_app.logger.info("GET /system")
-        buildings, items, offices, statuses = render_system_setting()
-        return render_template(
-            "system.html",
-            buildings=buildings,
-            items=items,
-            offices=offices,
-            statuses=statuses,
-        )
+    current_app.logger.info("GET /system")
+    buildings, items, offices, statuses = render_system_setting()
+    return render_template(
+        "system.html",
+        buildings=buildings,
+        items=items,
+        offices=offices,
+        statuses=statuses,
+    )
 
 
 @admin_bp.route("/manage_user/", methods=["GET", "POST"])
@@ -103,15 +101,16 @@ def manage_user_page(page=1):
     """
     form = AddOneUserForm()
     form_csv = AddUsersByFileForm()
+    template = render_template(
+        "manage_user.html",
+        form=form,
+        form_csv=form_csv,
+        users=render_users(page=page),
+    )
     if request.method == "GET":
         # Render all users
         current_app.logger.info("GET /manage_user")
-        return render_template(
-            "manage_user.html",
-            form=form,
-            form_csv=form_csv,
-            users=render_users(page=page),
-        )
+        return template
     if request.method == "POST":
         # Add user
         if form.username.data:
@@ -126,33 +125,16 @@ def manage_user_page(page=1):
                     "email": form.email.data,
                     "is_admin": int(form.classnum.data) == 0,
                 }
-                if len(data["password"]) < 6:
-                    flash(
-                        "Password is too short (at least 6 characters).",
-                        category="alert",
-                    )
-                elif already_exists := add_users([data]):
-                    flash(", ".join(already_exists) + " 已經存在", category="alert")
-                return render_template(
-                    "manage_user.html",
-                    form=form,
-                    form_csv=form_csv,
-                    users=render_users(page=page),
-                )
+                if already_exists := add_users([data]):
+                    flash(", ".join(already_exists) + " 已經存在", category="warning")
+                else:
+                    flash("OK", category="success")
             else:
                 for _, errorMessages in form.errors.items():
                     for err in errorMessages:
                         flash(err, category="alert")
-                current_app.logger.info("POST /manage_user: Invalid submit")
-                return (
-                    render_template(
-                        "manage_user.html",
-                        form=form,
-                        form_csv=form_csv,
-                        users=render_users(page=page),
-                    ),
-                    400,
-                )
+                current_app.logger.warning("POST /manage_user: Invalid submit")
+            return redirect(url_for("admin.manage_user_page"))
         if form_csv.csv_file.data:
             # Add users by csv
             if form_csv.validate_on_submit():
@@ -164,26 +146,12 @@ def manage_user_page(page=1):
                 else:
                     if already_exists := add_users(data):
                         flash(", ".join(already_exists) + " 已經存在", category="alert")
-                return render_template(
-                    "manage_user.html",
-                    form=form,
-                    form_csv=form_csv,
-                    users=render_users(page=page),
-                )
             else:
+                current_app.logger.warning("POST /manage_user: Invalid submit")
                 for _, errorMessages in form_csv.errors.items():
                     for err in errorMessages:
                         flash(err, category="alert")
-                current_app.logger.info("POST /manage_user: Invalid submit")
-                return (
-                    render_template(
-                        "manage_user.html",
-                        form=form,
-                        form_csv=form_csv,
-                        users=render_users(page=page),
-                    ),
-                    400,
-                )
+            return redirect(url_for("admin.manage_user_page"))
 
 
 @admin_bp.route("/backup", methods=["GET", "POST"])
@@ -201,4 +169,9 @@ def backup_page():
         if form.validate_on_submit():
             file = form.file.data
             file.save("backup/" + file.filename)
-        return render_template("backup.html", form=form, backups=get_backups())
+            flash("Upload successfully.", category="success")
+        else:
+            for _, errorMessages in form.errors.items():
+                for err in errorMessages:
+                    flash(err, category="alert")
+        return redirect(url_for("admin.backup_page"))

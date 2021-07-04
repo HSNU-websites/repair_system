@@ -2,6 +2,7 @@ import unittest
 from flask import url_for
 from app import create_app, db
 from app.database.model import Users
+from app.database.db_helper import reset
 
 
 class NoAuthTest(unittest.TestCase):
@@ -57,27 +58,20 @@ class NormalUserAuthTest(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        db.drop_all()
         self.app = create_app("testing")
         self.client = self.app.test_client()
         self.app_context = self.app.test_request_context()
         self.app_context.push()
+        db.drop_all()
         db.create_all()
         self.login_data = {"username": "user", "password": "123"}
-        self.user = Users.new(
-            username="user",
-            password="123",
-            name="User",
-            classnum=0,
-            is_admin=False,
-        )
-        db.session.add(self.user)
-        db.session.commit()
+        reset(env="testing")
         # status code
         self.normal = 200
         self.admin = 302
 
     def tearDown(self) -> None:
+        db.session.commit()
         db.session.remove()
         db.drop_all()
         if self.app_context is not None:

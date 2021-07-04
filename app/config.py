@@ -24,6 +24,7 @@ class Config:
 
 
 class Development(Config):
+    SECRET_KEY = "dhfkjgruytv4yntcm94[g"
     SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
     DEBUG = True
     ENV = "development"
