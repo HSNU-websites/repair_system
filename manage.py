@@ -8,8 +8,10 @@ import app.database.backup as b
 import app.database.db_helper as h
 from app import create_app, db
 from app.database.model import Users
+from app.mylogging import init_logging
 
 app = create_app(getenv("ENV", "production"))
+init_logging(app)
 manager = Manager(app)
 
 

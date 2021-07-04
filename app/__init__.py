@@ -1,26 +1,25 @@
 import logging
+
 from flask import (
     Flask,
-    has_request_context,
-    request,
     abort,
-    flash,
     current_app,
-    redirect,
-    session,
+    flash, redirect,
+    request,
+    session
 )
+from flask_apscheduler import APScheduler
 from flask_login import LoginManager
+from flask_login.signals import user_unauthorized
 from flask_login.utils import (
-    login_url as make_login_url,
     expand_login_view,
+    login_url as make_login_url,
     make_next_param,
 )
-from flask_login.signals import user_unauthorized
 from flask_mail import Mail
-from flask_apscheduler import APScheduler
+
 from .config import config
-from .database import db, cache
-from .myhandler import MyTimedRotatingFileHandler
+from .database import cache, db
 
 
 class LoginManager_(LoginManager):
@@ -62,18 +61,6 @@ class LoginManager_(LoginManager):
         return redirect(redirect_url)
 
 
-class RequestFormatter(logging.Formatter):
-    def format(self, record):
-        if has_request_context():
-            record.url = request.url
-            record.remote_addr = request.remote_addr
-        else:
-            record.url = None
-            record.remote_addr = None
-
-        return super().format(record)
-
-
 login_manager = LoginManager_()
 mail = Mail()
 scheduler = APScheduler()
@@ -99,26 +86,6 @@ def create_app(env):
             day="*",
             hour="7",
         )
-
-    # log
-    formatter = RequestFormatter(
-        "[%(asctime)s] %(remote_addr)s requested %(url)s %(levelname)s: %(message)s"
-    )
-
-    access_log_handler = MyTimedRotatingFileHandler(
-        "log/access.log",
-        "log/access_%Y-%m-%d.log",
-        when="MIDNIGHT",
-        backupCount=14,
-        encoding="UTF-8",
-        delay=False,
-        utc=False,
-    )
-    access_log_handler.setLevel(logging.INFO)
-    access_log_handler.setFormatter(formatter)
-    app.logger.handlers = []  # remove stream handler
-    app.logger.addHandler(access_log_handler)
-    app.logger.setLevel(logging.INFO)
 
     # Blueprint
     from .main import main_bp
