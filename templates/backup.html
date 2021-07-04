@@ -1,3 +1,5 @@
+{% from 'msg.jinja' import display_msg %}
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 
@@ -8,9 +10,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&display=swap" rel="stylesheet">
     <script src="/static/backup.js"></script>
+    <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <title>備份與還原</title>
 </head>
@@ -42,6 +46,7 @@
         </div>
         <div>
             <h2 style="text-align: center;">備份記錄檔</h2>
+            <div id="messages" class="report_page">{{ display_msg(messages) }}</div>
             <table id="backups">
                 {% for backup in backups %}
                 <tr class="backup">
