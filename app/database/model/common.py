@@ -29,7 +29,7 @@ def get_dict(row):
     if isinstance(row, db.Model):
         return {
             key: process_value(row.__dict__[key])
-            for key in type(row).__mapper__.columns.keys()
+            for key in row.__mapper__.columns.keys()
         }
     else:
         return {}
@@ -75,7 +75,14 @@ def topological_sort(graph) -> list:
 
 def to_topological(target, sample):
     s = set(target)
-    return [n for n in sample if n in s]
+    result = []
+    for node in sample:
+        if node in s:
+            result.append(node)
+            s.remove(node)
+    for node in s:  # if node is not in sample, assume it does not depand on anyone.
+        result.append(node)
+    return result
 
 
 def validate_topological(target, graph):

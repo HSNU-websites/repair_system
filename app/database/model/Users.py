@@ -128,12 +128,12 @@ class Users(db.Model):
     def new(cls, username, password="", name="", classnum=0, email="", is_admin=False, is_valid=True, is_marked_deleted=False):
         u = cls(
             id=None,
-            username=username,
+            username=username[:16],
             password_hash=passwd_context.hash(password) if password else "",
-            name=name,
+            name=name[:255],
             classnum=classnum,
             properties=0,
-            email=email
+            email=email[:255]
         )
         u.is_admin = is_admin
         u.is_valid = is_valid
@@ -144,11 +144,11 @@ class Users(db.Model):
         if password is not None:
             self.password_hash = passwd_context.hash(password) if password else ""
         if name is not None:
-            self.name = name
+            self.name = name[:255]
         if classnum is not None:
             self.classnum = classnum
         if email is not None:
-            self.email = email
+            self.email = email[:255]
         if is_admin is not None:
             self.is_admin = is_admin
         if is_valid is not None:

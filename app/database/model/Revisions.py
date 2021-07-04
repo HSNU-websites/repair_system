@@ -48,5 +48,5 @@ class Revisions(db.Model):
             user_id=user_id,
             status_id=status_id,
             insert_time=insert_time,
-            description=description
+            description=description[:255]
         )

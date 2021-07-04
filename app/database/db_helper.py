@@ -264,7 +264,7 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
 def render_users(Filter=dict(), page=1, per_page=100) -> dict:
     if page < 1:
         page = 1
-    q = Users.query
+    q = Users.query.filter(Users.id > 1)
     Filter = {
         key: value
         for key, value in Filter.items()
@@ -415,7 +415,7 @@ def del_users(ids: list[int], force=False):
 
 
 def reset(env):
-    db.session.commit()  # must commit before drop_all
+    db.session.close()  # must close before drop_all
     db.drop_all()
     db.create_all()
 

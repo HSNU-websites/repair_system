@@ -1,4 +1,3 @@
-/data
 /.circleci/
 /.vscode/
 __pycache__/
@@ -7,6 +6,8 @@ __pycache__/
 /docker-compose.yml
 /.git/
 /.gitignore
+data.db*
+data_testing.db*
 /nginx/
 /data/
 /backup/

@@ -71,8 +71,7 @@ class NormalUserAuthTest(unittest.TestCase):
         self.admin = 302
 
     def tearDown(self) -> None:
-        db.session.commit()
-        db.session.remove()
+        db.session.close()
         db.drop_all()
         if self.app_context is not None:
             self.app_context.pop()

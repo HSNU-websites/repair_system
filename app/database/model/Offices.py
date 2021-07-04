@@ -27,6 +27,6 @@ class Offices(db.Model):
     def new(cls, description, sequence=0):
         return Offices(
             id=None,
-            description=description,
+            description=description[:255],
             sequence=sequence
         )

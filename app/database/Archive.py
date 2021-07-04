@@ -1,10 +1,13 @@
 import hashlib
 import io
+import logging
 import re  # regex
 import tarfile
 from pathlib import Path
 
 import ujson
+
+backup_logger = logging.getLogger('backup')
 
 
 class Archive():
@@ -27,25 +30,28 @@ class Archive():
 
     def read(self, filepath: str, hash_check=True) -> dict:
         if self.mode != "r":
-            return dict()
+            err = "mode must be 'r' for reading archive '{}'".format(self.path)
+            backup_logger.error(err)
+            raise RuntimeError(err)
         s = self.archive.extractfile(filepath).read()
 
         if hash_check:
             m1 = self.hash(s)
             m2 = self.hash_dict["files"][filepath]
             if m1 == m2:
-                print("Hash '{hash_method}' matches '{filepath}'".format(
+                backup_logger.info("Hash '{hash_method}' matches '{filepath}'".format(
                     hash_method=self.hash_dict["hash_method"], filepath=filepath))
             else:
-                print(
+                err = (
                     "Hash '{hash_method}' does not match '{filepath}'\n"
                     "Original: {m2}\n"
-                    "Current : {m1}".format(
+                    "Current : {m1}\n"
+                    "Abort reading!".format(
                         hash_method=self.hash_dict["hash_method"], filepath=filepath, m1=m1, m2=m2
                     )
                 )
-                print("Abort reading")
-                return dict()
+                backup_logger.error(err)
+                raise RuntimeError(err)
         return ujson.loads(s.decode("utf-8"))
 
     def write(self, filepath: str, data: dict, hash_gen=True):
@@ -54,7 +60,9 @@ class Archive():
         e.g. 'f/123.txt' will create a folder 'f' and write to 'f/123.txt'
         """
         if self.mode != "w":
-            return False
+            err = "mode must be 'w' for writing archive '{}'".format(self.path)
+            backup_logger.error(err)
+            raise RuntimeError(err)
         s = ujson.dumps(data, ensure_ascii=False, escape_forward_slashes=False)
         encoded = s.encode("utf-8")
 
@@ -66,7 +74,6 @@ class Archive():
         if hash_gen:
             m = self.hash(encoded)
             self.hash_dict["files"][filepath] = m
-        return True
 
     def __init__(self, path: Path, mode: str):
         """
@@ -74,16 +81,18 @@ class Archive():
         """
         self.path = Path(path)
         if mode not in {"r", "w"}:
-            print("Invalid mode '{mode}' for '{path}'!".format(mode=mode, path=self.path))
-            return None
+            err = "Invalid mode '{mode}' for '{path}'!".format(mode=mode, path=self.path)
+            backup_logger.error(err)
+            raise RuntimeError(err)
         self.mode = mode
 
         if type(self).pattern.match(self.path.name):
             self.path.parent.mkdir(parents=True, exist_ok=True)
             self.archive = tarfile.open(self.path, mode + ":xz")
         else:
-            print("Invalid filename '{filename}', must be '*.tar.xz'!".format)
-            return None
+            err = "Invalid filename '{filename}', must be '*.tar.xz'!".format(filename=self.path.name)
+            backup_logger.error(err)
+            raise RuntimeError(err)
 
         # hash
         if mode == "r":
@@ -91,7 +100,9 @@ class Archive():
                 self.hash_dict = self.read("hash.json", hash_check=False)
                 self.hash = type(self).Hash(self.hash_dict["hash_method"])
             else:
-                print("No hash file found in '{path}'".format(path=self.path))
+                err = "No hash file found in '{path}'".format(path=self.path)
+                backup_logger.error(err)
+                raise RuntimeError(err)
         else:
             self.hash = type(self).Hash()
             self.hash_dict = {

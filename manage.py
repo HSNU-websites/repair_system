@@ -34,8 +34,7 @@ def reset(yes=False):
         if a != "YES":
             print("Terminated.")
             return
-    is_development = app.config["ENV"] == "development"
-    h.reset(is_development=is_development)
+    h.reset(env=app.config["ENV"])
 
 
 @manager.command
