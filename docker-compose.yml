@@ -62,6 +62,7 @@ services:
     volumes:
       - ./data/ssl:/etc/letsencrypt
       - ./user_conf.d:/etc/nginx/user_conf.d
+      - /dev/null:/var/log/nginx/access.log
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     networks:
