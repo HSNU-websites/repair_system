@@ -75,8 +75,7 @@ def login_auth(username, password):
 
 
 @cache.memoize()
-def load_user(user_id: str):
-    # whether user_id is str or int doesn't matter
+def load_user(user_id: int):
     user = Users.query.filter_by(id=user_id).first()
     if user and user.is_valid:
         sessionUser = User()
@@ -376,6 +375,7 @@ def update_users(data: list[dict]):
                 old_properties = user.properties
                 user.update(**d)
                 l.append(user)
+                cache.delete_memoized(get_user, user.id)
                 if user.properties != old_properties:
                     cache.delete_memoized(get_admin_emails)
                     cache.delete_memoized(load_user, user.id)
@@ -409,6 +409,7 @@ def del_users(ids: list[int], force=False):
                 s.add(user_id)
     if s:
         for user_id in s:
+            cache.delete_memoized(get_user, user_id)
             cache.delete_memoized(load_user, user_id)
         Users.query.filter(Users.id.in_(s)).delete()
         db.session.commit()
