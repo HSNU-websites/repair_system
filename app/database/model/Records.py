@@ -19,9 +19,9 @@ class Records(db.Model):
     __tablename__ = "records"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.ForeignKey("users.id"), nullable=False, index=True)
-    item_id = db.Column(db.ForeignKey("items.id"), nullable=False)
+    item_id = db.Column(db.ForeignKey("items.id"), nullable=False, index=True)
     building_id = db.Column(db.ForeignKey("buildings.id"), nullable=False)
-    insert_time = db.Column(db.TIMESTAMP, nullable=False, index=True)
+    insert_time = db.Column(db.TIMESTAMP, nullable=False)
     location = db.Column(db.String(255), nullable=False)
     description = db.Column(db.String(255), nullable=False)
 

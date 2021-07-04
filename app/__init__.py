@@ -1,7 +1,4 @@
-from os import path, mkdir
 import logging
-from logging.handlers import TimedRotatingFileHandler
-from datetime import datetime
 from flask import (
     Flask,
     has_request_context,

@@ -17,7 +17,7 @@ class Users(db.Model):
 
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(255), unique=True, nullable=False)
+    username = db.Column(db.String(16), unique=True, nullable=False)
     # passwd_context.hash("pAs$W0rd")
     password_hash = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
@@ -128,7 +128,7 @@ class Users(db.Model):
     def new(cls, username, password="", name="", classnum=0, email="", is_admin=False, is_valid=True, is_marked_deleted=False):
         u = cls(
             id=None,
-            username=username[:255],
+            username=username[:16],
             password_hash=passwd_context.hash(password) if password else "",
             name=name[:255],
             classnum=classnum,

@@ -2,7 +2,7 @@ from os import getenv, urandom
 
 
 class Config:
-    SECRET_KEY = urandom(16)
+    SECRET_KEY = urandom(32)
     # SQLAlchemy
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = "mysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_DATABASE}?charset=utf8mb4".format(
@@ -40,13 +40,11 @@ class Testing(Config):
     TESTING = True
     DEBUG = True
     ENV = "testing"
-    RECAPTCHA_ENABLED = False
     PRESERVE_CONTEXT_ON_EXCEPTION = False
     WTF_CSRF_ENABLED = False
 
 
 class Production(Config):
-
     ENV = "production"
 
 
