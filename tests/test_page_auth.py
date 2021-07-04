@@ -65,7 +65,7 @@ class NormalUserAuthTest(unittest.TestCase):
         db.drop_all()
         db.create_all()
         self.login_data = {"username": "user", "password": "123"}
-        reset(is_test=True)
+        reset(env="testing")
         # status code
         self.normal = 200
         self.admin = 302

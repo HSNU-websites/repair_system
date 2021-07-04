@@ -414,7 +414,7 @@ def del_users(ids: list[int], force=False):
         db.session.commit()
 
 
-def reset(is_test=False, is_development=False):
+def reset(env):
     db.session.commit()  # must commit before drop_all
     db.drop_all()
     db.create_all()
@@ -439,7 +439,7 @@ def reset(is_test=False, is_development=False):
     db.session.add_all(users)
 
     # test users will be removed in production
-    if is_test:
+    if env == "testing":
         db.session.add(
             Users.new(
                 username="user",
@@ -448,7 +448,7 @@ def reset(is_test=False, is_development=False):
                 classnum=0,
             )
         )
-    if is_development:
+    elif env == "development":
         db.session.add(
             Users.new(
                 username="user",
@@ -495,7 +495,7 @@ def reset(is_test=False, is_development=False):
         db.session.add(Items.new(item[0], item[1], sequence=i))
     db.session.commit()
 
-    if is_development:
+    if env == "development":
         current_timestamp = int((datetime.datetime.now() - datetime.timedelta(days=10)).timestamp())
         count = 1000
         random_timestamps = sorted(random.sample(range(current_timestamp), k=count))

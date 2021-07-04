@@ -19,7 +19,7 @@ class BackendTest(unittest.TestCase):
         db.drop_all()
         db.create_all()
         self.login_data = {"username": "admin", "password": "123"}
-        reset(is_test=True)
+        reset(env="testing")
 
     def tearDown(self) -> None:
         db.session.commit()
