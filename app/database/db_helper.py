@@ -436,11 +436,10 @@ def reset(env):
             is_admin=True,
         ),
     ]
-    db.session.add_all(users)
 
     # test users will be removed in production
     if env == "testing":
-        db.session.add(
+        users.append(
             Users.new(
                 username="user",
                 password="123",
@@ -449,7 +448,7 @@ def reset(env):
             )
         )
     elif env == "development":
-        db.session.add(
+        users.append(
             Users.new(
                 username="user",
                 password="123",
@@ -457,7 +456,7 @@ def reset(env):
                 classnum=0,
             )
         )
-        random_users = [
+        users += [
             Users.new(
                 username=str(410001 + i),
                 name="Student" + str(i),
@@ -465,45 +464,48 @@ def reset(env):
             )
             for i in range(1000)
         ]
-        db.session.add_all(random_users)
+    db.session.bulk_save_objects(users)
 
     # Buildings default
-    db.session.add(
+    buildings = [
         Buildings(id=1, description="其他", sequence=len(db_default.buildings) + 1)
-    )
+    ]
     for i, building in enumerate(db_default.buildings, start=1):
-        db.session.add(Buildings.new(building, sequence=i))
+        buildings.append(Buildings.new(building, sequence=i))
+    db.session.bulk_save_objects(buildings)
 
     # Statuses default
-    db.session.add(
+    statuses = [
         Statuses(id=1, description="其他", sequence=len(db_default.statuses) + 1)
-    )
+    ]
     for i, status in enumerate(db_default.statuses, start=1):
-        db.session.add(Statuses.new(status, sequence=i))
+        statuses.append(Statuses.new(status, sequence=i))
+    db.session.bulk_save_objects(statuses)
 
     # Offices default
+    offices = []
     for i, office in enumerate(db_default.offices, start=1):
-        db.session.add(Offices.new(office, sequence=i))
-
-    db.session.commit()
+        offices.append(Offices.new(office, sequence=i))
+    db.session.bulk_save_objects(offices)
 
     # Items default
-    db.session.add(
+    items = [
         Items(id=1, description="其他", office_id=1, sequence=len(db_default.items) + 1)
-    )
+    ]
     for i, item in enumerate(db_default.items, start=1):
-        db.session.add(Items.new(item[0], item[1], sequence=i))
-    db.session.commit()
+        items.append(Items.new(item[0], item[1], sequence=i))
+    db.session.bulk_save_objects(items)
 
     if env == "development":
-        current_timestamp = int((datetime.datetime.now() - datetime.timedelta(days=10)).timestamp())
+        now = datetime.datetime.now()
+        current_timestamp = int((now - datetime.timedelta(days=10)).timestamp())
         count = 1000
         random_timestamps = sorted(random.sample(range(current_timestamp), k=count))
         random_records = [
             Records.new(
-                user_id=random.randint(1, len(users) + len(random_users) + 1),
-                item_id=random.randint(1, len(db_default.items) + 1),
-                building_id=random.randint(1, len(db_default.buildings) + 1),
+                user_id=random.randint(1, len(users)),
+                item_id=random.randint(1, len(items)),
+                building_id=random.randint(1, len(buildings)),
                 location="某{}個地方".format(random.randint(1, 100000)),
                 description="{}的紀錄".format(random.randint(1, 100000)),
                 insert_time=datetime.datetime.fromtimestamp(random_timestamp).strftime(
@@ -514,38 +516,44 @@ def reset(env):
         ]
         random_records += [
             Records.new(
-                1,
-                1,
-                1,
-                "某個地方",
-                "十天前的紀錄",
-                insert_time=(datetime.datetime.now() - datetime.timedelta(days=10)).strftime(timeformat),
+                user_id=1,
+                item_id=1,
+                building_id=1,
+                location="某個地方",
+                description="十天前的紀錄",
+                insert_time=(now - datetime.timedelta(days=10)).strftime(timeformat),
             ),
             Records.new(
-                1,
-                1,
-                1,
-                "某個地方",
-                "三天前的紀錄",
-                insert_time=(datetime.datetime.now() - datetime.timedelta(days=3)).strftime(timeformat),
+                user_id=1,
+                item_id=1,
+                building_id=1,
+                location="某個地方",
+                description="三天前的紀錄",
+                insert_time=(now - datetime.timedelta(days=3)).strftime(timeformat),
             ),
             Records.new(
-                1,
-                1,
-                1,
-                "某個地方",
-                "昨天的紀錄",
-                insert_time=(datetime.datetime.now() - datetime.timedelta(days=1)).strftime(timeformat),
+                user_id=1,
+                item_id=1,
+                building_id=1,
+                location="某個地方",
+                description="昨天的紀錄",
+                insert_time=(now - datetime.timedelta(days=1)).strftime(timeformat),
             ),
-            Records.new(1, 1, 1, "某個地方", "今天的紀錄"),
+            Records.new(
+                user_id=1,
+                item_id=1,
+                building_id=1,
+                location="某個地方",
+                description="今天的紀錄",
+                insert_time=now.strftime(timeformat)
+            ),
         ]
         db.session.bulk_save_objects(random_records)
-        db.session.commit()
 
         random_revisions = [
             Revisions.new(
                 record_id=random.randint(1, len(random_records)),
-                user_id=random.randint(1, len(users) + 1),
+                user_id=random.randint(1, len(users)),
                 status_id=1,
                 description="測試修訂{}紀錄".format(random.randint(1, 100000)),
             )
@@ -554,7 +562,7 @@ def reset(env):
         random_revisions += [
             Revisions.new(
                 record_id=random.randint(1, len(random_records)),
-                user_id=random.randint(1, len(users) + 1),
+                user_id=random.randint(1, len(users)),
                 status_id=2,
                 description="測試修訂{}紀錄".format(random.randint(1, 100000)),
             )
@@ -565,4 +573,3 @@ def reset(env):
 
     updateUnfinisheds()
     updateSequence()
-    db.session.commit()
