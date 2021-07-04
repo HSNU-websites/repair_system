@@ -415,7 +415,7 @@ def del_users(ids: list[int], force=False):
 
 
 def reset(is_development=False):
-    db.session.commit()  # must commit before drop_all
+    db.session.close()  # must close before drop_all
     db.drop_all()
     db.create_all()
 
