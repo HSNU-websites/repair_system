@@ -499,9 +499,10 @@ def reset(env):
 
     if env == "development":
         now = datetime.datetime.now()
-        current_timestamp = int((now - datetime.timedelta(days=10)).timestamp())
-        count = 1000
-        random_timestamps = sorted(random.sample(range(current_timestamp), k=count))
+        current_timestamp = int((now - datetime.timedelta(days=4)).timestamp())
+        timestamp = int((now - datetime.timedelta(days=100)).timestamp())
+        count = 300
+        random_timestamps = sorted(random.sample(range(timestamp, current_timestamp), k=count))
         random_records = [
             Records.new(
                 user_id=random.randint(1, len(users)),
@@ -509,21 +510,11 @@ def reset(env):
                 building_id=random.randint(1, len(buildings)),
                 location="某{}個地方".format(random.randint(1, 100000)),
                 description="{}的紀錄".format(random.randint(1, 100000)),
-                insert_time=datetime.datetime.fromtimestamp(random_timestamp).strftime(
-                    timeformat
-                ),
+                insert_time=datetime.datetime.fromtimestamp(random_timestamp).strftime(timeformat),
             )
             for random_timestamp in random_timestamps
         ]
         random_records += [
-            Records.new(
-                user_id=1,
-                item_id=1,
-                building_id=1,
-                location="某個地方",
-                description="十天前的紀錄",
-                insert_time=(now - datetime.timedelta(days=10)).strftime(timeformat),
-            ),
             Records.new(
                 user_id=1,
                 item_id=1,
@@ -558,7 +549,7 @@ def reset(env):
                 status_id=1,
                 description="測試修訂{}紀錄".format(random.randint(1, 100000)),
             )
-            for _ in range(500)
+            for _ in range(100)
         ]
         random_revisions += [
             Revisions.new(
@@ -567,10 +558,10 @@ def reset(env):
                 status_id=2,
                 description="測試修訂{}紀錄".format(random.randint(1, 100000)),
             )
-            for _ in range(200)
+            for _ in range(100)
         ]
         db.session.bulk_save_objects(random_revisions)
-        db.session.commit()
 
+    db.session.commit()
     updateUnfinisheds()
     updateSequence()

@@ -2,10 +2,9 @@ from flask_sqlalchemy import SQLAlchemy
 from passlib.context import CryptContext
 
 db = SQLAlchemy()
-timeformat = r"%Y-%m-%dT%H:%M:%S"
+timeformat = r"%Y-%m-%d %H:%M:%S"
 dateformat = r"%Y-%m-%d"
-filetimeformat = r"%Y-%m-%dT%H-%M-%S"
-timeformat_re_str = r"\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}"
+filetimeformat = r"%Y-%m-%dT%H-%M-%S" # backup filename
 finishedStatus_id = 2
 
 passwd_context = CryptContext(  # First scheme will be default

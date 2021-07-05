@@ -13,7 +13,9 @@ from .database.model import (
     Offices,
     Records,
     Unfinisheds,
-    Users)
+    Users,
+    timeformat,
+)
 
 mail_logger = logging.getLogger("mail")
 
@@ -24,9 +26,9 @@ def send_mail(subject, recipients, html):
     """
     mail_logger.info(
         "Sending mail...\n"
-        "subject: {subject}\n"
-        "recipients: {recipients}\n"
-        "html: {html}"
+        "Subject: {subject}\n"
+        "Bcc: {recipients}\n"
+        "Html: {html}"
         .format(subject=subject, recipients=recipients, html=html)
     )
 
@@ -37,11 +39,14 @@ def send_mail(subject, recipients, html):
             .format(ENV=current_app.config["ENV"])
         )
     else:
-        msg = Message(subject=subject, recipients=recipients, html=html)
+        sender = (current_app.config["MAIL_DEFAULT_SENDER"], current_app.config["MAIL_USERNAME"])
+        msg = Message(subject=subject, bcc=recipients, html=html, sender=sender)
         try:
             mail.send(msg)
         except Exception as e:
             mail_logger.exception(e)
+        else:
+            mail_logger.info("Mail sent successfully")
 
 
 def send_report_mail(user_id, building_id, location, item_id, description):
@@ -90,7 +95,7 @@ def send_daily_mail():
     seven_days = (today - datetime.timedelta(days=7))
 
     # get offices
-    # (office.id, office.description, [[yesterday],[2-7 days],[7 days and before]])
+    # (office.id, office.description, [ [yesterday], [2-7 days], [7 days and before] ] )
     result = [
         (row.id, row.description, [[], [], []])
         for row in db.session.query(Offices.id, Offices.description)
@@ -126,19 +131,19 @@ def send_daily_mail():
         record += "<div>昨日新增: </div>"
         for row in value[0]:
             record += "<div>%s %s</div>" % (
-                row.insert_time.strftime("%Y-%m-%dT%H-%M-%S"), row.description
+                row.insert_time.strftime(timeformat), row.description
             )
 
         record += "<div>七天內未完成: </div>"
         for row in value[1]:
             record += "<div>%s %s</div>" % (
-                row.insert_time.strftime("%Y-%m-%dT%H-%M-%S"), row.description
+                row.insert_time.strftime(timeformat), row.description
             )
 
         record += "<div>七天以上未完成: </div>"
         for row in value[2]:
             record += "<div style='color: red'>%s %s</div>" % (
-                row.insert_time.strftime("%Y-%m-%dT%H-%M-%S"), row.description
+                row.insert_time.strftime(timeformat), row.description
             )
     content = """
 <h3>每日報修:</h3>
