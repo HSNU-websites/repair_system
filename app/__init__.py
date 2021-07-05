@@ -1,5 +1,3 @@
-import logging
-
 from flask import (
     Flask,
     abort,
@@ -17,7 +15,6 @@ from flask_login.utils import (
     make_next_param,
 )
 from flask_mail import Mail
-
 from .config import config
 from .database import cache, db
 
