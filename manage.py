@@ -68,13 +68,15 @@ def init_database():
             db.create_all()
         except OperationalError as e:
             print(e)
-            print(f"Failed to connect to database in try {i+1}, sleep for {sleep_sec}")
+            print(f"Failed to connect to database in try {i+1}, sleep for {sleep_sec} sec")
             sleep(sleep_sec)
         else:
             success = True
             break
 
-    if not success:
+    if success:
+        print("Database connect successfully")
+    else:
         raise RuntimeError(f"Could not connect to database after {max_try} tries")
 
     if Users.query.count() == 0:
