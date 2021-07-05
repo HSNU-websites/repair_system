@@ -8,7 +8,7 @@ server {
     listen [::]:443 ssl default_server reuseport http2;
 
     # Domain names this server should respond to.
-    server_name example.com;
+    server_name ${NGINX_HOST};
 
     location / {
         proxy_pass http://repair_system;
