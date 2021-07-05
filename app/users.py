@@ -6,7 +6,7 @@ from .database.db_helper import load_user
 
 @login_manager.user_loader
 def load(user_id):
-    return load_user(user_id)
+    return load_user(int(user_id))
 
 
 def admin_required(func):
