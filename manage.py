@@ -1,7 +1,9 @@
 import unittest
 from os import getenv
+from time import sleep
 
 from flask_script import Manager
+from sqlalchemy.exc import OperationalError
 
 import app.database.backup as b
 import app.database.db_helper as h
@@ -58,7 +60,23 @@ def init_database():
     """
     Reset all Tables to Default if not initialized
     """
-    db.create_all()
+    max_try = 10
+    sleep_sec = 5
+    success = False
+    for i in range(max_try):
+        try:
+            db.create_all()
+        except OperationalError as e:
+            print(e)
+            print(f"Failed to connect to database in try {i+1}, sleep for {sleep_sec}")
+            sleep(sleep_sec)
+        else:
+            success = True
+            break
+
+    if not success:
+        raise RuntimeError(f"Could not connect to database after {max_try} tries")
+
     if Users.query.count() == 0:
         reset(yes=True)
 
