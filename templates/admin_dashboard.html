@@ -10,14 +10,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&display=swap" rel="stylesheet">
-    <style>
-        @media only screen and (max-width: 1400px) {
-            #sidebar {
-                position: relative;
-            }
-        }
-    </style>
     <script src="{{ url_for('static', filename='admin_dashboard.js') }}"></script>
+    <script src="{{ url_for('static', filename='nav.js') }}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <script>
         if (window.innerWidth <= 800) {
@@ -36,6 +30,7 @@
 <body>
     <div style="min-height: 100%;">
         <nav>
+            <span id="hamburger">&#9776;</span>
             <span><a href="/report">報修</a></span>
             <span><a href="/dashboard">報修紀錄</a></span>
             <span><a href="/admin_dashboard" class="active">控制台</a></span>
@@ -65,27 +60,27 @@
                     {{ form.submit }}
                 </div>
             </form>
+            <div id="reply_window">
+                <div class="closebtn" onclick="hide_reply_window();">&#10006;</div>
+                <div class="field">
+                    <label for="status">狀態: </label>
+                    <select name="status" id="status">
+                        {% for status in statuses %}
+                        <option value="{{ status['id'] }}">{{ status['description'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="description">額外敘述: </label>
+                    <br>
+                    <textarea name="description" placeholder="Description" cols="20" rows="10"></textarea>
+                </div>
+                <div class="field">
+                    <button class="add" onclick="send_reply_record(this);">回覆</button>
+                </div>
+            </div>
         </div>
-        <div id="reply_window">
-            <div class="closebtn" onclick="hide_reply_window();">&#10006;</div>
-            <div class="field">
-                <label for="status">狀態: </label>
-                <select name="status" id="status">
-                    {% for status in statuses %}
-                    <option value="{{ status['id'] }}">{{ status['description'] }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="field">
-                <label for="description">額外敘述: </label>
-                <br>
-                <textarea name="description" placeholder="Description" cols="20" rows="10"></textarea>
-            </div>
-            <div class="field">
-                <button class="add" onclick="send_reply_record(this);">回覆</button>
-            </div>
-        </div>
-        <table style="margin-left: 300px;">
+        <table class="admin">
             <thead>
                 <tr>
                     <td colspan="7" class="pages">
@@ -96,9 +91,7 @@
                         <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
                             class="end" {% endif
                             %}>&#8250;</a>
-                        <a href="{{ records['pages'] }}" {% if records['page']>= records['pages'] %}
-                            class="end" {% endif
-                            %}>&#8250;&#8250;</a>
+                        <a href="{{ records['pages'] }}" {% if records['page']>= records['pages'] %} class="end" {% endif %}>&#8250;&#8250;</a>
                     </td>
                 </tr>
                 <tr>

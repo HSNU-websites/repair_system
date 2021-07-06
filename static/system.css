@@ -17,13 +17,11 @@ a:hover {
 }
 
 h1 {
-    font-family: 'Noto Sans TC', sans-serif;
     text-align: center;
     font-weight: normal;
 }
 
 h3 {
-    font-family: 'Noto Sans TC', sans-serif;
     margin-left: 5px;
 }
 
@@ -51,12 +49,10 @@ hr {
 }
 
 #tip {
-    font-family: 'Noto Sans TC', sans-serif;
     text-align: center;
 }
 
 #copyright {
-    font-family: 'Noto Sans TC', sans-serif;
     height: 40px;
     position: relative;
     text-align: center;
@@ -71,10 +67,4 @@ hr {
 
 #copyright a:hover {
     text-decoration: underline;
-}
-
-@media only screen and (max-height: 500px) {
-    #copyright {
-        visibility: hidden;
-    }
 }

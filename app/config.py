@@ -30,17 +30,17 @@ class Config:
 
 
 class Development(Config):
+    ENV = "development"
     SECRET_KEY = "dhfkjgruytv4yntcm94[g"
     SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
     DEBUG = True
-    ENV = "development"
 
 
 class Testing(Config):
+    ENV = "testing"
     SQLALCHEMY_DATABASE_URI = "sqlite:///data_testing.db"
     TESTING = True
     DEBUG = True
-    ENV = "testing"
     PRESERVE_CONTEXT_ON_EXCEPTION = False
     WTF_CSRF_ENABLED = False
 

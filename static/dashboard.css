@@ -13,7 +13,6 @@ body {
 }
 
 h1 {
-    font-family: 'Noto Sans TC', sans-serif;
     text-align: center;
     font-weight: normal;
 }
@@ -32,6 +31,10 @@ table {
     border-collapse: collapse;
 }
 
+table.admin {
+    margin-left: 300px;
+}
+
 th, td {
     text-align: center;
     padding: 4px 10px 4px 10px;
@@ -46,18 +49,12 @@ tbody tr:nth-child(even) {
     background-color: #8ca5f5;
 }
 
-tbody td:last-child {
-    font-family: 'Noto Sans TC', sans-serif;
+table.admin tbody td:last-child {
     background-color: #a4b8fa;
 }
 
 tbody tr:hover {
     background-color: rgba(255, 255, 255, 0.2);
-}
-
-td {
-    word-break: break-word;
-    word-wrap: break-word;
 }
 
 td:nth-child(3) {
@@ -135,7 +132,6 @@ td.button_set {
 }
 
 .field {
-    font-family: 'Noto Sans TC', sans-serif;
     margin: 10px 0 10px 0;
     color: black;
     font-size: 16px;
@@ -155,9 +151,7 @@ td.button_set {
 
 #reply_window {
     font-size: 14px;
-    position: fixed;
     display: none;
-    right: 10px;
     padding: 20px 10px 20px 10px;
     background-color: rgba(255, 255, 255, 0.2);
     transition: 0.3s;
@@ -227,7 +221,6 @@ td.button_set {
 }
 
 #copyright {
-    font-family: 'Noto Sans TC', sans-serif;
     height: 40px;
     position: relative;
     text-align: center;
@@ -235,8 +228,17 @@ td.button_set {
     width: 100%;
 }
 
-@media only screen and (max-height: 500px) {
-    #copyright {
-        visibility: hidden;
+@media only screen and (max-width: 500px) {
+    table, #sidebar {
+        font-size: 11px;
+    }
+}
+
+@media only screen and (max-width: 1400px) {
+    #sidebar {
+        position: relative;
+    }
+    table.admin {
+        margin-left: auto;
     }
 }

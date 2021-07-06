@@ -1,0 +1,54 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>每日報修</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+    <main>
+        <h3>每日報修:</h3>
+        <div style="color: red;">未完成以紅色表示</div>
+        <hr>
+        {% for id, description, value in records %}
+        <div><b>{{ description }}</b></div>
+
+        <div>
+            <h4>昨日新增: </h4>
+            <div>
+                {% for row in value[0] %}
+                <div>{{ row.insert_time.strftime(timeformat) }} {{ row.description }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div>
+            <h4>七天內未完成: </h4>
+            <div>
+                {% for row in value[1] %}
+                <div>{{ row.insert_time.strftime(timeformat) }} {{ row.description }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div style="color: red;">
+            <h4>七天以上未完成: </h4>
+            <div>
+                {% for row in value[2] %}
+                <div>{{ row.insert_time.strftime(timeformat) }} {{ row.description }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <hr>
+        {% endfor %}
+    </main>
+    <footer>此為系統自動寄送郵件，不須回覆</footer>
+</body>
+
+</html>
