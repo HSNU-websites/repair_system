@@ -46,6 +46,7 @@ class Testing(Config):
 
 
 class Production(Config):
+    PREFERRED_URL_SCHEME = "https"
     ENV = "production"
 
 
