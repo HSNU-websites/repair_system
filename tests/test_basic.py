@@ -1,6 +1,7 @@
 import unittest
-from flask import url_for
+
 from app import create_app
+from flask import url_for
 
 
 class BasicTest(unittest.TestCase):
@@ -11,12 +12,9 @@ class BasicTest(unittest.TestCase):
     def setUp(self):
         self.app = create_app("testing")
         self.client = self.app.test_client()
-        self.app_context = self.app.test_request_context()
-        self.app_context.push()
 
     def tearDown(self):
-        if self.app_context is not None:
-            self.app_context.pop()
+        pass
 
     def test_app_is_testing(self):
         self.assertTrue(self.app.config["TESTING"])
