@@ -17,7 +17,7 @@ from ..database.db_helper import (
     render_users,
     add_users,
 )
-from ..database.backup import get_backups, backup_dir
+from ..database.backup_helper import get_backups, backup_dir
 from ..users import admin_required
 
 
@@ -44,7 +44,7 @@ def dashboard_page(page=1):
             form=form,
             statuses=render_system_setting()[3],
         )
-    if request.method == "POST":  
+    if request.method == "POST":
         if form.validate_on_submit():
             current_app.logger.info("POST /admin_dashboard")
             cookies = []
