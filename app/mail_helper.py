@@ -63,17 +63,26 @@ def send_report_mail(user_id, building_id, location, item_id, description):
     office = db.session.query(Offices.description).filter_by(id=item.office_id).first()
 
     subject = "報修成功通知"
-    content = """
-<h3>報修:</h3>
-<main>
-    <div><b>報修人:</b> {user}</div>
-    <div><b>大樓:</b> {building}</div>
-    <div><b>地點:</b> {location}</div>
-    <div><b>損壞物件:</b> {item} ({office})</div>
-    <div><b>敘述:</b> {description}</div>
-</main>
-<footer>此為系統自動寄送郵件，請勿回覆</footer>
-""".format(
+#     content = """
+# <h3>報修:</h3>
+# <main>
+#     <div><b>報修人:</b> {user}</div>
+#     <div><b>大樓:</b> {building}</div>
+#     <div><b>地點:</b> {location}</div>
+#     <div><b>損壞物件:</b> {item} ({office})</div>
+#     <div><b>敘述:</b> {description}</div>
+# </main>
+# <footer>此為系統自動寄送郵件，請勿回覆</footer>
+# """.format(
+#         user=" ".join([user.username, user.name]),
+#         building=building.description,
+#         location=location,
+#         item=item.description,
+#         office=office.description,
+#         description=description,
+#     )
+    content = render_template(
+        "report_mail.html",
         user=" ".join([user.username, user.name]),
         building=building.description,
         location=location,

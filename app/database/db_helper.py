@@ -264,6 +264,11 @@ def render_users(Filter=dict(), page=1, per_page=100) -> dict:
     if page < 1:
         page = 1
     q = Users.query.filter(Users.id > 1)
+
+    username_between = Filter.pop("username_between", None)
+    if isinstance(username_between, tuple) and len(username_between) == 2:
+        q = q.filter(Users.username.between(*username_between))
+
     Filter = {
         key: value
         for key, value in Filter.items()
@@ -389,30 +394,35 @@ def del_users(ids: list[int], force=False):
     force: update records and revisions set user_id = 1 (deleted)
            and delete user
     """
-    s = set()
+    ids = set(ids)
     if force:
-        for user_id in ids:
-            Records.query.filter_by(user_id=user_id).update({"user_id": 1})
-            Revisions.query.filter_by(user_id=user_id).update({"user_id": 1})
-            s.add(user_id)
+        Records.query.filter(Records.user_id.in_(ids)).update({"user_id": 1})
+        Revisions.query.filter(Records.user_id.in_(ids)).update({"user_id": 1})
     else:
+        idRec_query = db.session.query(Records.user_id).filter(Records.user_id.in_(ids))
+        idRev_query = db.session.query(Revisions.user_id).filter(Revisions.user_id.in_(ids))
+        union = {row.user_id for row in idRec_query.union(idRev_query).all()}
+        for user in Users.query.filter(Users.id.in_(union)).all():
+            user.is_valid = False
+            user.is_marked_deleted = True
+        ids = ids - union
+
+    if ids:
         for user_id in ids:
-            a = db.session.query(db.exists().where(
-                Records.user_id == user_id)).scalar()
-            b = db.session.query(db.exists().where(
-                Revisions.user_id == user_id)).scalar()
-            if a or b:
-                u = Users.query.filter_by(id=user_id).first()
-                u.is_valid = False
-                u.is_marked_deleted = True
-            else:
-                s.add(user_id)
-    if s:
-        for user_id in s:
             cache.delete_memoized(get_user, user_id)
             cache.delete_memoized(load_user, user_id)
-        Users.query.filter(Users.id.in_(s)).delete()
-        db.session.commit()
+        Users.query.filter(Users.id.in_(ids)).delete()
+    db.session.commit()
+
+
+def del_users_between(username_between: tuple, force=False):
+    if not (isinstance(username_between, tuple) and len(username_between) == 2):
+        raise TypeError("username_between must be a tuple with 2 str")
+
+    ids = [
+        row.id for row in db.session.query(Users.id).filter(Users.username.between(*username_between)).all()
+    ]
+    del_users(ids, force)
 
 
 def reset(env):

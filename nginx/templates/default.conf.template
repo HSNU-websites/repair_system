@@ -8,7 +8,7 @@ server {
     listen [::]:443 ssl default_server reuseport http2;
 
     # Domain names this server should respond to.
-    server_name example.com;
+    server_name ${NGINX_HOST};
 
     location / {
         proxy_pass http://repair_system;
@@ -31,6 +31,4 @@ server {
 
     # HSTS (ngx_http_headers_module is required) (63072000 seconds)
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
-
-    server_tokens off;
 }

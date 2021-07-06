@@ -9,7 +9,7 @@ services:
       - db
     restart: unless-stopped
     environment:
-      - MODE=production
+      - ENV=production
       - DB_USER=repair_system
       - DB_PASSWORD=passw0rd
       - DB_HOST=db:3306
@@ -24,7 +24,7 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - repair_system
+      - net
 
   db:
     image: mysql:8
@@ -41,14 +41,15 @@ services:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - repair_system
+      - net
 
   nginx:
     image: jonasal/nginx-certbot:latest
     container_name: nginx
     restart: unless-stopped
     environment:
-      - CERTBOT_EMAIL=root@example.com
+      - NGINX_HOST=localhost
+      - CERTBOT_EMAIL=
       - STAGING=0
       - DHPARAM_SIZE=2048
       - RSA_KEY_SIZE=4096
@@ -61,12 +62,12 @@ services:
       - 443:443
     volumes:
       - ./data/ssl:/etc/letsencrypt
-      - ./user_conf.d:/etc/nginx/user_conf.d
+      - ./nginx/templates:/etc/nginx/templates
       - /dev/null:/var/log/nginx/access.log
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     networks:
-      - repair_system
+      - net
 
 networks:
-  repair_system:
+  net:

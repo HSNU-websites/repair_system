@@ -43,7 +43,7 @@ class MyTimedRotatingFileHandler(BaseRotatingHandler):
 
         BaseRotatingHandler.__init__(self, filename, 'a', encoding=encoding,
                                      delay=delay, errors=errors)
-        self.rotatefilename = rotatefilename
+        self.rotatefilename = os.fspath(rotatefilename)
         self.when = when.upper()
         self.backupCount = backupCount
         self.utc = utc
