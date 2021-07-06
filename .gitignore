@@ -3,10 +3,6 @@ __pycache__/
 /.venv/
 .env
 data.db*
-data_testing.db*
-*.tar.xz
 /backup/
 /log/
 /data/
-fullchain.pem
-privkey.pem
