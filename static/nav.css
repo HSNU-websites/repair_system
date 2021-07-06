@@ -34,13 +34,33 @@ nav a.active {
     text-decoration: underline;
 }
 
+nav #hamburger {
+    padding-left: 0;
+    display: none;
+}
+
 .right {
     float: right;
 }
 
 @media only screen and (max-width: 600px) {
     nav span {
-        font-size: 12px;
-        margin: 11px 1px 11px 1px;
+        /* width: 100%; */
+        visibility: hidden;
+        display: block;
+        background-color: rgb(173, 216, 230);
+        margin: 0;
+        border: none;
+        padding: 5px 0 5px 10px;
+    }
+    nav .right {
+        float: none;
+    }
+    nav span:nth-last-child(2) {
+        margin: 0;
+    }
+    nav #hamburger {
+        visibility: visible;
+        display: inline-block;
     }
 }

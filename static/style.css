@@ -2,7 +2,6 @@ h1 {
     text-align: center;
     margin: 10px auto 10px auto;
     font-weight: normal;
-    font-family: 'Noto Sans TC', sans-serif;
 }
 
 body {
@@ -11,6 +10,7 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     margin: auto 0px auto 0px;
+    font-family: 'Noto Sans TC', sans-serif;
 }
 
 a {
@@ -31,7 +31,6 @@ a:hover {
 }
 
 #copyright {
-    font-family: 'Noto Sans TC', sans-serif;
     position: absolute;
     text-align: center;
     bottom: 10px;

@@ -27,6 +27,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <script src="{{ url_for('static', filename='manage_user.js') }}"></script>
     <script src="{{ url_for('static', filename='msg.js') }}"></script>
+    <script src="{{ url_for('static', filename='nav.js') }}"></script>
     <script>
         if (window.innerWidth <= 800) {
             alert("不建議在行動裝置上使用此頁面");
@@ -46,6 +47,7 @@
 <body>
     <div style="min-height: 100%;">
         <nav>
+            <span id="hamburger">&#9776;</span>
             <span><a href="/report">報修</a></span>
             <span><a href="/dashboard">報修紀錄</a></span>
             <span><a href="/admin_dashboard">控制台</a></span>
@@ -123,18 +125,18 @@
                 <div>
                     <span id="{{ user['id'] }}">{{ user["username"] }}</span>
                     {% if user["is_marked_deleted"] %}
-                    <input value="{{ user["name"] }}" type="text" disabled></input>
-                    <input value="{{ user["classnum"] }}" type="text" disabled></input>
+                    <input value="{{ user[" name"] }}" type="text" disabled></input>
+                    <input value="{{ user[" classnum"] }}" type="text" disabled></input>
                     <input type="password" placeholder="未更改" disabled>
-                    <input value="{{ user["email"] }}" class="email" type="text" disabled></input>
+                    <input value="{{ user[" email"] }}" class="email" type="text" disabled></input>
                     <input type="checkbox" {% if user["is_admin"] %} checked {% endif %} disabled></input>
                     <input type="checkbox" {% if user["is_valid"] %} checked {% endif %} disabled></input>
                     <input type="checkbox" checked disabled></input>
                     {% else %}
-                    <input value="{{ user["name"] }}" type="text"></input>
-                    <input value="{{ user["classnum"] }}" type="text"></input>
+                    <input value="{{ user[" name"] }}" type="text"></input>
+                    <input value="{{ user[" classnum"] }}" type="text"></input>
                     <input type="password" placeholder="未更改">
-                    <input value="{{ user["email"] }}" class="email" type="text"></input>
+                    <input value="{{ user[" email"] }}" class="email" type="text"></input>
                     <input type="checkbox" {% if user["is_admin"] %} checked {% endif %}></input>
                     <input type="checkbox" {% if user["is_valid"] %} checked {% endif %}></input>
                     <input type="checkbox" disabled></input>
