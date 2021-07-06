@@ -31,6 +31,4 @@ server {
 
     # HSTS (ngx_http_headers_module is required) (63072000 seconds)
     add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
-
-    server_tokens off;
 }
