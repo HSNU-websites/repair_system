@@ -45,7 +45,6 @@ nav #hamburger {
 
 @media only screen and (max-width: 600px) {
     nav span {
-        /* width: 100%; */
         visibility: hidden;
         display: block;
         background-color: rgb(173, 216, 230);

@@ -91,9 +91,7 @@
                         <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
                             class="end" {% endif
                             %}>&#8250;</a>
-                        <a href="{{ records['pages'] }}" {% if records['page']>= records['pages'] %}
-                            class="end" {% endif
-                            %}>&#8250;&#8250;</a>
+                        <a href="{{ records['pages'] }}" {% if records['page']>= records['pages'] %} class="end" {% endif %}>&#8250;&#8250;</a>
                     </td>
                 </tr>
                 <tr>

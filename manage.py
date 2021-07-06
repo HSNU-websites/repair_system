@@ -1,7 +1,7 @@
 import unittest
 from os import getenv
-from flask_script import Manager
 from time import sleep
+from flask_script import Manager
 from sqlalchemy.exc import OperationalError
 from app.database.backup import backup
 import app.database.db_helper as db_helper

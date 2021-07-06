@@ -125,18 +125,18 @@
                 <div>
                     <span id="{{ user['id'] }}">{{ user["username"] }}</span>
                     {% if user["is_marked_deleted"] %}
-                    <input value="{{ user[" name"] }}" type="text" disabled></input>
-                    <input value="{{ user[" classnum"] }}" type="text" disabled></input>
+                    <input value="{{ user["name"] }}" type="text" disabled></input>
+                    <input value="{{ user["classnum"] }}" type="text" disabled></input>
                     <input type="password" placeholder="未更改" disabled>
-                    <input value="{{ user[" email"] }}" class="email" type="text" disabled></input>
+                    <input value="{{ user["email"] }}" class="email" type="text" disabled></input>
                     <input type="checkbox" {% if user["is_admin"] %} checked {% endif %} disabled></input>
                     <input type="checkbox" {% if user["is_valid"] %} checked {% endif %} disabled></input>
                     <input type="checkbox" checked disabled></input>
                     {% else %}
-                    <input value="{{ user[" name"] }}" type="text"></input>
-                    <input value="{{ user[" classnum"] }}" type="text"></input>
+                    <input value="{{ user["name"] }}" type="text"></input>
+                    <input value="{{ user["classnum"] }}" type="text"></input>
                     <input type="password" placeholder="未更改">
-                    <input value="{{ user[" email"] }}" class="email" type="text"></input>
+                    <input value="{{ user["email"] }}" class="email" type="text"></input>
                     <input type="checkbox" {% if user["is_admin"] %} checked {% endif %}></input>
                     <input type="checkbox" {% if user["is_valid"] %} checked {% endif %}></input>
                     <input type="checkbox" disabled></input>
