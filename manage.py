@@ -83,5 +83,34 @@ def init_database():
         reset(yes=True)
 
 
+@manager.command
+def add_user():
+    while True:
+        username = input("帳號(學號)：")
+        if username == "":
+            print("帳號不可為空！")
+        elif Users.username_exists(username):
+            print("帳號已存在！")
+        else:
+            break
+    while True:
+        password = input("密碼：")
+        if len(password) < 6:
+            print("密碼須至少6碼！")
+        else:
+            break
+    name = input("姓名：")
+    admin = input("是否註冊為管理員？Y/N：")
+    is_admin = (admin == "Y")
+    d = {
+        "username": username,
+        "password": password,
+        "name": name,
+        "is_admin": is_admin
+    }
+
+    h.add_users([d])
+
+
 if __name__ == "__main__":
     manager.run()
