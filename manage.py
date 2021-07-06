@@ -3,7 +3,7 @@ from os import getenv
 from time import sleep
 from flask_script import Manager
 from sqlalchemy.exc import OperationalError
-from app.database.backup import backup
+from app.database.backup import backup as backup_function
 import app.database.db_helper as db_helper
 from app import create_app, db
 from app.database.model import Users
@@ -42,7 +42,7 @@ def backup():
     """
     Backup Tables
     """
-    backup()
+    backup_function()
 
 
 @manager.command
