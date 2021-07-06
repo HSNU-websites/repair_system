@@ -21,9 +21,13 @@ class ReportForm(FlaskForm):
     building = SelectField(
         "大樓: ", validators=[DataRequired()]
     )  # choices will be added when rendered
-    location = StringField("地點 (限 200 字內): ", validators=[DataRequired(), Length(max=200)])
+    location = StringField(
+        "地點 (限 200 字內): ", validators=[DataRequired(), Length(max=200)]
+    )
     item = SelectField("損壞物件: ", validators=[DataRequired()])
-    description = StringField("狀況描述 (限 200 字內): ", validators=[DataRequired(), Length(max=200)])
+    description = StringField(
+        "狀況描述 (限 200 字內): ", validators=[DataRequired(), Length(max=200)]
+    )
     submit = SubmitField("報修")
 
 
@@ -56,7 +60,12 @@ class AddOneUserForm(FlaskForm):
         render_kw={"placeholder": "Class Number"},
     )
     password = PasswordField(
-        "密碼: ", validators=[DataRequired(), Length(min=6)], render_kw={"placeholder": "Password"}
+        "密碼: ",
+        validators=[
+            DataRequired(),
+            Length(min=6, message="Password is too short (at least 6 characters)."),
+        ],
+        render_kw={"placeholder": "Password"},
     )
     email = EmailField("電子郵件 (僅管理員需要): ", render_kw={"placeholder": "Email"})
     submit = SubmitField("新增")

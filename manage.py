@@ -1,13 +1,10 @@
 import unittest
 from os import getenv
 from time import sleep
-
 from flask_script import Manager
 from sqlalchemy.exc import OperationalError
-
-import app.database.backup as b
-import app.database.db_helper as h
-import app.mail_helper as m
+from app.database.backup import backup
+import app.database.db_helper as db_helper
 from app import create_app, db
 from app.database.model import Users
 from app.mylogging import init_logging
@@ -34,11 +31,10 @@ def reset(yes=False):
             "It's extremely dangerous.\n"
             "If you are sure, please type 'YES'"
         )
-        a = input()
-        if a != "YES":
+        if input() != "YES":
             print("Terminated.")
             return
-    h.reset(env=app.config["ENV"])
+    db_helper.reset(env=app.config["ENV"])
 
 
 @manager.command
@@ -46,7 +42,7 @@ def backup():
     """
     Backup Tables
     """
-    b.backup()
+    backup()
 
 
 @manager.command
@@ -67,7 +63,7 @@ def init_database():
         try:
             db.create_all()
         except OperationalError as e:
-            print(e)
+            print(f"Error: {e}")
             print(f"Failed to connect to database in try {i+1}, sleep for {sleep_sec} sec")
             sleep(sleep_sec)
         else:
@@ -104,14 +100,14 @@ def add_user():
         admin = input("是否註冊為管理員？Y/N：")
         is_admin = (admin == "Y")
 
-        d = {
+        user_info = {
             "username": username,
             "password": password,
             "name": name,
             "is_admin": is_admin
         }
 
-        h.add_users([d])
+        db_helper.add_users([user_info])
         print("使用者新增成功")
 
     except KeyboardInterrupt:
