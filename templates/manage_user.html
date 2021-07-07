@@ -96,6 +96,21 @@
                     {{ form_csv.submit }}
                 </div>
             </form>
+            <hr>
+            <form action="/manage_user/" method="POST">
+                {{ form_filter.csrf_token }}
+                <div class="field">
+                    {{ form_filter.upper.label }}
+                    {{ form_filter.upper }}
+                </div>
+                <div class="field">
+                    {{ form_filter.lower.label }}
+                    {{ form_filter.lower }}
+                </div>
+                <div class="field">
+                    {{ form_filter.submit }}
+                </div>
+            </form>
         </div>
         <div id="main_content">
             <div id="messages">{{ display_msg(messages) }}</div>

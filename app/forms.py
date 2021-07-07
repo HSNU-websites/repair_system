@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, SelectField, StringField, SubmitField
-from wtforms.fields.html5 import EmailField
+from wtforms.fields.html5 import EmailField, IntegerField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from flask_wtf.recaptcha import RecaptchaField
 from wtforms.validators import DataRequired, ValidationError, Length
@@ -39,6 +39,16 @@ class ReportsFilterForm(FlaskForm):
     classnum = StringField(
         "班級: ",
         render_kw={"placeholder": "Class Number"},
+    )
+    submit = SubmitField("送出")
+
+
+class UserFilterForm(FlaskForm):
+    upper = IntegerField(
+        "上限: ", validators=[DataRequired()], render_kw={"placeholder": "Student ID"}
+    )
+    lower = IntegerField(
+        "下限: ", validators=[DataRequired()], render_kw={"placeholder": "Student ID"}
     )
     submit = SubmitField("送出")
 

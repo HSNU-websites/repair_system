@@ -10,7 +10,13 @@ from flask import (
 from flask_login import login_required
 from . import admin_bp
 from .helper import csv_handler
-from ..forms import ReportsFilterForm, AddOneUserForm, AddUsersByFileForm, RestoreForm
+from ..forms import (
+    ReportsFilterForm,
+    AddOneUserForm,
+    AddUsersByFileForm,
+    RestoreForm,
+    UserFilterForm,
+)
 from ..database.db_helper import (
     render_system_setting,
     render_records,
@@ -48,12 +54,9 @@ def dashboard_page(page=1):
         if form.validate_on_submit():
             current_app.logger.info("POST /admin_dashboard")
             cookies = []
-            Filter = dict()
             if username := form.username.data:
-                Filter["username"] = username
                 cookies.append(("username", username))
             if classnum := form.classnum.data:
-                Filter["classnum"] = classnum
                 cookies.append(("classnum", classnum))
 
             response = make_response(redirect(url_for("admin.dashboard_page")))
@@ -93,13 +96,24 @@ def manage_user_page(page=1):
     """
     The page allows admins to add, edit and delete users.
     """
+    Filter = dict()
+
+    if (upper := request.cookies.get("upper")) and (
+        lower := request.cookies.get("lower")
+    ):
+        Filter["username_between"] = (upper, lower)
+        form_filter = UserFilterForm(upper=upper, lower=lower)
+    else:
+        form_filter = UserFilterForm()
     form = AddOneUserForm()
     form_csv = AddUsersByFileForm()
+    
     template = render_template(
         "manage_user.html",
         form=form,
         form_csv=form_csv,
-        users=render_users(page=page),
+        form_filter=form_filter,
+        users=render_users(Filter=Filter, page=page),
     )
     if request.method == "GET":
         # Render all users
@@ -127,7 +141,7 @@ def manage_user_page(page=1):
                 for _, errorMessages in form.errors.items():
                     for err in errorMessages:
                         flash(err, category="alert")
-                current_app.logger.warning("POST /manage_user: Invalid submit")
+                current_app.logger.warning("POST /manage_user: Invalid submit for adding one user")
             return redirect(url_for("admin.manage_user_page"))
         if form_csv.csv_file.data:
             # Add users by csv
@@ -141,11 +155,31 @@ def manage_user_page(page=1):
                     if already_exists := add_users(data):
                         flash(", ".join(already_exists) + " 已經存在", category="alert")
             else:
-                current_app.logger.warning("POST /manage_user: Invalid submit")
+                current_app.logger.warning("POST /manage_user: Invalid submit for csv file")
                 for _, errorMessages in form_csv.errors.items():
                     for err in errorMessages:
                         flash(err, category="alert")
             return redirect(url_for("admin.manage_user_page"))
+        # filter
+        if form_filter.upper.data or form_filter.lower.data:
+            if form_filter.validate_on_submit():
+                cookies = []
+                Filter = dict()
+                if upper := form_filter.upper.data:
+                    cookies.append(("upper", str(upper)))
+                if lower := form_filter.lower.data:
+                    cookies.append(("lower", str(lower)))
+
+                response = make_response(redirect(url_for("admin.manage_user_page")))
+                response.delete_cookie("upper")
+                response.delete_cookie("lower")
+                for cookie in cookies:
+                    response.set_cookie(*cookie, max_age=120)
+                return response
+            else:
+                current_app.logger.warning("POST /admin_dashboard: Invalid submit for user filter")
+                return redirect(url_for("admin.manage_user_page"))
+        return redirect(url_for("admin.manage_user_page"))
 
 
 @admin_bp.route("/backup", methods=["GET", "POST"])
