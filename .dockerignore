@@ -7,7 +7,6 @@ __pycache__/
 /.git/
 /.gitignore
 data.db*
-data_testing.db*
 /nginx/
 /data/
 /backup/

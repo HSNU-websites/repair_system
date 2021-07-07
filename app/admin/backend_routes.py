@@ -12,7 +12,7 @@ from ..database.db_helper import (
     del_revisions,
     del_records,
 )
-from ..database.backup import backup, restore, del_backup, backup_dir
+from ..database.backup_helper import backup, restore, del_backup, backup_dir
 
 
 @admin_bp.route("/admin_dashboard_backend", methods=["POST", "DELETE"])
