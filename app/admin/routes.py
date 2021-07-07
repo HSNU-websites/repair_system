@@ -17,7 +17,7 @@ from ..database.db_helper import (
     render_users,
     add_users,
 )
-from ..database.backup import get_backups, backup_dir
+from ..database.backup_helper import get_backups, backup_dir
 from ..users import admin_required
 
 
@@ -30,24 +30,25 @@ def dashboard_page(page=1):
     The page allows admins to browse all reports and make response to the reports.
     """
     # cookies are used to save filter when user turns page
-    form = ReportsFilterForm()
     Filter = dict()
+    if username := request.cookies.get("username"):
+        Filter["username"] = username
+    if classnum := request.cookies.get("classnum"):
+        Filter["classnum"] = classnum
+    form = ReportsFilterForm(**Filter)
     if request.method == "GET":
         current_app.logger.info("GET /admin_dashboard")
-        if username := request.cookies.get("username"):
-            Filter["username"] = username
-        if classnum := request.cookies.get("classnum"):
-            Filter["classnum"] = classnum
         return render_template(
             "admin_dashboard.html",
             records=render_records(Filter=Filter, page=page),
             form=form,
             statuses=render_system_setting()[3],
         )
-    if request.method == "POST":  
+    if request.method == "POST":
         if form.validate_on_submit():
             current_app.logger.info("POST /admin_dashboard")
             cookies = []
+            Filter = dict()
             if username := form.username.data:
                 Filter["username"] = username
                 cookies.append(("username", username))
@@ -55,14 +56,7 @@ def dashboard_page(page=1):
                 Filter["classnum"] = classnum
                 cookies.append(("classnum", classnum))
 
-            response = make_response(
-                render_template(
-                    "admin_dashboard.html",
-                    records=render_records(Filter=Filter, page=page),
-                    form=form,
-                    statuses=render_system_setting()[3],
-                )
-            )
+            response = make_response(redirect(url_for("admin.dashboard_page")))
             response.delete_cookie("username")
             response.delete_cookie("classnum")
             for cookie in cookies:

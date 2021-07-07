@@ -3,12 +3,11 @@ from os import getenv
 from time import sleep
 from flask_script import Manager
 from sqlalchemy.exc import OperationalError
-from app.database.backup import backup as backup_function
+import app.database.backup_helper as backup_helper
 import app.database.db_helper as db_helper
 from app import create_app, db
 from app.database.model import Users
 from app.mylogging import init_logging
-
 app = create_app(getenv("ENV", "production"))
 init_logging(app)
 manager = Manager(app)
@@ -42,13 +41,15 @@ def backup():
     """
     Backup Tables
     """
-    backup_function()
+    backup_helper.backup()
 
 
 @manager.command
 def test():
     tests = unittest.TestLoader().discover("tests")
-    unittest.TextTestRunner(verbosity=2).run(tests)
+    result = unittest.TextTestRunner(verbosity=2).run(tests)
+
+    return 0 if result.wasSuccessful() else 1
 
 
 @manager.command
@@ -81,31 +82,37 @@ def init_database():
 
 @manager.command
 def add_user():
-    while True:
-        username = input("帳號(學號)：")
-        if username == "":
-            print("帳號不可為空！")
-        elif Users.username_exists(username):
-            print("帳號已存在！")
-        else:
-            break
-    while True:
-        password = input("密碼：")
-        if len(password) < 6:
-            print("密碼須至少6碼！")
-        else:
-            break
-    name = input("姓名：")
-    admin = input("是否註冊為管理員？Y/N：")
-    is_admin = (admin == "Y")
-    user_info = {
-        "username": username,
-        "password": password,
-        "name": name,
-        "is_admin": is_admin
-    }
+    try:
+        while True:
+            username = input("帳號(學號)：")
+            if username == "":
+                print("帳號不可為空！")
+            elif Users.username_exists(username):
+                print("帳號已存在！")
+            else:
+                break
+        while True:
+            password = input("密碼：")
+            if len(password) < 6:
+                print("密碼須至少6碼！")
+            else:
+                break
+        name = input("姓名：")
+        admin = input("是否註冊為管理員？Y/N：")
+        is_admin = (admin == "Y")
 
-    db_helper.add_users([user_info])
+        user_info = {
+            "username": username,
+            "password": password,
+            "name": name,
+            "is_admin": is_admin
+        }
+
+        db_helper.add_users([user_info])
+        print("使用者新增成功")
+
+    except KeyboardInterrupt:
+        print("\n操作取消")
 
 
 if __name__ == "__main__":

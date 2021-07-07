@@ -38,7 +38,7 @@ class Development(Config):
 
 class Testing(Config):
     ENV = "testing"
-    SQLALCHEMY_DATABASE_URI = "sqlite:///data_testing.db"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     TESTING = True
     DEBUG = True
     PRESERVE_CONTEXT_ON_EXCEPTION = False
@@ -46,8 +46,8 @@ class Testing(Config):
 
 
 class Production(Config):
-    PREFERRED_URL_SCHEME = "https"
     ENV = "production"
+    PREFERRED_URL_SCHEME = "https"
 
 
 config = {
