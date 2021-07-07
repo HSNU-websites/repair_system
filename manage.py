@@ -1,5 +1,6 @@
 import unittest
 from os import getenv
+import sys
 from time import sleep
 from flask_script import Manager
 from sqlalchemy.exc import OperationalError
@@ -50,9 +51,9 @@ def test():
     result = unittest.TextTestRunner(verbosity=2).run(tests)
 
     if result.wasSuccessful():
-        exit(0)
+        sys.exit(0)
     else:
-        exit(1)
+        sys.exit(1)
 
 
 @manager.command
