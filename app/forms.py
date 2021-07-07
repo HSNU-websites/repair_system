@@ -45,10 +45,10 @@ class ReportsFilterForm(FlaskForm):
 
 class UserFilterForm(FlaskForm):
     upper = IntegerField(
-        "上限: ", validators=[DataRequired()], render_kw={"placeholder": "Student ID"}
+        "學號上限: ", validators=[DataRequired()], render_kw={"placeholder": "Student ID"}
     )
     lower = IntegerField(
-        "下限: ", validators=[DataRequired()], render_kw={"placeholder": "Student ID"}
+        "學號下限: ", validators=[DataRequired()], render_kw={"placeholder": "Student ID"}
     )
     submit = SubmitField("送出")
 

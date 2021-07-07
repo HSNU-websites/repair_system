@@ -66,6 +66,7 @@ class NormalUserAuthTest(unittest.TestCase):
 
         # NormalUser data
         self.login_data = {"username": "user", "password": "123"}
+        self.login()
 
         # status code
         self.normal = 200
@@ -80,44 +81,31 @@ class NormalUserAuthTest(unittest.TestCase):
     def login(self):
         return self.client.post(url_for("main.index_page"), data=self.login_data)
 
-    def test_login(self):
-        response = self.login()
-        self.assertEqual(
-            response.status_code, 302
-        )  # After a user successfully login, he or she will be redirected.
-
     def test_report_page(self):
-        self.login()
         response = self.client.get(url_for("user.report_page"))
         self.assertEqual(response.status_code, self.normal)
 
     def test_dashboard_page(self):
-        self.login()
         response = self.client.get(url_for("user.dashboard_page"))
         self.assertEqual(response.status_code, self.normal)
 
     def test_user_setting_page(self):
-        self.login()
         response = self.client.get(url_for("user.user_setting_page"))
         self.assertEqual(response.status_code, self.normal)
 
     def test_admin_dashboard_page(self):
-        self.login()
         response = self.client.get(url_for("admin.dashboard_page"))
         self.assertEqual(response.status_code, self.admin)
 
     def test_system_page(self):
-        self.login()
         response = self.client.get(url_for("admin.system_page"))
         self.assertEqual(response.status_code, self.admin)
 
     def test_manage_user_page(self):
-        self.login()
         response = self.client.get(url_for("admin.manage_user_page"))
         self.assertEqual(response.status_code, self.admin)
 
     def test_backup_page(self):
-        self.login()
         response = self.client.get(url_for("admin.backup_page"))
         self.assertEqual(response.status_code, self.admin)
 
@@ -133,6 +121,8 @@ class AdminAuthTest(NormalUserAuthTest):
 
         # Admin data
         self.login_data = {"username": "admin", "password": "123"}
+        self.client = self.app.test_client()
+        self.login()
 
         # status code
         self.normal = 200
