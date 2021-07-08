@@ -98,6 +98,7 @@ class ManageUserBackendTest(BackendTest):
         response = self.client.post(
             url_for("admin.manage_user_page"),
             data={
+                "form_name": "add_one",
                 "username": "710000",
                 "name": "test",
                 "classnum": "1498",
@@ -111,6 +112,7 @@ class ManageUserBackendTest(BackendTest):
         response = self.client.post(
             url_for("admin.manage_user_page"),
             data={
+                "form_name": "add_one",
                 "username": "user",
                 "name": "user",
                 "classnum": "1498",
@@ -126,6 +128,7 @@ class ManageUserBackendTest(BackendTest):
         response = self.client.post(
             url_for("admin.manage_user_page"),
             data={
+                "form_name": "add_one",
                 "username": "710000",
                 "name": "test",
                 "classnum": "0",
