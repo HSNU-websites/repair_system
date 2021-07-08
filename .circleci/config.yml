@@ -13,10 +13,7 @@ jobs:
       - python/save-cache
       - run:
           name: Test
-          command: python manage.py test
-          environment:
-            SECRET_KEY: ${SECRET_KEY}
-
+          command: python3 ./src/manage.py test
 
 workflows:
   main:
