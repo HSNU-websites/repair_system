@@ -12,6 +12,7 @@ from app.database.model import Users
 from app.mylogging import init_logging
 
 app = create_app(getenv("ENV", "production"))
+# db.app = app # db will use app if no app_context is available
 init_logging(app)
 manager = Manager(app)
 
