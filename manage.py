@@ -50,10 +50,7 @@ def test():
     tests = unittest.TestLoader().discover("tests")
     result = unittest.TextTestRunner(verbosity=2).run(tests)
 
-    if result.wasSuccessful():
-        sys.exit(0)
-    else:
-        sys.exit(1)
+    return 0 if result.wasSuccessful() else 1
 
 
 @manager.command

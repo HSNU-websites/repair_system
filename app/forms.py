@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, SelectField, StringField, SubmitField
+from wtforms import PasswordField, SelectField, StringField, SubmitField, HiddenField
 from wtforms.fields.html5 import EmailField, IntegerField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from flask_wtf.recaptcha import RecaptchaField
@@ -44,11 +44,12 @@ class ReportsFilterForm(FlaskForm):
 
 
 class UserFilterForm(FlaskForm):
+    form_name = HiddenField(render_kw={"value": "filter"})
     upper = IntegerField(
-        "學號上限: ", validators=[DataRequired()], render_kw={"placeholder": "Student ID"}
+        "", render_kw={"placeholder": "Student ID"}
     )
     lower = IntegerField(
-        "學號下限: ", validators=[DataRequired()], render_kw={"placeholder": "Student ID"}
+        "", render_kw={"placeholder": "Student ID"}
     )
     submit = SubmitField("送出")
 

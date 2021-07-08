@@ -101,7 +101,7 @@ def manage_user_page(page=1):
     if (upper := request.cookies.get("upper")) and (
         lower := request.cookies.get("lower")
     ):
-        Filter["username_between"] = (upper, lower)
+        Filter["username_between"] = (lower, upper)
         form_filter = UserFilterForm(upper=upper, lower=lower)
     else:
         form_filter = UserFilterForm()
@@ -169,7 +169,6 @@ def manage_user_page(page=1):
                     cookies.append(("upper", str(upper)))
                 if lower := form_filter.lower.data:
                     cookies.append(("lower", str(lower)))
-
                 response = make_response(redirect(url_for("admin.manage_user_page")))
                 response.delete_cookie("upper")
                 response.delete_cookie("lower")
@@ -178,6 +177,9 @@ def manage_user_page(page=1):
                 return response
             else:
                 current_app.logger.warning("POST /admin_dashboard: Invalid submit for user filter")
+                for _, errorMessages in form_filter.errors.items():
+                    for err in errorMessages:
+                        flash(err, category="alert")
                 return redirect(url_for("admin.manage_user_page"))
         return redirect(url_for("admin.manage_user_page"))
 
