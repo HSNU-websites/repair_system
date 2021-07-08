@@ -20,6 +20,7 @@ class BackendTest(unittest.TestCase):
 
         # Admin data
         self.login_data = {"username": "admin", "password": "123"}
+        self.login()
 
     def tearDown(self) -> None:
         db.session.close()
@@ -37,7 +38,6 @@ class ReportFormTest(BackendTest):
     """
 
     def test_ok(self):
-        self.login()
         response = self.client.post(
             url_for("user.report_page"),
             data={
@@ -52,7 +52,6 @@ class ReportFormTest(BackendTest):
         self.assertIn(b"Successfully report.", response.data)
 
     def test_bad(self):
-        self.login()
         response = self.client.post(
             url_for("user.report_page"),
             data={
@@ -72,7 +71,6 @@ class SystemBackendTest(BackendTest):
     """
 
     def test_ok(self):
-        self.login()
         response = self.client.delete(
             url_for("admin.system_backend_page"),
             json={"category": "offices", "id": "1"},
@@ -80,12 +78,10 @@ class SystemBackendTest(BackendTest):
         self.assertEqual(response.status_code, 200)
 
     def test_method_not_allowed(self):
-        self.login()
         response = self.client.get(url_for("admin.system_backend_page"))
         self.assertEqual(response.status_code, 405)
 
     def test_bad_request(self):
-        self.login()
         response = self.client.post(
             url_for("admin.system_backend_page"),
             json={"category": "items", "value": "test_item"},
@@ -99,10 +95,10 @@ class ManageUserBackendTest(BackendTest):
     """
 
     def test_add_one_user_ok(self):
-        self.login()
         response = self.client.post(
             url_for("admin.manage_user_page"),
             data={
+                "form_name": "add_one",
                 "username": "710000",
                 "name": "test",
                 "classnum": "1498",
@@ -113,10 +109,10 @@ class ManageUserBackendTest(BackendTest):
         self.assertEqual(response.status_code, 200)
 
     def test_add_duplicate_user(self):
-        self.login()
         response = self.client.post(
             url_for("admin.manage_user_page"),
             data={
+                "form_name": "add_one",
                 "username": "user",
                 "name": "user",
                 "classnum": "1498",
@@ -129,10 +125,10 @@ class ManageUserBackendTest(BackendTest):
 
     def test_add_one_user_bad(self):
         # Add admin but email is not provided.
-        self.login()
         response = self.client.post(
             url_for("admin.manage_user_page"),
             data={
+                "form_name": "add_one",
                 "username": "710000",
                 "name": "test",
                 "classnum": "0",
@@ -144,7 +140,6 @@ class ManageUserBackendTest(BackendTest):
         self.assertIn(b"Email is required for admin.", response.data)
 
     def test_backend_ok(self):
-        self.login()
         response = self.client.delete(
             url_for("admin.manage_user_backend_page"),
             json={"user_id": 1},
@@ -152,12 +147,10 @@ class ManageUserBackendTest(BackendTest):
         self.assertEqual(response.status_code, 200)
 
     def test_backend_method_not_allowed(self):
-        self.login()
         response = self.client.get(url_for("admin.manage_user_backend_page"))
         self.assertEqual(response.status_code, 405)
 
     def test_backend_bad_request(self):
-        self.login()
         response = self.client.delete(
             url_for("admin.manage_user_backend_page"),
             json={},
@@ -172,22 +165,18 @@ class BackupBackendTest(BackendTest):
 
     def test_ok(self):
         # it can test whether backup works
-        self.login()
         response = self.client.post(url_for("admin.backup_backend_page"))
         self.assertEqual(response.status_code, 200)
 
     def test_method_not_allowed(self):
-        self.login()
         response = self.client.get(url_for("admin.backup_backend_page"))
         self.assertEqual(response.status_code, 405)
 
     def test_bad_request(self):
-        self.login()
         response = self.client.delete(url_for("admin.backup_backend_page"), json={})
         self.assertEqual(response.status_code, 400)
 
     def test_not_exists_backup_file(self):
-        self.login()
         response = self.client.get(
             url_for("admin.get_backup_file", filename="notexists")
         )
@@ -200,7 +189,6 @@ class UserSettingTest(BackendTest):
     """
 
     def test_ok(self):
-        self.login()
         response = self.client.post(
             url_for("user.user_setting_page"),
             data={"email": "test@test.com", "password": "password"},
@@ -210,7 +198,6 @@ class UserSettingTest(BackendTest):
         self.assertIn(b"OK.", response.data)
 
     def test_bad(self):
-        self.login()
         response = self.client.post(
             url_for("user.user_setting_page"),
             data={},
@@ -220,13 +207,10 @@ class UserSettingTest(BackendTest):
         self.assertIn(b"Invalid.", response.data)
 
     def test_too_short_password(self):
-        self.login()
         response = self.client.post(
             url_for("user.user_setting_page"),
             data={"email": "test@test.com", "password": "short"},
             follow_redirects=True,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            b"Password is too short (at least 6 characters).", response.data
-        )
+        self.assertIn(b"Password is too short (at least 6 characters).", response.data)

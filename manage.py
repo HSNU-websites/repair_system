@@ -1,16 +1,14 @@
 import unittest
 from os import getenv
+import sys
 from time import sleep
-
 from flask_script import Manager
 from sqlalchemy.exc import OperationalError
-
 import app.database.backup_helper as backup_helper
 import app.database.db_helper as db_helper
 from app import create_app, db
 from app.database.model import Users
 from app.mylogging import init_logging
-
 app = create_app(getenv("ENV", "production"))
 init_logging(app)
 manager = Manager(app)

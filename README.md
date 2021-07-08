@@ -50,7 +50,7 @@ Password: 123
 在 `./data/log/` 裡面有 SQL, flask 和 mail 的 log，有記錄每一筆 request。
 
 ## 常見問題
-1. flask 的版本需指定 `flask == 1.1`，因為需要和 flask-script 配合。
+1. flask 的版本需指定 `flask == 1.1`，因為需要和 flask-script 配合 ( flask-script 已經不再維護 )。
 
 2. 如果打不開的話，可以試試：
     ```shell

@@ -2,7 +2,8 @@ from flask import (
     Flask,
     abort,
     current_app,
-    flash, redirect,
+    flash,
+    redirect,
     request,
     session
 )
@@ -14,6 +15,7 @@ from flask_login.utils import (
     login_url as make_login_url,
     make_next_param,
 )
+from flask_login.config import USE_SESSION_FOR_NEXT
 from flask_mail import Mail
 from .config import config
 from .database import cache, db
