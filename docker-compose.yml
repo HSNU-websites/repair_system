@@ -3,7 +3,7 @@ version: '2'
 services:
 
   web:
-    build: .
+    build: ./src
     container_name: web
     depends_on:
       - db
