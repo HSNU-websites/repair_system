@@ -17,7 +17,7 @@ class RequestFormatter(logging.Formatter):
         return super().format(record)
 
 # handler.setLevel(logging.INFO): handles log if log.level > INFO
-#  logger.setLevel(logging.INFO): pass log to handlers if log.level > INFO
+# logger.setLevel(logging.INFO): pass log to handlers if log.level > INFO
 
 
 def init_logging(app):

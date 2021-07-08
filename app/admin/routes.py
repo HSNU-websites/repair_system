@@ -1,15 +1,21 @@
 from flask import (
-    request,
-    render_template,
     current_app,
-    make_response,
-    flash,
+    flash, make_response,
     redirect,
-    url_for,
+
+    render_template,
+    request,
+    url_for
 )
 from flask_login import login_required
-from . import admin_bp
-from .helper import csv_handler
+
+from ..database.backup_helper import backup_dir, get_backups
+from ..database.db_helper import (
+    add_users,
+    render_records,
+    render_system_setting,
+    render_users
+)
 from ..forms import (
     ReportsFilterForm,
     AddOneUserForm,
@@ -17,14 +23,9 @@ from ..forms import (
     RestoreForm,
     UserFilterForm,
 )
-from ..database.db_helper import (
-    render_system_setting,
-    render_records,
-    render_users,
-    add_users,
-)
-from ..database.backup_helper import get_backups, backup_dir
 from ..users import admin_required
+from . import admin_bp
+from .helper import csv_handler
 
 
 @admin_bp.route("/admin_dashboard/", methods=["GET", "POST"])
@@ -107,7 +108,7 @@ def manage_user_page(page=1):
         form_filter = UserFilterForm()
     form = AddOneUserForm()
     form_csv = AddUsersByFileForm()
-    
+
     template = render_template(
         "manage_user.html",
         form=form,
