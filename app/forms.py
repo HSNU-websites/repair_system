@@ -3,7 +3,7 @@ from wtforms import PasswordField, SelectField, StringField, SubmitField, Hidden
 from wtforms.fields.html5 import EmailField, IntegerField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from flask_wtf.recaptcha import RecaptchaField
-from wtforms.validators import DataRequired, ValidationError, Length
+from wtforms.validators import DataRequired, ValidationError, Length, Optional
 
 
 class LoginForm(FlaskForm):
@@ -45,16 +45,13 @@ class ReportsFilterForm(FlaskForm):
 
 class UserFilterForm(FlaskForm):
     form_name = HiddenField(render_kw={"value": "filter"})
-    upper = IntegerField(
-        "", render_kw={"placeholder": "Student ID"}
-    )
-    lower = IntegerField(
-        "", render_kw={"placeholder": "Student ID"}
-    )
+    upper = IntegerField("", [Optional()], render_kw={"placeholder": "Student ID"})
+    lower = IntegerField("", [Optional()], render_kw={"placeholder": "Student ID"})
     submit = SubmitField("送出")
 
 
 class AddOneUserForm(FlaskForm):
+    form_name = HiddenField(render_kw={"value": "add_one"})
     username = StringField(
         "學號 (登入帳號): ",
         validators=[DataRequired(), Length(max=16)],
@@ -87,6 +84,7 @@ class AddOneUserForm(FlaskForm):
 
 
 class AddUsersByFileForm(FlaskForm):
+    form_name = HiddenField(render_kw={"value": "csv"})
     csv_file = FileField(
         "CSV file",
         validators=[FileRequired(), FileAllowed(["csv"], "Only csv is allowed.")],

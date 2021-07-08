@@ -120,8 +120,9 @@ def manage_user_page(page=1):
         current_app.logger.info("GET /manage_user")
         return template
     if request.method == "POST":
+        form_name = request.form["form_name"]
         # Add user
-        if form.username.data:
+        if form_name == "add_one":
             # Add one user
             if form.validate_on_submit():
                 current_app.logger.info("POST /manage_user")
@@ -143,7 +144,7 @@ def manage_user_page(page=1):
                         flash(err, category="alert")
                 current_app.logger.warning("POST /manage_user: Invalid submit for adding one user")
             return redirect(url_for("admin.manage_user_page"))
-        if form_csv.csv_file.data:
+        if form_name == "csv":
             # Add users by csv
             if form_csv.validate_on_submit():
                 current_app.logger.info("POST /manage_user")
@@ -153,7 +154,9 @@ def manage_user_page(page=1):
                     flash("Bad encoding.", category="alert")
                 else:
                     if already_exists := add_users(data):
-                        flash(", ".join(already_exists) + " 已經存在", category="alert")
+                        flash(", ".join(already_exists) + " 已經存在", category="warning")
+                    else:
+                        flash("OK", category="success")
             else:
                 current_app.logger.warning("POST /manage_user: Invalid submit for csv file")
                 for _, errorMessages in form_csv.errors.items():
@@ -161,7 +164,7 @@ def manage_user_page(page=1):
                         flash(err, category="alert")
             return redirect(url_for("admin.manage_user_page"))
         # filter
-        if form_filter.upper.data or form_filter.lower.data:
+        if form_name == "filter":
             if form_filter.validate_on_submit():
                 cookies = []
                 Filter = dict()

@@ -61,6 +61,7 @@
         <div id="sidebar">
             <form action="/manage_user/" , method="POST">
                 {{ form.csrf_token }}
+                {{ form.form_name }}
                 <div class="field">
                     {{ form.username.label }}
                     {{ form.username }}
@@ -88,6 +89,7 @@
             <hr>
             <form action="/manage_user/" method="POST" enctype="multipart/form-data">
                 {{ form_csv.csrf_token }}
+                {{ form_csv.form_name }}
                 <div class="field">
                     {{ form_csv.csv_file.label }}
                     {{ form_csv.csv_file }}
@@ -99,6 +101,7 @@
             <hr>
             <form action="/manage_user/" method="POST">
                 {{ form_filter.csrf_token }}
+                {{ form_filter.form_name }}
                 <h2 style="font-weight: normal;">學號篩選器</h2>
                 <div class="field">
                     {{ form_filter.lower }} ~ {{ form_filter.upper }}
