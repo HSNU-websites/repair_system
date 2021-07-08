@@ -9,12 +9,12 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: pip-{{ checksum "src/requirements.txt" }}
+          key: python-{{ checksum "src/requirements.txt" }}
       - run:
           name: Install Python dependencies
           command: pip install --user -r src/requirements.txt
       - save_cache:
-          key: pip-{{ checksum "src/requirements.txt" }}
+          key: python-{{ checksum "src/requirements.txt" }}
           paths:
             - "~/.local/lib"
       - run:
