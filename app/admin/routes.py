@@ -1,24 +1,31 @@
 from flask import (
-    request,
-    render_template,
     current_app,
-    make_response,
-    flash,
+    flash, make_response,
     redirect,
-    url_for,
+
+    render_template,
+    request,
+    url_for
 )
 from flask_login import login_required
+
+from ..database.backup_helper import backup_dir, get_backups
+from ..database.db_helper import (
+    add_users,
+    render_records,
+    render_system_setting,
+    render_users
+)
+from ..forms import (
+    ReportsFilterForm,
+    AddOneUserForm,
+    AddUsersByFileForm,
+    RestoreForm,
+    UserFilterForm,
+)
+from ..users import admin_required
 from . import admin_bp
 from .helper import csv_handler
-from ..forms import ReportsFilterForm, AddOneUserForm, AddUsersByFileForm, RestoreForm
-from ..database.db_helper import (
-    render_system_setting,
-    render_records,
-    render_users,
-    add_users,
-)
-from ..database.backup_helper import get_backups, backup_dir
-from ..users import admin_required
 
 
 @admin_bp.route("/admin_dashboard/", methods=["GET", "POST"])
@@ -30,14 +37,14 @@ def dashboard_page(page=1):
     The page allows admins to browse all reports and make response to the reports.
     """
     # cookies are used to save filter when user turns page
-    form = ReportsFilterForm()
     Filter = dict()
+    if username := request.cookies.get("username"):
+        Filter["username"] = username
+    if classnum := request.cookies.get("classnum"):
+        Filter["classnum"] = classnum
+    form = ReportsFilterForm(**Filter)
     if request.method == "GET":
         current_app.logger.info("GET /admin_dashboard")
-        if username := request.cookies.get("username"):
-            Filter["username"] = username
-        if classnum := request.cookies.get("classnum"):
-            Filter["classnum"] = classnum
         return render_template(
             "admin_dashboard.html",
             records=render_records(Filter=Filter, page=page),
@@ -49,20 +56,11 @@ def dashboard_page(page=1):
             current_app.logger.info("POST /admin_dashboard")
             cookies = []
             if username := form.username.data:
-                Filter["username"] = username
                 cookies.append(("username", username))
             if classnum := form.classnum.data:
-                Filter["classnum"] = classnum
                 cookies.append(("classnum", classnum))
 
-            response = make_response(
-                render_template(
-                    "admin_dashboard.html",
-                    records=render_records(Filter=Filter, page=page),
-                    form=form,
-                    statuses=render_system_setting()[3],
-                )
-            )
+            response = make_response(redirect(url_for("admin.dashboard_page")))
             response.delete_cookie("username")
             response.delete_cookie("classnum")
             for cookie in cookies:
@@ -99,21 +97,33 @@ def manage_user_page(page=1):
     """
     The page allows admins to add, edit and delete users.
     """
+    Filter = dict()
+
+    if (upper := request.cookies.get("upper")) and (
+        lower := request.cookies.get("lower")
+    ):
+        Filter["username_between"] = (lower, upper)
+        form_filter = UserFilterForm(upper=upper, lower=lower)
+    else:
+        form_filter = UserFilterForm()
     form = AddOneUserForm()
     form_csv = AddUsersByFileForm()
+
     template = render_template(
         "manage_user.html",
         form=form,
         form_csv=form_csv,
-        users=render_users(page=page),
+        form_filter=form_filter,
+        users=render_users(Filter=Filter, page=page),
     )
     if request.method == "GET":
         # Render all users
         current_app.logger.info("GET /manage_user")
         return template
     if request.method == "POST":
+        form_name = request.form["form_name"]
         # Add user
-        if form.username.data:
+        if form_name == "add_one":
             # Add one user
             if form.validate_on_submit():
                 current_app.logger.info("POST /manage_user")
@@ -133,9 +143,9 @@ def manage_user_page(page=1):
                 for _, errorMessages in form.errors.items():
                     for err in errorMessages:
                         flash(err, category="alert")
-                current_app.logger.warning("POST /manage_user: Invalid submit")
+                current_app.logger.warning("POST /manage_user: Invalid submit for adding one user")
             return redirect(url_for("admin.manage_user_page"))
-        if form_csv.csv_file.data:
+        if form_name == "csv":
             # Add users by csv
             if form_csv.validate_on_submit():
                 current_app.logger.info("POST /manage_user")
@@ -145,13 +155,37 @@ def manage_user_page(page=1):
                     flash("Bad encoding.", category="alert")
                 else:
                     if already_exists := add_users(data):
-                        flash(", ".join(already_exists) + " 已經存在", category="alert")
+                        flash(", ".join(already_exists) + " 已經存在", category="warning")
+                    else:
+                        flash("OK", category="success")
             else:
-                current_app.logger.warning("POST /manage_user: Invalid submit")
+                current_app.logger.warning("POST /manage_user: Invalid submit for csv file")
                 for _, errorMessages in form_csv.errors.items():
                     for err in errorMessages:
                         flash(err, category="alert")
             return redirect(url_for("admin.manage_user_page"))
+        # filter
+        if form_name == "filter":
+            if form_filter.validate_on_submit():
+                cookies = []
+                Filter = dict()
+                if upper := form_filter.upper.data:
+                    cookies.append(("upper", str(upper)))
+                if lower := form_filter.lower.data:
+                    cookies.append(("lower", str(lower)))
+                response = make_response(redirect(url_for("admin.manage_user_page")))
+                response.delete_cookie("upper")
+                response.delete_cookie("lower")
+                for cookie in cookies:
+                    response.set_cookie(*cookie, max_age=120)
+                return response
+            else:
+                current_app.logger.warning("POST /admin_dashboard: Invalid submit for user filter")
+                for _, errorMessages in form_filter.errors.items():
+                    for err in errorMessages:
+                        flash(err, category="alert")
+                return redirect(url_for("admin.manage_user_page"))
+        return redirect(url_for("admin.manage_user_page"))
 
 
 @admin_bp.route("/backup", methods=["GET", "POST"])

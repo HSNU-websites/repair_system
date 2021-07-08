@@ -1,4 +1,4 @@
-input[type="text"], input[type="email"], input[type="password"] {
+input[type="text"], input[type="email"], input[type="password"], input[type="number"] {
     margin: 5px 10px 5px 10px;
     font-family: 'Noto Sans TC', sans-serif;
     background: #FFFFFF;
@@ -14,7 +14,7 @@ input[type="text"], input[type="email"], input[type="password"] {
     transition: .18s ease-out;
 }
 
-input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="number"]:focus {
     border: 1px solid rgb(13, 142, 194);
     box-shadow: inset 5px 10px 4px rgba(13, 142, 194, 0.07)
 }

@@ -34,7 +34,7 @@ nav a.active {
     text-decoration: underline;
 }
 
-nav #hamburger {
+#hamburger {
     padding-left: 0;
     display: none;
 }
@@ -58,7 +58,7 @@ nav #hamburger {
     nav span:nth-last-child(2) {
         margin: 0;
     }
-    nav #hamburger {
+    #hamburger {
         visibility: visible;
         display: inline-block;
     }
