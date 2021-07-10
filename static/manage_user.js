@@ -44,7 +44,7 @@ function send_update(element) {
     }
     $.ajax({
         url: "/manage_user_backend",
-        type: "update",
+        type: "patch",
         data: JSON.stringify(data),
         dataType: "json",
     })

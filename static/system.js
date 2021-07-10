@@ -83,7 +83,7 @@ function send_update(element) {
     }
     $.ajax({
         url: "/system_backend",
-        type: "update",
+        type: "patch",
         data: JSON.stringify(result),
         dataType: "json",
     })

@@ -20,7 +20,7 @@ function restoreTo(backup_name) {
     if (window.confirm("確認還原?")) {
         $.ajax({
             url: "/backup_backend",
-            type: "update",
+            type: "put",
             data: JSON.stringify({"name": backup_name}),
             dataType: "json",
         })
