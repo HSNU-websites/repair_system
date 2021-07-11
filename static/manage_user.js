@@ -8,11 +8,11 @@ function send_remove(element) {
     })
         .always(function (r) {
             if (r.status == 200) {
-                alert("OK");
-                location.reload();
+                add_msg("OK.", "success");
+                element.parentElement.remove();
             }
             else {
-                alert("Error");
+                add_msg("Error.", "alert");
             }
         })
 }
@@ -30,7 +30,7 @@ function send_update(element) {
     // validate password
     if (password != "") {
         if (password.length < 6) {
-            alert("Password is too short (at least 6 characters).");
+            add_msg("Password is too short (at least 6 characters).", "alert");
             return;
         }
         else {
@@ -39,7 +39,7 @@ function send_update(element) {
     }
     // validate email
     if (is_admin & email == "") {
-        alert("Email is required for admin.");
+        add_msg("Email is required for admin.", "alert");
         return;
     }
     $.ajax({
@@ -50,11 +50,10 @@ function send_update(element) {
     })
         .always(function (r) {
             if (r.status == 200) {
-                alert("OK");
-                location.reload();
+                add_msg("OK.", "success");
             }
             else {
-                alert("Error");
+                add_msg("Error.", "alert");
             }
         })
 }
