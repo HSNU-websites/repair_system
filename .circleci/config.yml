@@ -8,15 +8,18 @@ jobs:
     executor: python/default
     steps:
       - checkout
-      - python/load-cache
-      - python/install-deps
-      - python/save-cache
+      - restore_cache:
+          key: python-{{ checksum "src/requirements.txt" }}
+      - run:
+          name: Install Python dependencies
+          command: pip install --user -r src/requirements.txt
+      - save_cache:
+          key: python-{{ checksum "src/requirements.txt" }}
+          paths:
+            - "~/.local/lib"
       - run:
           name: Test
-          command: python manage.py test
-          environment:
-            SECRET_KEY: ${SECRET_KEY}
-
+          command: python3 ./src/manage.py test
 
 workflows:
   main:

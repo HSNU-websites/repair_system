@@ -1,9 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, SelectField, StringField, SubmitField, HiddenField
-from wtforms.fields.html5 import EmailField, IntegerField
-from flask_wtf.file import FileField, FileRequired, FileAllowed
+from flask_wtf.file import FileAllowed, FileField, FileRequired
 from flask_wtf.recaptcha import RecaptchaField
-from wtforms.validators import DataRequired, ValidationError, Length, Optional
+from wtforms import HiddenField, PasswordField, SelectField, StringField, SubmitField
+from wtforms.fields.html5 import EmailField, IntegerField
+from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
 
 class LoginForm(FlaskForm):

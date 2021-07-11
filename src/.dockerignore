@@ -1,0 +1,6 @@
+__pycache__/
+/.dockerignore
+/Dockerfile
+data.db*
+/backup/
+/log/

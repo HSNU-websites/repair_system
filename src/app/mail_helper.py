@@ -1,8 +1,9 @@
 import datetime
 import logging
+
 from flask import current_app, render_template
-from flask_mail import Message
-from . import mail
+from flask_mail import Mail, Message
+
 from .database import db
 from .database.db_helper import get_admin_emails
 from .database.model import (
@@ -15,6 +16,7 @@ from .database.model import (
     timeformat,
 )
 
+mail = Mail()
 mail_logger = logging.getLogger("mail")
 
 
@@ -26,7 +28,8 @@ def send_mail(subject, recipients, html):
         "Sending mail...\n"
         "Subject: {subject}\n"
         "Bcc: {recipients}\n"
-        "Html: {html}".format(subject=subject, recipients=recipients, html=html)
+        "Html: \n"
+        "{html}".format(subject=subject, recipients=recipients, html=html)
     )
 
     # do not send email in development

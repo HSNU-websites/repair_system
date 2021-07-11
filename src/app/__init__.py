@@ -7,7 +7,6 @@ from flask import (
     request,
     session
 )
-from flask_apscheduler import APScheduler
 from flask_login import LoginManager
 from flask_login.signals import user_unauthorized
 from flask_login.utils import (
@@ -16,9 +15,10 @@ from flask_login.utils import (
     make_next_param,
 )
 from flask_login.config import USE_SESSION_FOR_NEXT
-from flask_mail import Mail
 from .config import config
 from .database import cache, db
+from .mail_helper import mail
+from .scheduler_helper import scheduler
 
 
 class LoginManager_(LoginManager):
@@ -61,8 +61,6 @@ class LoginManager_(LoginManager):
 
 
 login_manager = LoginManager_()
-mail = Mail()
-scheduler = APScheduler()
 
 
 def create_app(env):
@@ -76,15 +74,6 @@ def create_app(env):
     if app.config["ENV"] != "testing":
         scheduler.init_app(app)
         scheduler.start()
-        from .mail_helper import send_daily_mail
-
-        scheduler.add_job(
-            "send_daily_mail",
-            send_daily_mail,
-            trigger="cron",
-            day="*",
-            hour="7",
-        )
 
     # Blueprint
     from .main import main_bp
