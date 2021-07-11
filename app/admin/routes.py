@@ -67,6 +67,9 @@ def dashboard_page(page=1):
             return response
         else:
             current_app.logger.warning("POST /admin_dashboard: Invalid submit")
+            for _, errorMessages in form.errors.items():
+                for err in errorMessages:
+                    flash(err, category="alert")
             return redirect(url_for("admin.dashboard_page"))
 
 

@@ -1,5 +1,5 @@
-from flask import render_template, redirect, url_for, request, flash, current_app, abort
-from flask_login import current_user, login_user, logout_user, login_required
+from flask import render_template, redirect, url_for, request, flash, current_app
+from flask_login import current_user, login_user, logout_user
 from . import main_bp
 from ..forms import LoginForm
 from ..database.db_helper import login_auth
