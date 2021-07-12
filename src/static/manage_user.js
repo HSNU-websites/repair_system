@@ -3,7 +3,7 @@ function send_remove(element) {
     $.ajax({
         url: "/manage_user_backend",
         type: "delete",
-        data: JSON.stringify({ "user_id": user_id }),
+        data: JSON.stringify({ "type": "single", "user_id": user_id }),
         dataType: "json",
     })
         .always(function (r) {
@@ -56,4 +56,39 @@ function send_update(element) {
                 add_msg("Error.", "alert");
             }
         })
+}
+
+function del_all_users() {
+    var cookies = document.cookie.split(';').map(function (c) {
+        return c.trim().split('=').map(decodeURIComponent);
+    }).reduce(function (a, b) {
+        try {
+            a[b[0]] = JSON.parse(b[1]);
+        } catch (e) {
+            a[b[0]] = b[1];
+        }
+        return a;
+    }, {});
+    var upper = cookies["upper"];
+    var lower = cookies["lower"];
+    if (!(upper & lower)) {
+        add_msg("The range does not be provided.", "alert");
+        return;
+    }
+    if (window.confirm("確認刪除全部使用者?")) {
+        $.ajax({
+            url: "/manage_user_backend",
+            type: "delete",
+            data: JSON.stringify({ "type": "group", "upper": upper, "lower": lower }),
+            dataType: "json",
+        })
+            .always(function (r) {
+                if (r.status == 200) {
+                    add_msg("OK. The update will be loaded after you refesh the page.", "success");
+                }
+                else {
+                    add_msg("Error.", "alert");
+                }
+            })
+    }
 }

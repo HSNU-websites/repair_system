@@ -7,6 +7,7 @@ from ..database.db_helper import (
     update,
     insert,
     del_users,
+    del_users_between,
     update_users,
     add_revision,
     del_revisions,
@@ -98,11 +99,22 @@ def manage_user_backend_page():
         # Delete user
         current_app.logger.info("DELETE /manage_user_backend")
         data = request.get_json(force=True)
-        try:
-            del_users([data["user_id"]])
-            return "OK"
-        except:
-            abort(400)
+        type = data["type"]
+        if type == "single":
+            try:
+                del_users([data["user_id"]])
+                return "OK"
+            except:
+                abort(400)
+        if type == "group":
+            upper = int(data["upper"])
+            lower = int(data["lower"])
+            try:
+                del_users_between((lower, upper))
+                return "OK"
+            except:
+                abort(400)
+        abort(400)
     if request.method == "PATCH":
         # Update user
         current_app.logger.info("PATCH /manage_user_backend")

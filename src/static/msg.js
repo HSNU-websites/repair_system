@@ -19,4 +19,5 @@ function add_msg(msg, category) {
     message.classList.add(category);
     container.appendChild(message);
     closebtn.addEventListener("click", function (event) { hide(closebtn.parentElement) })
+    setTimeout(function () { hide(message) }, 3000);
 }
