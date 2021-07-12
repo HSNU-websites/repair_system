@@ -99,7 +99,7 @@ def manage_user_backend_page():
         # Delete user
         current_app.logger.info("DELETE /manage_user_backend")
         data = request.get_json(force=True)
-        type = data["type"]
+        type = data.get("type", None)
         if type == "single":
             try:
                 del_users([data["user_id"]])
@@ -107,9 +107,9 @@ def manage_user_backend_page():
             except:
                 abort(400)
         if type == "group":
-            upper = int(data["upper"])
-            lower = int(data["lower"])
             try:
+                upper = int(data["upper"])
+                lower = int(data["lower"])
                 del_users_between((lower, upper))
                 return "OK"
             except:

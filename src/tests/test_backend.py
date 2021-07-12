@@ -139,12 +139,25 @@ class ManageUserBackendTest(BackendTest):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b"Email is required for admin.", response.data)
 
-    def test_backend_ok(self):
+    def test_delete_single_user_ok(self):
         response = self.client.delete(
             url_for("admin.manage_user_backend_page"),
-            json={"user_id": 1},
+            json={"type": "single", "user_id": 1},
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_delete_group_ok(self):
+        response = self.client.delete(
+            url_for("admin.manage_user_backend_page"),
+            json={"type": "group", "upper": "410000", "lower": "419999"},
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_delete_group_bad(self):
+        response = self.client.delete(
+            url_for("admin.manage_user_backend_page"), json={"type": "group"}
+        )
+        self.assertEqual(response.status_code, 400)
 
     def test_backend_method_not_allowed(self):
         response = self.client.get(url_for("admin.manage_user_backend_page"))
