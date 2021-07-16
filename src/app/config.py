@@ -21,7 +21,8 @@ class Config:
     # APScheduler
     SCHEDULER_API_ENABLED = True
     # Cache
-    CACHE_TYPE = "SimpleCache"
+    CACHE_TYPE = "FileSystemCache"
+    CACHE_DIR = "/dev/shm/repair_system/"
     CACHE_DEFAULT_TIMEOUT = 0  # Never timeout
     CACHE_THRESHOLD = 5000
     # reCAPTCHA
@@ -33,12 +34,14 @@ class Development(Config):
     ENV = "development"
     SECRET_KEY = "dhfkjgruytv4yntcm94[g"
     SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
+    CACHE_TYPE = "SimpleCache"
     DEBUG = True
 
 
 class Testing(Config):
     ENV = "testing"
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    CACHE_TYPE = "SimpleCache"
     TESTING = True
     DEBUG = True
     PRESERVE_CONTEXT_ON_EXCEPTION = False
