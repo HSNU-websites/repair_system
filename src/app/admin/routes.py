@@ -64,10 +64,13 @@ def dashboard_page(page=1):
             response.delete_cookie("username")
             response.delete_cookie("classnum")
             for cookie in cookies:
-                response.set_cookie(*cookie, max_age=120)
+                response.set_cookie(*cookie)
             return response
         else:
             current_app.logger.warning("POST /admin_dashboard: Invalid submit")
+            for _, errorMessages in form.errors.items():
+                for err in errorMessages:
+                    flash(err, category="alert")
             return redirect(url_for("admin.dashboard_page"))
 
 
@@ -177,7 +180,7 @@ def manage_user_page(page=1):
                 response.delete_cookie("upper")
                 response.delete_cookie("lower")
                 for cookie in cookies:
-                    response.set_cookie(*cookie, max_age=120)
+                    response.set_cookie(*cookie)
                 return response
             else:
                 current_app.logger.warning("POST /admin_dashboard: Invalid submit for user filter")

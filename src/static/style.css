@@ -54,11 +54,11 @@ a:hover {
     -o-transition: .2s ease-out;
     transition: .2s ease-out;
     background-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 10px 10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 10px 10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.2);
 }
 
 .container:hover {
-    box-shadow: -10px -10px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 10px 10px 16px 0 rgba(0, 0, 0, 0.35), 0 6px 20px 0 rgba(0, 0, 0, 0.35);
 }
 
 .container a {

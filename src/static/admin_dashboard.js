@@ -7,7 +7,7 @@ function send_remove(element, category, id) {
     })
         .always(function (r) {
             if (r.status == 200) {
-                alert("OK");
+                add_msg("OK", "success");
                 if (category == "revision") {
                     element.parentElement.remove();
                 }
@@ -16,7 +16,7 @@ function send_remove(element, category, id) {
                 }
             }
             else {
-                alert("Error");
+                add_msg("Error.", "alert");
             }
         })
 }
@@ -60,11 +60,11 @@ function send_reply_record(element) {
     })
         .always(function (r) {
             if (r.status == 200) {
-                alert("OK");
-                window.location.reload()
+                send_add_message("OK.", "success");
+                window.location.reload();
             }
             else {
-                alert("Error");
+                add_msg("Error.", "alert");
             }
         })
 }

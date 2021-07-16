@@ -1,3 +1,5 @@
+{% from 'msg.jinja' import display_msg %}
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 
@@ -8,10 +10,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&display=swap" rel="stylesheet">
     <script src="{{ url_for('static', filename='admin_dashboard.js') }}"></script>
     <script src="{{ url_for('static', filename='nav.js') }}"></script>
+    <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     <script>
         if (window.innerWidth <= 800) {
@@ -29,6 +33,7 @@
 
 <body>
     <div style="min-height: 100%;">
+        <div id="messages">{{ display_msg(messages) }}</div>
         <nav>
             <span id="hamburger">&#9776;</span>
             <span><a href="/report">報修</a></span>

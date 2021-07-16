@@ -7,6 +7,7 @@ from ..database.db_helper import (
     update,
     insert,
     del_users,
+    del_users_between,
     update_users,
     add_revision,
     del_revisions,
@@ -42,7 +43,7 @@ def admin_dashboard_backend_page():
         return "OK"
 
 
-@admin_bp.route("/system_backend", methods=["POST", "DELETE", "UPDATE"])
+@admin_bp.route("/system_backend", methods=["POST", "DELETE", "PATCH"])
 @admin_required
 @login_required
 def system_backend_page():
@@ -69,9 +70,9 @@ def system_backend_page():
             return "OK"
         else:
             abort(400)
-    if request.method == "UPDATE":
+    if request.method == "PATCH":
         # Update
-        current_app.logger.info("UPDATE /system_backend")
+        current_app.logger.info("PATCH /system_backend")
         data = request.get_json(force=True)
         category = data[0]["category"]
         for r in data[1:]:
@@ -87,7 +88,7 @@ def system_backend_page():
         return "OK"
 
 
-@admin_bp.route("/manage_user_backend", methods=["DELETE", "UPDATE"])
+@admin_bp.route("/manage_user_backend", methods=["DELETE", "PATCH"])
 @admin_required
 @login_required
 def manage_user_backend_page():
@@ -98,14 +99,25 @@ def manage_user_backend_page():
         # Delete user
         current_app.logger.info("DELETE /manage_user_backend")
         data = request.get_json(force=True)
-        try:
-            del_users([data["user_id"]])
-            return "OK"
-        except:
-            abort(400)
-    if request.method == "UPDATE":
+        type = data.get("type", None)
+        if type == "single":
+            try:
+                del_users([data["user_id"]])
+                return "OK"
+            except:
+                abort(400)
+        if type == "group":
+            try:
+                upper = int(data["upper"])
+                lower = int(data["lower"])
+                del_users_between((lower, upper))
+                return "OK"
+            except:
+                abort(400)
+        abort(400)
+    if request.method == "PATCH":
         # Update user
-        current_app.logger.info("UPDATE /manage_user_backend")
+        current_app.logger.info("PATCH /manage_user_backend")
         data = request.get_json(force=True)
         try:
             update_users([data])
@@ -114,7 +126,7 @@ def manage_user_backend_page():
             abort(400)
 
 
-@admin_bp.route("/backup_backend", methods=["POST", "DELETE", "UPDATE"])
+@admin_bp.route("/backup_backend", methods=["POST", "DELETE", "PUT"])
 @admin_required
 @login_required
 def backup_backend_page():
@@ -136,7 +148,7 @@ def backup_backend_page():
             return "OK"
         except:
             abort(400)
-    if request.method == "UPDATE":
+    if request.method == "PUT":
         # restore to specific version
         # NOT available to use now
         try:

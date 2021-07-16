@@ -7,11 +7,11 @@ function doBackup() {
     })
         .always(function (r) {
             if (r.status == 200) {
-                alert("OK");
-                location.reload();
+                send_add_message("OK.", "success");
+                window.location.reload();
             }
             else {
-                alert("Error");
+                add_msg("Error.", "alert");
             }
         })
 }
@@ -20,23 +20,22 @@ function restoreTo(backup_name) {
     if (window.confirm("確認還原?")) {
         $.ajax({
             url: "/backup_backend",
-            type: "update",
+            type: "put",
             data: JSON.stringify({"name": backup_name}),
             dataType: "json",
         })
             .always(function (r) {
                 if (r.status == 200) {
-                    alert("OK");
-                    location.reload();
+                    add_msg("OK.", "success");
                 }
                 else {
-                    alert("Error");
+                    add_msg("Error.", "alert");
                 }
             })
     }
 }
 
-function deleteBackup(backup_name) {
+function deleteBackup(backup_name, element) {
     $.ajax({
         url: "/backup_backend",
         type: "delete",
@@ -45,11 +44,11 @@ function deleteBackup(backup_name) {
     })
         .always(function (r) {
             if (r.status == 200) {
-                alert("OK");
-                location.reload();
+                add_msg("OK.", "success");
+                element.parentElement.parentElement.remove();
             }
             else {
-                alert("Error");
+                add_msg("Error.", "alert");
             }
         })
 }

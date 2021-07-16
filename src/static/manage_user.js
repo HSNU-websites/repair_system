@@ -3,16 +3,16 @@ function send_remove(element) {
     $.ajax({
         url: "/manage_user_backend",
         type: "delete",
-        data: JSON.stringify({ "user_id": user_id }),
+        data: JSON.stringify({ "type": "single", "user_id": user_id }),
         dataType: "json",
     })
         .always(function (r) {
             if (r.status == 200) {
-                alert("OK");
-                location.reload();
+                add_msg("OK.", "success");
+                element.parentElement.remove();
             }
             else {
-                alert("Error");
+                add_msg("Error.", "alert");
             }
         })
 }
@@ -30,7 +30,7 @@ function send_update(element) {
     // validate password
     if (password != "") {
         if (password.length < 6) {
-            alert("Password is too short (at least 6 characters).");
+            add_msg("Password is too short (at least 6 characters).", "alert");
             return;
         }
         else {
@@ -39,22 +39,57 @@ function send_update(element) {
     }
     // validate email
     if (is_admin & email == "") {
-        alert("Email is required for admin.");
+        add_msg("Email is required for admin.", "alert");
         return;
     }
     $.ajax({
         url: "/manage_user_backend",
-        type: "update",
+        type: "patch",
         data: JSON.stringify(data),
         dataType: "json",
     })
         .always(function (r) {
             if (r.status == 200) {
-                alert("OK");
-                location.reload();
+                add_msg("OK.", "success");
             }
             else {
-                alert("Error");
+                add_msg("Error.", "alert");
             }
         })
+}
+
+function del_all_users() {
+    var cookies = document.cookie.split(';').map(function (c) {
+        return c.trim().split('=').map(decodeURIComponent);
+    }).reduce(function (a, b) {
+        try {
+            a[b[0]] = JSON.parse(b[1]);
+        } catch (e) {
+            a[b[0]] = b[1];
+        }
+        return a;
+    }, {});
+    var upper = cookies["upper"];
+    var lower = cookies["lower"];
+    if (!(upper & lower)) {
+        add_msg("The range does not be provided.", "alert");
+        return;
+    }
+    if (window.confirm("確認刪除全部使用者?")) {
+        $.ajax({
+            url: "/manage_user_backend",
+            type: "delete",
+            data: JSON.stringify({ "type": "group", "upper": upper, "lower": lower }),
+            dataType: "json",
+        })
+            .always(function (r) {
+                if (r.status == 200) {
+                    send_add_message("OK.", "success");
+                    window.location.reload();
+                }
+                else {
+                    add_msg("Error.", "alert");
+                }
+            })
+    }
 }

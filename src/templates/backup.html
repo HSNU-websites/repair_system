@@ -58,7 +58,7 @@
         </div>
         <div>
             <h2 style="text-align: center;">備份記錄檔</h2>
-            <div id="messages" class="report_page">{{ display_msg(messages) }}</div>
+            <div id="messages">{{ display_msg(messages) }}</div>
             <table id="backups">
                 {% for backup in backups %}
                 <tr class="backup">
@@ -66,7 +66,7 @@
                     <td>
                         <button class="add"><a href="backup/{{ backup }}">下載</a></button>
                         <button class="update" onclick="restoreTo('{{ backup }}');">復原至此版本</button>
-                        <button class="remove" onclick="deleteBackup('{{ backup }}');">刪除</button>
+                        <button class="remove" onclick="deleteBackup('{{ backup }}', this);">刪除</button>
                     </td>
                 </tr>
                 {% endfor %}

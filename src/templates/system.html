@@ -1,3 +1,5 @@
+{% from 'msg.jinja' import display_msg %}
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 
@@ -8,6 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='system.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='nav.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='input.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='messages.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='HSNU.png') }}">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300&display=swap" rel="stylesheet">
@@ -15,6 +18,7 @@
     <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
     <script src="{{ url_for('static', filename='system.js') }}"></script>
     <script src="{{ url_for('static', filename='nav.js') }}"></script>
+    <script src="{{ url_for('static', filename='msg.js') }}"></script>
     <script>
         if (window.innerWidth <= 800) {
             alert("不建議在行動裝置上使用此頁面");
@@ -36,6 +40,7 @@
         <span class="right"><a href="/user_setting">使用者設定</a></span>
     </nav>
     <h1>系統設定</h1>
+    <div id="messages">{{ display_msg(messages) }}</div>
     <p id="tip">長按左邊按鈕可拖曳改變順序</p>
     <div class="container">
         <div id="buildings">

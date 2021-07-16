@@ -10,11 +10,11 @@ function send_remove(element) {
     })
         .always(function (r) {
             if (r.status == 200) {
-                alert("OK");
-                location.reload();
+                add_msg("OK.", "success");
+                element.parentElement.remove();
             }
             else {
-                alert("Error");
+                add_msg("Error.", "alert");
             }
         })
 }
@@ -25,13 +25,13 @@ function send_add(element) {
     var value = input_list[input_list.length - 1].value;
     // check whether empty
     if (value == "") {
-        alert("Empty value is invalid.");
+        add_msg("Empty value is invalid.", "alert");
         return;
     }
 
     if (category == "items") {
         var office = element.parentElement.getElementsByTagName("select");
-        office = office[office.length - 1]    
+        office = office[office.length - 1]
         var data = JSON.stringify({ "category": category, "value": value, "office": parseInt(office[office.selectedIndex].value) });
     }
     else {
@@ -46,11 +46,11 @@ function send_add(element) {
     })
         .always(function (r) {
             if (r.status == 200) {
-                alert("OK");
-                location.reload();
+                send_add_message("OK.", "success");
+                window.location.reload();
             }
             else {
-                alert("Error");
+                add_msg("Error.", "alert");
             }
         })
 }
@@ -64,7 +64,7 @@ function send_update(element) {
             var description = info[i].children[1].value;
             // check whether empty
             if (description == "" | description == undefined) {
-                alert("Empty value is invalid.");
+                add_msg("Empty value is invalid.", "alert");
                 return;
             }
             var data = {
@@ -77,23 +77,21 @@ function send_update(element) {
                 var office_id = office[office.selectedIndex].value;
                 data.office_id = parseInt(office_id);
             }
-            console.log(data)
             result.push(data)
         }
     }
     $.ajax({
         url: "/system_backend",
-        type: "update",
+        type: "patch",
         data: JSON.stringify(result),
         dataType: "json",
     })
         .always(function (r) {
             if (r.status == 200) {
-                alert("OK");
-                location.reload();
+                add_msg("OK.", "success");
             }
             else {
-                alert("Error");
+                add_msg("Error.", "alert");
             }
         })
 }
