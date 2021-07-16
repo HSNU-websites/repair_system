@@ -53,12 +53,9 @@ def logout_page():
 
 @main_bp.route("/add_flash", methods=["POST"])
 def add_flash_page():
-    data = request.get_json(force=True)
-    flash(data["message"], data["category"])
-    return ""
     try:
-        data = request.form.data
-        flash(data["msg"])
+        data = request.get_json(force=True)
+        flash(data["message"], data["category"])
         return ""
     except:
         abort(400)
