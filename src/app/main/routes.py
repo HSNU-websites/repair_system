@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request, flash, current_app
+from flask import render_template, redirect, url_for, request, flash, current_app, abort
 from flask_login import current_user, login_user, logout_user
 from . import main_bp
 from ..forms import LoginForm
@@ -50,6 +50,18 @@ def logout_page():
         logout_user()
         flash("Logout.", category="info")
     return redirect(url_for("main.index_page"))
+
+@main_bp.route("/add_flash", methods=["POST"])
+def add_flash_page():
+    data = request.get_json(force=True)
+    flash(data["message"], data["category"])
+    return ""
+    try:
+        data = request.form.data
+        flash(data["msg"])
+        return ""
+    except:
+        abort(400)
 
 
 @main_bp.app_errorhandler(500)

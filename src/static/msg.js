@@ -21,3 +21,12 @@ function add_msg(msg, category) {
     closebtn.addEventListener("click", function (event) { hide(closebtn.parentElement) })
     setTimeout(function () { hide(message) }, 3000);
 }
+
+function send_add_message(msg, category) {
+    $.ajax({
+        url: "/add_flash",
+        type: "post",
+        data: JSON.stringify({ "message": msg, "category": category }),
+        dataType: "json",
+    })
+}

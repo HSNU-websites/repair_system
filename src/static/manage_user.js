@@ -84,7 +84,8 @@ function del_all_users() {
         })
             .always(function (r) {
                 if (r.status == 200) {
-                    add_msg("OK. The update will be loaded after you refesh the page.", "success");
+                    send_add_message("OK.", "success");
+                    window.location.reload();
                 }
                 else {
                     add_msg("Error.", "alert");
