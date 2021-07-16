@@ -5,7 +5,7 @@ from pathlib import Path
 
 import ujson
 
-from .archive import Archive
+from .myarchive import Archive
 from .common import cache
 from .db_helper import updateUnfinisheds
 from .model import (
