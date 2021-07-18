@@ -38,7 +38,7 @@ function send_update(element) {
         }
     }
     // validate email
-    if (is_admin & email == "") {
+    if (is_admin && email == "") {
         add_msg("Email is required for admin.", "alert");
         return;
     }
@@ -71,7 +71,7 @@ function del_all_users() {
     }, {});
     var upper = cookies["upper"];
     var lower = cookies["lower"];
-    if (!(upper & lower)) {
+    if (!(upper && lower)) {
         add_msg("The range does not be provided.", "alert");
         return;
     }

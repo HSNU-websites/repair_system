@@ -417,7 +417,7 @@ def del_users(ids: list[int], force=False):
 
 def del_users_between(username_between: tuple, force=False):
     if not (isinstance(username_between, tuple) and len(username_between) == 2):
-        raise TypeError("username_between must be a tuple with 2 str")
+        raise TypeError("username_between must be a tuple with 2 (str | int)")
 
     ids = [
         row.id for row in db.session.query(Users.id).filter(Users.username.between(*username_between)).all()
