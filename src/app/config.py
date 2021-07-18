@@ -26,9 +26,10 @@ class Development(Config):
     SECRET_KEY = "dhfkjgruytv4yntcm94[g"
     # Flask-APScheduler
     SCHEDULER_API_ENABLED = True
+    # Flask-Caching
+    CACHE_TYPE = "SimpleCache"
     # Flask-SQLAlchemy
     SQLALCHEMY_DATABASE_URI = "sqlite:///data.db"
-    CACHE_TYPE = "SimpleCache"
 
 
 class Testing(Config):
@@ -39,7 +40,7 @@ class Testing(Config):
     SECRET_KEY = "dhfkjgruytv4yntcm94[g"
     TESTING = True
     # Flask-Caching
-    CACHE_TYPE = "SimpleCache"
+    CACHE_TYPE = "NullCache"
     # Flask-SQLAlchemy
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     # Flask-WTF
