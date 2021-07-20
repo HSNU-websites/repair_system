@@ -1,6 +1,6 @@
 import unittest
 from os import getenv
-from time import sleep
+from time import sleep, time
 
 from flask_script import Manager
 from sqlalchemy.exc import OperationalError
@@ -27,7 +27,6 @@ def reset(yes=False):
     """
     Reset all Tables to Default
     """
-
     if not yes:
         print(
             "This will drop all tables.\n"
@@ -117,6 +116,14 @@ def add_user():
 
     except KeyboardInterrupt:
         print("\n操作取消")
+
+
+def calc_time(func, *args, **kwargs):
+    start = time()
+    result = func(*args, **kwargs)
+    end = time()
+    t = round((end - start) * 1000)
+    return (result, f"{t} ms")
 
 
 if __name__ == "__main__":
