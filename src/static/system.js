@@ -63,7 +63,7 @@ function send_update(element) {
         if (info[i].tagName == "DIV") {
             var description = info[i].children[1].value;
             // check whether empty
-            if (description == "" | description == undefined) {
+            if (!description) {
                 add_msg("Empty value is invalid.", "alert");
                 return;
             }
