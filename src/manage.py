@@ -1,10 +1,8 @@
 import unittest
 from os import getenv
 from time import sleep, time
-
 from flask_script import Manager
 from sqlalchemy.exc import OperationalError
-
 import app.database.backup_helper as backup_helper
 import app.database.db_helper as db_helper
 from app import create_app, db
@@ -68,7 +66,9 @@ def init_database():
             db.create_all()
         except OperationalError as e:
             print(f"Error: {e}")
-            print(f"Failed to connect to database in try {i+1}, sleep for {sleep_sec} sec")
+            print(
+                f"Failed to connect to database in try {i+1}, sleep for {sleep_sec} sec"
+            )
             sleep(sleep_sec)
         else:
             success = True
@@ -102,13 +102,13 @@ def add_user():
                 break
         name = input("姓名：")
         admin = input("是否註冊為管理員？Y/N：")
-        is_admin = (admin == "Y")
+        is_admin = admin == "Y"
 
         user_info = {
             "username": username,
             "password": password,
             "name": name,
-            "is_admin": is_admin
+            "is_admin": is_admin,
         }
 
         db_helper.add_users([user_info])
