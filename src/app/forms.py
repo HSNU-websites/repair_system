@@ -47,6 +47,16 @@ class UserFilterForm(FlaskForm):
     form_name = HiddenField(render_kw={"value": "filter"})
     upper = IntegerField("", [Optional()], render_kw={"placeholder": "Student ID"})
     lower = IntegerField("", [Optional()], render_kw={"placeholder": "Student ID"})
+    order_by = SelectField(
+        "",
+        [DataRequired()],
+        choices=[
+            ("id", "ID (預設)"),
+            ("classnum", "班級"),
+            ("username", "學號"),
+            ("name", "姓名"),
+        ],
+    )
     submit = SubmitField("送出")
 
 
