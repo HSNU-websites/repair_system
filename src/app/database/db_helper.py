@@ -148,6 +148,17 @@ def del_records(ids: list[int]):
     db.session.commit()
 
 
+def update_record(data: dict):
+    try:
+        id = data.pop("id")
+        Records.query.filter_by(id=id).update(data)
+        db.session.commit()
+        cache.delete_memoized(record_to_dict, id)
+        return True
+    except:
+        return False
+
+
 def add_revision(record_id, user_id, status_id, description):
     rev = Revisions.new(record_id=record_id, user_id=user_id, status_id=status_id, description=description)
     if status_id == finishedStatus_id:
@@ -260,7 +271,8 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
     }
 
 
-def render_users(Filter=dict(), page=1, per_page=100) -> dict:
+def render_users(Filter=dict(), page=1, per_page=100, order=("id", "asc")) -> dict:
+    # order = (column_name, order: "asc", "desc")
     if page < 1:
         page = 1
     q = Users.query.filter(Users.id > 1)
@@ -274,9 +286,14 @@ def render_users(Filter=dict(), page=1, per_page=100) -> dict:
         for key, value in Filter.items()
         if key in Users.__mapper__.columns
     }
+    if len(order) == 2 and order[0] in Users.__mapper__.columns and order[1] in {"asc", "desc"}:
+        o = eval("Users." + ".".join(order) + "()")
+    else:
+        o = Users.id.asc()
+
     q = q.filter_by(**Filter)
     l = []
-    for user in q.order_by(Users.id.asc()).offset((page - 1) * per_page).limit(per_page).all():
+    for user in q.order_by(o).offset((page - 1) * per_page).limit(per_page).all():
         l.append({
             "id": user.id,
             "username": user.username,
