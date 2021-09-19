@@ -1,7 +1,9 @@
+from functools import wraps
+
 from flask_apscheduler import APScheduler as _BaseAPScheduler
 
 from . import mail_helper
-from functools import wraps
+from .database import backup_helper
 
 
 class APScheduler(_BaseAPScheduler):
@@ -20,3 +22,8 @@ scheduler = APScheduler()
 @scheduler.with_app_context
 def send_daily_mail():
     return mail_helper.send_daily_mail()
+
+@scheduler.task("cron", day="*", hour="3")
+@scheduler.with_app_context
+def daily_backup():
+    return backup_helper.scheduled_backup()

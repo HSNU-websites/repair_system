@@ -5,7 +5,7 @@ from pathlib import Path
 
 import ujson
 
-from .myarchive import Archive
+from ..myhandler import timeformat_to_regex
 from .common import cache
 from .db_helper import updateUnfinisheds
 from .model import (
@@ -20,12 +20,16 @@ from .model import (
     topological_order,
     validate_topological
 )
+from .myarchive import Archive
 
 defaultTables = idTables
 partition = 10000
 
 backup_dir = Path("backup").resolve()  # absolute path to backup directory
 backup_logger = logging.getLogger("backup")
+backup_name = "Backup_{time}.tar.xz".format(time=filetimeformat)
+backup_auto_name = "Backup_{time}_auto.tar.xz".format(time=filetimeformat)
+backup_auto_name_match = timeformat_to_regex(backup_auto_name)
 
 # mail [].sort(key = lambda s: s[2])
 # archiveName -> *.tar.gz / * (a folder)
@@ -70,10 +74,12 @@ def get_backups(reverse: bool = True) -> list:
     return result
 
 
-def backup(tablenames: list[str] = None):
+def backup(tablenames: list[str] = None, scheduled: bool = False):
     try:
-        archiveName = "Backup_{time}.tar.xz".format(
-            time=datetime.datetime.now().strftime(filetimeformat))
+        if scheduled:
+            archiveName = datetime.datetime.now().strftime(backup_auto_name)
+        else:
+            archiveName = datetime.datetime.now().strftime(backup_name)
 
         backup_logger.info("Starting backup...")
         backup_logger.info("tables: {}".format(tablenames))
@@ -109,6 +115,23 @@ def backup(tablenames: list[str] = None):
         raise e
     else:
         backup_logger.info("Backup finished, file: {}".format(archiveName))
+
+
+def scheduled_backup(backupCount=60):
+    backup(scheduled=True)
+    result = []
+    for filePath in backup_dir.iterdir():
+        if backup_auto_name_match.match(filePath.name):
+            result.append(filePath)
+
+    if len(result) < backupCount:
+        result = []
+    else:
+        result.sort()
+        result = result[:len(result) - backupCount]
+
+    for filePath in result:
+        filePath.unlink()
 
 
 def restore(archiveName: str, tablenames: list[str] = None):
