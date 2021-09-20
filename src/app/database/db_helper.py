@@ -38,10 +38,10 @@ def render_statuses():
 
 @cache.memoize()
 def render_items(admin=False):
-    items = Items.query.order_by(Items.sequence).filter(Items.id > 4).all()
+    items = Items.query.order_by(Items.sequence).filter(Items.id > 3).all()
     if admin:
         # `other` for three offices
-        items += Items.query.filter(Items.id in (1, 2, 3)).all()
+        items += Items.query.limit(3).all()
     else:
         # just other
         item = Items.query.filter_by(id=1).first()
@@ -575,10 +575,10 @@ def reset(env):
             id=1, description="其他(總務處)", office_id=1, sequence=len(db_default.items) + 1
         ),
         Items(
-            id=2, description="其他(設備組)", office_id=1, sequence=len(db_default.items) + 2
+            id=2, description="其他(設備組)", office_id=2, sequence=len(db_default.items) + 2
         ),
         Items(
-            id=3, description="其他(資訊室)", office_id=1, sequence=len(db_default.items) + 3
+            id=3, description="其他(資訊室)", office_id=3, sequence=len(db_default.items) + 3
         ),
     ]
     for i, item in enumerate(db_default.items, start=1):

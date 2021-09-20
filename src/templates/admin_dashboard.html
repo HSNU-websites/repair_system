@@ -96,7 +96,8 @@
                         <a href="{{ records['page'] + 1 }}" {% if records['page']>= records['pages'] %}
                             class="end" {% endif
                             %}>&#8250;</a>
-                        <a href="{{ records['pages'] }}" {% if records['page']>= records['pages'] %} class="end" {% endif %}>&#8250;&#8250;</a>
+                        <a href="{{ records['pages'] }}" {% if records['page']>= records['pages'] %} class="end" {%
+                            endif %}>&#8250;&#8250;</a>
                     </td>
                 </tr>
                 <tr>
@@ -115,7 +116,15 @@
                     <td>{{ record["user"]["classnum"] | string + " " + record["user"]["name"] }}</td>
                     <td>{{ record["building"] }}</td>
                     <td>{{ record["location"] }}</td>
-                    <td>{{ record["item"] }}</td>
+                    <td>
+                        <select name="items">
+                            {% for item in items %}
+                            <option value="{{ item[0] }}" {% if item[1]==record["item"] %} selected {% endif %}>
+                                {{ item[1] }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </td>
                     <td>{{ record["description"] }}</td>
                     <td title="{{ record['insert_time'] }}">{{ record["insert_date"] }}</td>
                     <td>
@@ -134,9 +143,11 @@
                         </div>
                     </td>
                     <td class="button_set">
-                        <button class="update" onclick="show_reply_window(this, {{ record['id'] }});">回覆</button>
+                        <button class="add" onclick="show_reply_window(this, {{ record['id'] }});">回覆</button>
                         <div style="height: 5px;"></div>
                         <button class="remove" onclick="send_remove(this, 'record', {{ record['id'] }});">刪除</button>
+                        <div style="height: 5px;"></div>
+                        <button class="update" onclick="send_update(this, {{ record['id'] }})">更新</button>
                     </td>
                 </tr>
                 {% endfor %}
