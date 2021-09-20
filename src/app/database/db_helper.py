@@ -22,7 +22,7 @@ from .model import (
     timeformat,
     dateformat,
     get_dict,
-    finishedStatus_id
+    finishedStatus_id,
 )
 
 
@@ -37,8 +37,16 @@ def render_statuses():
 
 
 @cache.memoize()
-def render_items():
-    items = Items.query.order_by(Items.sequence).all()
+def render_items(admin=False):
+    items = Items.query.order_by(Items.sequence).filter(Items.id > 4).all()
+    if admin:
+        # `other` for three offices
+        items += Items.query.filter(Items.id in (1, 2, 3)).all()
+    else:
+        # just other
+        item = Items.query.filter_by(id=1).first()
+        item.description = "其他"
+        items += [item]
     return [(item.id, item.description) for item in items]
 
 
@@ -50,10 +58,14 @@ def render_buildings():
 
 @cache.memoize()
 def render_system_setting():
-    buildings = [get_dict(row) for row in Buildings.query.order_by(Buildings.sequence).all()]
+    buildings = [
+        get_dict(row) for row in Buildings.query.order_by(Buildings.sequence).all()
+    ]
     items = [get_dict(row) for row in Items.query.order_by(Items.sequence).all()]
     offices = [get_dict(row) for row in Offices.query.order_by(Offices.sequence).all()]
-    statuses = [get_dict(row) for row in Statuses.query.order_by(Statuses.sequence).all()]
+    statuses = [
+        get_dict(row) for row in Statuses.query.order_by(Statuses.sequence).all()
+    ]
     return (buildings, items, offices, statuses)
 
 
@@ -90,7 +102,13 @@ def updateUnfinisheds():
     Unfinisheds.query.delete()
     l = []
     for record in db.session.query(Records.id).all():
-        r = db.session.query(Revisions.status_id).filter_by(record_id=record.id).order_by(Revisions.id.desc()).limit(1).scalar()
+        r = (
+            db.session.query(Revisions.status_id)
+            .filter_by(record_id=record.id)
+            .order_by(Revisions.id.desc())
+            .limit(1)
+            .scalar()
+        )
         if r != finishedStatus_id:
             l.append({"record_id": record.id})
     db.session.bulk_insert_mappings(Unfinisheds, l)
@@ -131,7 +149,7 @@ def add_record(user_id, building_id, location, item_id, description):
         item_id=item_id,
         building_id=building_id,
         location=location,
-        description=description
+        description=description,
     )
     db.session.add(r)
     db.session.commit()
@@ -160,7 +178,12 @@ def update_record(data: dict):
 
 
 def add_revision(record_id, user_id, status_id, description):
-    rev = Revisions.new(record_id=record_id, user_id=user_id, status_id=status_id, description=description)
+    rev = Revisions.new(
+        record_id=record_id,
+        user_id=user_id,
+        status_id=status_id,
+        description=description,
+    )
     if status_id == finishedStatus_id:
         Unfinisheds.query.filter_by(record_id=record_id).delete()
     else:
@@ -175,7 +198,11 @@ def del_revisions(ids: list[int]):
     for id in ids:
         record_id = db.session.query(Revisions.record_id).filter_by(id=id).scalar()
         Revisions.query.filter_by(id=id).delete()
-        rev = Revisions.query.filter_by(record_id=record_id).order_by(Revisions.id.desc()).first()
+        rev = (
+            Revisions.query.filter_by(record_id=record_id)
+            .order_by(Revisions.id.desc())
+            .first()
+        )
         if rev.status_id == finishedStatus_id:
             Unfinisheds.query.filter_by(record_id=record_id).delete()
         else:
@@ -190,9 +217,11 @@ def get_user(user_id) -> dict:
     """
     Used only in record_to_dict and user_setting.
     """
-    user = db.session.query(
-        Users.username, Users.name, Users.classnum, Users.email
-    ).filter_by(id=user_id).first()
+    user = (
+        db.session.query(Users.username, Users.name, Users.classnum, Users.email)
+        .filter_by(id=user_id)
+        .first()
+    )
     return {
         "username": user.username,
         "name": user.name,
@@ -205,27 +234,39 @@ def get_user(user_id) -> dict:
 def record_to_dict(record_id):
     record = Records.query.filter_by(id=record_id).first()
     l = []
-    for rev in Revisions.query.filter_by(record_id=record.id).order_by(Revisions.id.asc()).all():
-        status = db.session.query(Statuses.description).filter_by(id=rev.status_id).scalar()
-        l.append({
-            "id": rev.id,
-            "user": get_user(rev.user_id),
-            "status": status,
-            "insert_time": rev.insert_time.strftime(timeformat),
-            "description": rev.description
-        })
+    for rev in (
+        Revisions.query.filter_by(record_id=record.id)
+        .order_by(Revisions.id.asc())
+        .all()
+    ):
+        status = (
+            db.session.query(Statuses.description).filter_by(id=rev.status_id).scalar()
+        )
+        l.append(
+            {
+                "id": rev.id,
+                "user": get_user(rev.user_id),
+                "status": status,
+                "insert_time": rev.insert_time.strftime(timeformat),
+                "description": rev.description,
+            }
+        )
 
     return {
         "id": record.id,
         "user": get_user(record.user_id),
-        "item": db.session.query(Items.description).filter_by(id=record.item_id).scalar(),
-        "building": db.session.query(Buildings.description).filter_by(id=record.building_id).scalar(),
+        "item": db.session.query(Items.description)
+        .filter_by(id=record.item_id)
+        .scalar(),
+        "building": db.session.query(Buildings.description)
+        .filter_by(id=record.building_id)
+        .scalar(),
         "location": record.location,
         "insert_time": record.insert_time.strftime(timeformat),
         "insert_date": record.insert_time.strftime(dateformat),
         "description": record.description,
         "revisions": l,
-        "unfinished": Unfinisheds.query.filter_by(record_id=record.id).count() > 0
+        "unfinished": Unfinisheds.query.filter_by(record_id=record.id).count() > 0,
     }
 
 
@@ -235,12 +276,18 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
     q = db.session.query(Records.id)
     valid = True
     if "username" in Filter:
-        user_id = db.session.query(Users.id).filter_by(username=Filter.pop("username")).scalar()
+        user_id = (
+            db.session.query(Users.id)
+            .filter_by(username=Filter.pop("username"))
+            .scalar()
+        )
         if valid := valid and user_id is not None:
             q = q.filter_by(user_id=user_id)
 
     if valid and "classnum" in Filter:
-        unfin_query = db.session.query(Users.id).filter_by(classnum=Filter.pop("classnum"))
+        unfin_query = db.session.query(Users.id).filter_by(
+            classnum=Filter.pop("classnum")
+        )
         if valid := valid and unfin_query.count() > 0:
             q = q.filter(Records.user_id.in_(unfin_query))
 
@@ -259,7 +306,10 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
     if valid:
         l = [
             record_to_dict(record.id)
-            for record in q.order_by(Records.id.desc()).offset((page - 1) * per_page).limit(per_page).all()
+            for record in q.order_by(Records.id.desc())
+            .offset((page - 1) * per_page)
+            .limit(per_page)
+            .all()
         ]
     else:
         l = []
@@ -267,7 +317,7 @@ def render_records(Filter=dict(), page=1, per_page=100) -> dict:
     return {
         "page": page,
         "pages": math.ceil(q.count() / per_page) if valid else 0,
-        "records": l
+        "records": l,
     }
 
 
@@ -282,11 +332,13 @@ def render_users(Filter=dict(), page=1, per_page=100, order=("id", "asc")) -> di
         q = q.filter(Users.username.between(*username_between))
 
     Filter = {
-        key: value
-        for key, value in Filter.items()
-        if key in Users.__mapper__.columns
+        key: value for key, value in Filter.items() if key in Users.__mapper__.columns
     }
-    if len(order) == 2 and order[0] in Users.__mapper__.columns and order[1] in {"asc", "desc"}:
+    if (
+        len(order) == 2
+        and order[0] in Users.__mapper__.columns
+        and order[1] in {"asc", "desc"}
+    ):
         o = eval("Users." + ".".join(order) + "()")
     else:
         o = Users.id.asc()
@@ -294,21 +346,19 @@ def render_users(Filter=dict(), page=1, per_page=100, order=("id", "asc")) -> di
     q = q.filter_by(**Filter)
     l = []
     for user in q.order_by(o).offset((page - 1) * per_page).limit(per_page).all():
-        l.append({
-            "id": user.id,
-            "username": user.username,
-            "name": user.name,
-            "classnum": user.classnum,
-            "email": user.email,
-            "is_admin": user.is_admin,
-            "is_valid": user.is_valid,
-            "is_marked_deleted": user.is_marked_deleted,
-        })
-    return {
-        "page": page,
-        "pages": math.ceil(q.count() / per_page),
-        "users": l
-    }
+        l.append(
+            {
+                "id": user.id,
+                "username": user.username,
+                "name": user.name,
+                "classnum": user.classnum,
+                "email": user.email,
+                "is_admin": user.is_admin,
+                "is_valid": user.is_valid,
+                "is_marked_deleted": user.is_marked_deleted,
+            }
+        )
+    return {"page": page, "pages": math.ceil(q.count() / per_page), "users": l}
 
 
 def del_cache_for_sequence_table(tablename: str):
@@ -417,7 +467,9 @@ def del_users(ids: list[int], force=False):
         Revisions.query.filter(Records.user_id.in_(ids)).update({"user_id": 1})
     else:
         idRec_query = db.session.query(Records.user_id).filter(Records.user_id.in_(ids))
-        idRev_query = db.session.query(Revisions.user_id).filter(Revisions.user_id.in_(ids))
+        idRev_query = db.session.query(Revisions.user_id).filter(
+            Revisions.user_id.in_(ids)
+        )
         union = {row.user_id for row in idRec_query.union(idRev_query).all()}
         for user in Users.query.filter(Users.id.in_(union)).all():
             user.is_valid = False
@@ -437,7 +489,10 @@ def del_users_between(username_between: tuple, force=False):
         raise TypeError("username_between must be a tuple with 2 (str | int)")
 
     ids = [
-        row.id for row in db.session.query(Users.id).filter(Users.username.between(*username_between)).all()
+        row.id
+        for row in db.session.query(Users.id)
+        .filter(Users.username.between(*username_between))
+        .all()
     ]
     del_users(ids, force)
 
@@ -503,9 +558,7 @@ def reset(env):
     db.session.bulk_save_objects(buildings)
 
     # Statuses default
-    statuses = [
-        Statuses(id=1, description="其他", sequence=len(db_default.statuses) + 1)
-    ]
+    statuses = [Statuses(id=1, description="其他", sequence=len(db_default.statuses) + 1)]
     for i, status in enumerate(db_default.statuses, start=1):
         statuses.append(Statuses.new(status, sequence=i))
     db.session.bulk_save_objects(statuses)
@@ -518,7 +571,15 @@ def reset(env):
 
     # Items default
     items = [
-        Items(id=1, description="其他", office_id=1, sequence=len(db_default.items) + 1)
+        Items(
+            id=1, description="其他(總務處)", office_id=1, sequence=len(db_default.items) + 1
+        ),
+        Items(
+            id=2, description="其他(設備組)", office_id=1, sequence=len(db_default.items) + 2
+        ),
+        Items(
+            id=3, description="其他(資訊室)", office_id=1, sequence=len(db_default.items) + 3
+        ),
     ]
     for i, item in enumerate(db_default.items, start=1):
         items.append(Items.new(item[0], item[1], sequence=i))
@@ -529,7 +590,9 @@ def reset(env):
         current_timestamp = int((now - datetime.timedelta(days=4)).timestamp())
         timestamp = int((now - datetime.timedelta(days=100)).timestamp())
         count = 300
-        random_timestamps = sorted(random.sample(range(timestamp, current_timestamp), k=count))
+        random_timestamps = sorted(
+            random.sample(range(timestamp, current_timestamp), k=count)
+        )
         random_records = [
             Records.new(
                 user_id=random.randint(1, len(users)),
@@ -537,7 +600,9 @@ def reset(env):
                 building_id=random.randint(1, len(buildings)),
                 location="某{}個地方".format(random.randint(1, 100000)),
                 description="{}的紀錄".format(random.randint(1, 100000)),
-                insert_time=datetime.datetime.fromtimestamp(random_timestamp).strftime(timeformat),
+                insert_time=datetime.datetime.fromtimestamp(random_timestamp).strftime(
+                    timeformat
+                ),
             )
             for random_timestamp in random_timestamps
         ]
@@ -564,7 +629,7 @@ def reset(env):
                 building_id=1,
                 location="某個地方",
                 description="今天的紀錄",
-                insert_time=now.strftime(timeformat)
+                insert_time=now.strftime(timeformat),
             ),
         ]
         db.session.bulk_save_objects(random_records)
