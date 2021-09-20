@@ -12,11 +12,12 @@ from ..database.db_helper import (
     add_revision,
     del_revisions,
     del_records,
+    update_record,
 )
 from ..database.backup_helper import backup, restore, del_backup, backup_dir
 
 
-@admin_bp.route("/admin_dashboard_backend", methods=["POST", "DELETE"])
+@admin_bp.route("/admin_dashboard_backend", methods=["POST", "DELETE", "PATCH"])
 @admin_required
 @login_required
 def admin_dashboard_backend_page():
@@ -41,6 +42,13 @@ def admin_dashboard_backend_page():
         if category == "revision":
             del_revisions([id])
         return "OK"
+    if request.method == "PATCH":
+        data = request.get_json(force=True)
+        if update_record(data):
+            return "OK"
+        else:
+            abort(400)
+
 
 
 @admin_bp.route("/system_backend", methods=["POST", "DELETE", "PATCH"])
@@ -150,7 +158,6 @@ def backup_backend_page():
             abort(400)
     if request.method == "PUT":
         # restore to specific version
-        # NOT available to use now
         try:
             backup_name = request.get_json(force=True)["name"]
             restore(backup_name)
