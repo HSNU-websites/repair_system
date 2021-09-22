@@ -2,10 +2,9 @@ import datetime
 import math
 import random
 import string
-
 import db_default
+from sqlalchemy import not_, or_
 from flask_login import UserMixin
-
 from .common import cache
 from .model import (
     Buildings,
@@ -38,16 +37,10 @@ def render_statuses():
 
 @cache.memoize()
 def render_items(admin=False):
-    items = Items.query.order_by(Items.sequence).filter(Items.id > 3).all()
-    if admin:
-        # `other` for three offices
-        items += Items.query.limit(3).all()
-    else:
-        # just other
-        item = Items.query.filter_by(id=1).first()
-        item.description = "其他"
-        items += [item]
-    return [(item.id, item.description) for item in items]
+    items = Items.query.order_by(Items.sequence)
+    if not admin:
+        items = items.filter(or_((Items.id == 1), not_(Items.description.like("其他%"))))
+    return [(item.id, item.description) for item in items.all()]
 
 
 @cache.memoize()
