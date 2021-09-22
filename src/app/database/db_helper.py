@@ -3,7 +3,7 @@ import math
 import random
 import string
 import db_default
-from sqlalchemy.sql.expression import not_
+from sqlalchemy import not_, or_
 from flask_login import UserMixin
 from .common import cache
 from .model import (
@@ -39,8 +39,8 @@ def render_statuses():
 def render_items(admin=False):
     items = Items.query.order_by(Items.sequence)
     if not admin:
-        items = items.filter((Items.id == 1) | not_(Items.description.contains("其他"))).all()
-    return [(item.id, item.description) for item in items]
+        items = items.filter(or_((Items.id == 1), not_(Items.description.like("其他%"))))
+    return [(item.id, item.description) for item in items.all()]
 
 
 @cache.memoize()
