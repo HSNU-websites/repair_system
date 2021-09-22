@@ -1,20 +1,20 @@
 from flask import (
     current_app,
-    flash, make_response,
+    flash,
+    make_response,
     redirect,
-
     render_template,
     request,
-    url_for
+    url_for,
 )
 from flask_login import login_required
-
 from ..database.backup_helper import backup_dir, get_backups
 from ..database.db_helper import (
     add_users,
+    render_items,
     render_records,
     render_system_setting,
-    render_users
+    render_users,
 )
 from ..forms import (
     ReportsFilterForm,
@@ -50,6 +50,7 @@ def dashboard_page(page=1):
             records=render_records(Filter=Filter, page=page),
             form=form,
             statuses=render_system_setting()[3],
+            items=render_items(True),
         )
     if request.method == "POST":
         if form.validate_on_submit():
@@ -101,14 +102,17 @@ def manage_user_page(page=1):
     The page allows admins to add, edit and delete users.
     """
     Filter = dict()
+    filter_for_form = dict()
 
+    if order_by := request.cookies.get("order_by"):
+        filter_for_form["order_by"] = order_by
     if (upper := request.cookies.get("upper")) and (
         lower := request.cookies.get("lower")
     ):
         Filter["username_between"] = (lower, upper)
-        form_filter = UserFilterForm(upper=upper, lower=lower)
-    else:
-        form_filter = UserFilterForm()
+        filter_for_form["upper"] = upper
+        filter_for_form["lower"] = lower
+    form_filter = UserFilterForm(**filter_for_form)
     form = AddOneUserForm()
     form_csv = AddUsersByFileForm()
 
@@ -117,7 +121,11 @@ def manage_user_page(page=1):
         form=form,
         form_csv=form_csv,
         form_filter=form_filter,
-        users=render_users(Filter=Filter, page=page),
+        users=render_users(
+            Filter=Filter,
+            page=page,
+            order=((order_by, "asc") if order_by else ("id", "asc")),
+        ),
     )
     if request.method == "GET":
         # Render all users
@@ -146,7 +154,9 @@ def manage_user_page(page=1):
                 for _, errorMessages in form.errors.items():
                     for err in errorMessages:
                         flash(err, category="alert")
-                current_app.logger.warning("POST /manage_user: Invalid submit for adding one user")
+                current_app.logger.warning(
+                    "POST /manage_user: Invalid submit for adding one user"
+                )
             return redirect(url_for("admin.manage_user_page"))
         if form_name == "csv":
             # Add users by csv
@@ -162,7 +172,9 @@ def manage_user_page(page=1):
                     else:
                         flash("OK", category="success")
             else:
-                current_app.logger.warning("POST /manage_user: Invalid submit for csv file")
+                current_app.logger.warning(
+                    "POST /manage_user: Invalid submit for csv file"
+                )
                 for _, errorMessages in form_csv.errors.items():
                     for err in errorMessages:
                         flash(err, category="alert")
@@ -176,14 +188,19 @@ def manage_user_page(page=1):
                     cookies.append(("upper", str(upper)))
                 if lower := form_filter.lower.data:
                     cookies.append(("lower", str(lower)))
+                if order_by := form_filter.order_by.data:
+                    cookies.append(("order_by", order_by))
                 response = make_response(redirect(url_for("admin.manage_user_page")))
                 response.delete_cookie("upper")
                 response.delete_cookie("lower")
+                response.delete_cookie("order_by")
                 for cookie in cookies:
                     response.set_cookie(*cookie)
                 return response
             else:
-                current_app.logger.warning("POST /admin_dashboard: Invalid submit for user filter")
+                current_app.logger.warning(
+                    "POST /admin_dashboard: Invalid submit for user filter"
+                )
                 for _, errorMessages in form_filter.errors.items():
                     for err in errorMessages:
                         flash(err, category="alert")

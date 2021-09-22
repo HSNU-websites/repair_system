@@ -107,11 +107,12 @@
                 <div class="field">
                     {{ form_filter.lower }} ~ {{ form_filter.upper }}
                 </div>
+                <div class="field">
+                    以 {{ form_filter.order_by }} 排序
+                </div>
                 <div>直接送出即可清空篩選器</div>
                 <div class="field">
                     {{ form_filter.submit }}
-                </div>
-                <div>
                     <button class="remove" onclick="del_all_users();" type="button">Delete all users</button>
                 </div>
             </form>

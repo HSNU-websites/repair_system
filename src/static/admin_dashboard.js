@@ -68,3 +68,22 @@ function send_reply_record(element) {
             }
         })
 }
+
+function send_update(element, record_id) {
+    var parent = element.parentElement.parentElement;
+    var item_id = parent.children[3].children[0].value;
+    $.ajax({
+        url: "/admin_dashboard_backend",
+        type: "patch",
+        data: JSON.stringify({ "id": record_id, "item_id": item_id }),
+        dataType: "json",
+    })
+        .always(function (r) {
+            if (r.status == 200) {
+                add_msg("OK", "success");
+            }
+            else {
+                add_msg("Error.", "alert");
+            }
+        })
+}
