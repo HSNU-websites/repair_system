@@ -19,7 +19,7 @@ jobs:
             - "~/.local/lib"
       - run:
           name: Test
-          command: flask test
+          command: python3 -m flask test
 
 workflows:
   main:
