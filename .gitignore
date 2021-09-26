@@ -5,4 +5,5 @@ __pycache__/
 data.db*
 src/backup/
 src/log/
+log/
 /data/

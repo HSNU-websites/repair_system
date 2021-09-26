@@ -1,7 +1,7 @@
 import unittest
 from os import getenv
 from time import sleep, time
-from flask_script import Manager
+import click
 from sqlalchemy.exc import OperationalError
 import app.database.backup_helper as backup_helper
 import app.database.db_helper as db_helper
@@ -9,19 +9,19 @@ from app import create_app, db
 from app.database.model import Users
 from app.mylogging import init_logging
 
-app = create_app(getenv("ENV", "production"))
+app = create_app(getenv("FLASK_ENV", "production"))
 # db.app = app # db will use app if no app_context is available
 init_logging(app)
-manager = Manager(app)
 
 
-@manager.shell
-def shell():
+@app.shell_context_processor
+def make_shell_context():
     return globals()
 
 
-@manager.command
-def reset(yes=False):
+@app.cli.command()
+@click.option("-y", "--yes", is_flag=True)
+def reset(yes):
     """
     Reset all Tables to Default
     """
@@ -37,7 +37,7 @@ def reset(yes=False):
     db_helper.reset(env=app.config["ENV"])
 
 
-@manager.command
+@app.cli.command()
 def backup():
     """
     Backup Tables
@@ -45,7 +45,7 @@ def backup():
     backup_helper.backup()
 
 
-@manager.command
+@app.cli.command()
 def test():
     tests = unittest.TestLoader().discover("tests")
     result = unittest.TextTestRunner(verbosity=2).run(tests)
@@ -53,7 +53,7 @@ def test():
     return 0 if result.wasSuccessful() else 1
 
 
-@manager.command
+@app.cli.command(name="init_database")
 def init_database():
     """
     Reset all Tables to Default if not initialized
@@ -83,7 +83,7 @@ def init_database():
         reset(yes=True)
 
 
-@manager.command
+@app.cli.command(name="add_user")
 def add_user():
     try:
         while True:
@@ -124,7 +124,3 @@ def calc_time(func, *args, **kwargs):
     end = time()
     t = round((end - start) * 1000)
     return (result, f"{t} ms")
-
-
-if __name__ == "__main__":
-    manager.run()
