@@ -20,6 +20,9 @@ jobs:
       - run:
           name: Test
           command: python3 -m flask test
+          environment:
+            FLASK_APP: src/manage
+            FLASK_ENV: development
 
 workflows:
   main:
