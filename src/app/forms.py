@@ -1,8 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from flask_wtf.recaptcha import RecaptchaField
-from wtforms import HiddenField, PasswordField, SelectField, StringField, SubmitField
-from wtforms.fields.html5 import EmailField, IntegerField
+from wtforms.fields import EmailField, HiddenField, IntegerField, PasswordField, SelectField, StringField, SubmitField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
 
@@ -85,7 +84,7 @@ class AddOneUserForm(FlaskForm):
         ],
         render_kw={"placeholder": "Password"},
     )
-    email = EmailField("電子郵件 (僅管理員需要): ", render_kw={"placeholder": "Email"})
+    email = EmailField("電子郵件 (僅管理員需要): ", render_kw={"placeholder": "Email"}, default="")
     submit = SubmitField("新增")
 
     def validate_email(self, field):
