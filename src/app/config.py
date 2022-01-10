@@ -39,7 +39,7 @@ class Testing(Config):
     PRESERVE_CONTEXT_ON_EXCEPTION = False
     SECRET_KEY = "dhfkjgruytv4yntcm94[g"
     TESTING = True
-    SERVER_NAME = "localhost"
+    SERVER_NAME = "localhost.localdomain"
     # Flask-Caching
     CACHE_TYPE = "NullCache"
     # Flask-SQLAlchemy
