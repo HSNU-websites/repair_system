@@ -12,9 +12,11 @@ class BasicTest(unittest.TestCase):
     def setUp(self):
         self.app = create_app("testing")
         self.client = self.app.test_client()
+        self.ctx = self.app.test_request_context()
+        self.ctx.push()
 
     def tearDown(self):
-        pass
+        self.ctx.pop()
 
     def test_app_is_testing(self):
         self.assertTrue(self.app.config["TESTING"])

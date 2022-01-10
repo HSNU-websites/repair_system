@@ -50,9 +50,7 @@ Password: 123
 在 `./data/log/` 裡面有 SQL, flask 和 mail 的 log，有記錄每一筆 request。
 
 ## 常見問題
-1. flask 的版本需指定 `flask == 1.1`，因為需要和 flask-script 配合 ( flask-script 已經不再維護 )。
-
-2. 如果打不開的話，可以試試：
+1. 如果打不開的話，可以試試：
     ```shell
     $ sudo docker exec -it web python3 manage.py reset
     This will drop all tables.
@@ -62,7 +60,7 @@ Password: 123
     ```
     但請注意，此操作會重置全部資料庫。
 
-3. 如果不小心把初始使用者刪除，卻忘了自行註冊一個管理員，可以試試：
+2. 如果不小心把初始使用者刪除，卻忘了自行註冊一個管理員，可以試試：
     ```shell
     $ sudo docker exec -it web python3 manage.py add_user
     帳號(學號)：admin
@@ -73,7 +71,7 @@ Password: 123
     ```
     之後就可以用此帳號登入。
 
-4. 程式碼修改過後，需要重新 build image，要使用：
+3. 程式碼修改過後，需要重新 build image，要使用：
     ```shell
     $ sudo docker-compose down --rmi local
     $ sudo docker-compose up -d --build
