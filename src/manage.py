@@ -1,13 +1,18 @@
-import unittest
-from os import getenv
-from time import sleep, time
-import click
-from sqlalchemy.exc import OperationalError
-import app.database.backup_helper as backup_helper
-import app.database.db_helper as db_helper
-from app import create_app, db
-from app.database.model import Users
+from warnings import filterwarnings
+from pytz_deprecation_shim import PytzUsageWarning
+filterwarnings('ignore', category=PytzUsageWarning)
+# suppress timezone warning for apscheduler
+
 from app.mylogging import init_logging
+from app.database.model import Users
+from app import create_app, db
+import app.database.db_helper as db_helper
+import app.database.backup_helper as backup_helper
+from sqlalchemy.exc import OperationalError
+import click
+from time import sleep, time
+from os import getenv
+import unittest
 
 app = create_app(getenv("FLASK_ENV", "production"))
 # db.app = app # db will use app if no app_context is available
