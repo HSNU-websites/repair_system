@@ -1,4 +1,4 @@
-Flask
+Flask==1.1.2
 Flask-APScheduler
 Flask-Caching
 Flask-Login
@@ -10,4 +10,3 @@ gunicorn
 mysql
 passlib
 ujson
-click
