@@ -1,18 +1,21 @@
 from warnings import filterwarnings
 from pytz_deprecation_shim import PytzUsageWarning
+
 filterwarnings('ignore', category=PytzUsageWarning)
 # suppress timezone warning for apscheduler
 
-from app.mylogging import init_logging
-from app.database.model import Users
-from app import create_app, db
-import app.database.db_helper as db_helper
-import app.database.backup_helper as backup_helper
-from sqlalchemy.exc import OperationalError
-import click
-from time import sleep, time
-from os import getenv
 import unittest
+from os import getenv
+from time import sleep, time
+
+import click
+from sqlalchemy.exc import OperationalError
+
+import app.database.backup_helper as backup_helper
+import app.database.db_helper as db_helper
+from app import create_app, db
+from app.database.model import Users
+from app.mylogging import init_logging
 
 app = create_app(getenv("FLASK_ENV", "production"))
 # db.app = app # db will use app if no app_context is available
@@ -28,7 +31,7 @@ def make_shell_context():
 @click.option("-y", "--yes", is_flag=True)
 def reset(yes):
     """
-    Reset all Tables to Default
+    Reset all Tables to Default.
     """
     if not yes:
         print(
@@ -45,13 +48,16 @@ def reset(yes):
 @app.cli.command()
 def backup():
     """
-    Backup Tables
+    Backup Tables.
     """
     backup_helper.backup()
 
 
 @app.cli.command()
 def test():
+    """
+    Run unittest.
+    """
     tests = unittest.TestLoader().discover("tests")
     result = unittest.TextTestRunner(verbosity=2).run(tests)
 
@@ -61,7 +67,7 @@ def test():
 @app.cli.command(name="init_database")
 def init_database():
     """
-    Reset all Tables to Default if not initialized
+    Reset all Tables to Default if not initialized.
     """
     max_try = 10
     sleep_sec = 5
@@ -90,6 +96,9 @@ def init_database():
 
 @app.cli.command(name="add_user")
 def add_user():
+    """
+    Add a new user to database.
+    """
     try:
         while True:
             username = input("帳號(學號)：")
