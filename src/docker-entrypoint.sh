@@ -1,4 +1,6 @@
 #!/bin/sh
 
-/usr/local/bin/python3 -m flask init_database
-/usr/local/bin/python3 -m gunicorn -b 0.0.0.0:5000 manage:app
+flask init_database
+gunicorn -b 0.0.0.0:5000 manage:app
+
+exit #?

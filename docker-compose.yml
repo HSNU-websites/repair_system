@@ -10,7 +10,6 @@ services:
     restart: unless-stopped
     environment:
       - FLASK_ENV=production
-      - FLASK_APP=src/manage
       - DB_USER=repair_system
       - DB_PASSWORD=passw0rd
       - DB_HOST=db:3306
@@ -19,11 +18,14 @@ services:
       - MAIL_PASSWORD=PASSWORD
       - RECAPTCHA_PUBLIC_KEY=KEY
       - RECAPTCHA_PRIVATE_KEY=KEY
+      - TZ=Asia/Taipei
     volumes:
       - ./data/backup:/code/backup
       - ./data/log:/code/log
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
     networks:
       - net
 
@@ -37,10 +39,13 @@ services:
       - MYSQL_DATABASE=repair_system
       - MYSQL_USER=repair_system
       - MYSQL_PASSWORD=passw0rd
+      - TZ=Asia/Taipei
     volumes:
       - ./data/db:/var/lib/mysql
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
     networks:
       - net
 
@@ -50,7 +55,7 @@ services:
     restart: unless-stopped
     environment:
       - NGINX_HOST=localhost
-      - CERTBOT_EMAIL=
+      - CERTBOT_EMAIL=user@example.com
       - STAGING=0
       - DHPARAM_SIZE=2048
       - RSA_KEY_SIZE=4096
@@ -58,15 +63,17 @@ services:
       - USE_ECDSA=1
       - RENEWAL_INTERVAL=8d
       - DEBUG=0
+      - TZ=Asia/Taipei
     ports:
       - 80:80
       - 443:443
     volumes:
       - ./data/ssl:/etc/letsencrypt
       - ./nginx/templates:/etc/nginx/templates
-      - /dev/null:/var/log/nginx/access.log
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
     networks:
       - net
 
