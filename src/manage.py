@@ -91,7 +91,7 @@ def init_database():
         raise RuntimeError(f"Could not connect to database after {max_try} tries")
 
     if Users.query.count() == 0:
-        reset(yes=True)
+        db_helper.reset(env="production")
 
 
 @app.cli.command(name="add_user")
