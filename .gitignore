@@ -3,6 +3,6 @@ __pycache__/
 /.venv/
 .env
 data.db*
-src/backup/
-src/log/
+backup/
+log/
 /data/

@@ -9,7 +9,8 @@ services:
       - db
     restart: unless-stopped
     environment:
-      - ENV=production
+      - FLASK_ENV=production
+      - FLASK_APP=src/manage
       - DB_USER=repair_system
       - DB_PASSWORD=passw0rd
       - DB_HOST=db:3306

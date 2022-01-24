@@ -1,29 +1,37 @@
+from warnings import filterwarnings
+from pytz_deprecation_shim import PytzUsageWarning
+
+filterwarnings('ignore', category=PytzUsageWarning)
+# suppress timezone warning for apscheduler
+
 import unittest
 from os import getenv
 from time import sleep, time
-from flask_script import Manager
+
+import click
 from sqlalchemy.exc import OperationalError
+
 import app.database.backup_helper as backup_helper
 import app.database.db_helper as db_helper
 from app import create_app, db
 from app.database.model import Users
 from app.mylogging import init_logging
 
-app = create_app(getenv("ENV", "production"))
+app = create_app(getenv("FLASK_ENV", "production"))
 # db.app = app # db will use app if no app_context is available
 init_logging(app)
-manager = Manager(app)
 
 
-@manager.shell
-def shell():
+@app.shell_context_processor
+def make_shell_context():
     return globals()
 
 
-@manager.command
-def reset(yes=False):
+@app.cli.command()
+@click.option("-y", "--yes", is_flag=True)
+def reset(yes):
     """
-    Reset all Tables to Default
+    Reset all Tables to Default.
     """
     if not yes:
         print(
@@ -37,26 +45,29 @@ def reset(yes=False):
     db_helper.reset(env=app.config["ENV"])
 
 
-@manager.command
+@app.cli.command()
 def backup():
     """
-    Backup Tables
+    Backup Tables.
     """
     backup_helper.backup()
 
 
-@manager.command
+@app.cli.command()
 def test():
+    """
+    Run unittest.
+    """
     tests = unittest.TestLoader().discover("tests")
     result = unittest.TextTestRunner(verbosity=2).run(tests)
 
     return 0 if result.wasSuccessful() else 1
 
 
-@manager.command
+@app.cli.command(name="init_database")
 def init_database():
     """
-    Reset all Tables to Default if not initialized
+    Reset all Tables to Default if not initialized.
     """
     max_try = 10
     sleep_sec = 5
@@ -80,11 +91,14 @@ def init_database():
         raise RuntimeError(f"Could not connect to database after {max_try} tries")
 
     if Users.query.count() == 0:
-        reset(yes=True)
+        db_helper.reset(env="production")
 
 
-@manager.command
+@app.cli.command(name="add_user")
 def add_user():
+    """
+    Add a new user to database.
+    """
     try:
         while True:
             username = input("帳號(學號)：")
@@ -124,7 +138,3 @@ def calc_time(func, *args, **kwargs):
     end = time()
     t = round((end - start) * 1000)
     return (result, f"{t} ms")
-
-
-if __name__ == "__main__":
-    manager.run()
